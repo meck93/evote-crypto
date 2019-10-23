@@ -3,7 +3,7 @@ export {}
 const { assert } = require('chai')
 const EC = require('elliptic').ec
 const ec = new EC('secp256k1')
-const eccElgamal = require('../../src/ecc/eccElgamal.js')
+const eccElgamal = require('../../src/ecc/eccElgamal.ts')
 
 // fix constants for values 0 -> 2 and 1 -> 4
 const M_0 = ec.curve.pointFromX(2)

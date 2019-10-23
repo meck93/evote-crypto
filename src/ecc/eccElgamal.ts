@@ -1,14 +1,15 @@
+const BN = require('bn.js')
 const EC = require('elliptic').ec
 const ec = new EC('secp256k1')
-const crypto = require('crypto')
-const BN = require('bn.js')
+import crypto = require('crypto')
+import { Cipher } from './models'
 
 const UPPER_BOUND_RANDOM = ec.curve.p.sub(new BN(2, 10))
 const RAND_SIZE_BYTES = 33
 
 const shouldLog = false
 
-function getRandomValue() {
+export const getRandomValue = (): any => {
   let randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
   let randomValue = new BN(randomBytes)
 
@@ -20,7 +21,7 @@ function getRandomValue() {
   return randomValue
 }
 
-function encrypt(message, pubK) {
+export const encrypt = (message: any, pubK: any): Cipher => {
   const randBN = getRandomValue()
 
   // compute c1: generator ecc-multiply randomValue
@@ -36,12 +37,12 @@ function encrypt(message, pubK) {
   const c2 = s.add(message)
   shouldLog && console.log('is c2 on curve?', ec.curve.validate(c2))
 
-  return [c1, c2]
+  return { c1, c2 }
 }
 
-function decrypt(cipherText, privK) {
-  const c1 = cipherText[0]
-  const c2 = cipherText[1]
+export const decrypt = (cipherText: Cipher, privK: any): any => {
+  const c1 = cipherText.c1
+  const c2 = cipherText.c2
 
   // compute s: c1^privateKey
   const s = c1.mul(privK)
@@ -59,16 +60,9 @@ function decrypt(cipherText, privK) {
   return m
 }
 
-function homomorphicAdd(cipher0, cipher1) {
+export const homomorphicAdd = (cipher0: Cipher, cipher1: Cipher): Cipher => {
   // adds two cipher texts together
-  const c1 = cipher0[0].add(cipher1[0])
-  const c2 = cipher0[1].add(cipher1[1])
-  return [c1, c2]
-}
-
-module.exports = {
-  homomorphicAdd,
-  encrypt,
-  decrypt,
-  getRandomValue,
+  const c1 = cipher0.c1.add(cipher1.c1)
+  const c2 = cipher0.c2.add(cipher1.c2)
+  return { c1, c2 }
 }
