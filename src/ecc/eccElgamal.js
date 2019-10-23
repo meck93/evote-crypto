@@ -49,8 +49,7 @@ function decrypt(cipherText, privK) {
 
   // compute s^-1: the multiplicative inverse of s (probably the most difficult)
   let s_inverse = s.neg()
-  shouldLog &&
-    console.log('is s^-1 on the curve?', ec.curve.validate(s_inverse))
+  shouldLog && console.log('is s^-1 on the curve?', ec.curve.validate(s_inverse))
 
   // compute m: c2 ecc-add s^-1
   const m = c2.add(s_inverse)

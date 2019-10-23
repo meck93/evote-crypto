@@ -33,11 +33,7 @@ export const getGs = (p: number): number[] => {
   return g
 }
 
-export const encrypt = (
-  message: number,
-  pk: PublicKey,
-  log: boolean = false
-): Cipher => {
+export const encrypt = (message: number, pk: PublicKey, log: boolean = false): Cipher => {
   const msg = new BN(message, 10)
 
   // generate a random value
@@ -72,12 +68,7 @@ export const add = (em1: Cipher, em2: Cipher, pk: PublicKey): Cipher => {
   }
 }
 
-export const decrypt1 = (
-  cipherText: Cipher,
-  sk: any,
-  pk: PublicKey,
-  log: boolean = false
-): any => {
+export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolean = false): any => {
   let c1 = cipherText.c1
   let c2 = cipherText.c2
 
@@ -110,12 +101,7 @@ export const decrypt1 = (
   return m
 }
 
-export const decrypt2 = (
-  cipherText: Cipher,
-  sk: any,
-  pk: PublicKey,
-  log: boolean = false
-): any => {
+export const decrypt2 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolean = false): any => {
   let c1 = cipherText.c1
   let c2 = cipherText.c2
 

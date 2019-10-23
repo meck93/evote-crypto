@@ -1,18 +1,7 @@
 export {}
-import {
-  generateKeys,
-  encrypt,
-  decrypt1,
-  decrypt2,
-  add,
-  getGs,
-} from '../../src/elgamal'
+import { generateKeys, encrypt, decrypt1, decrypt2, add, getGs } from '../../src/elgamal'
 import { Cipher } from '../../src/elgamal/models'
-import {
-  generateNoVote,
-  generateYesVote,
-  tallyVotes,
-} from '../../src/elgamal/voting'
+import { generateNoVote, generateYesVote, tallyVotes } from '../../src/elgamal/voting'
 
 const random = require('random')
 const { expect } = require('chai')
@@ -99,48 +88,8 @@ describe('ElGamal Index', () => {
     expect(getGs(29)).to.eql([2, 3, 8, 10, 11, 14, 15, 18, 19, 21, 26, 27])
     expect(getGs(31)).to.eql([3, 11, 12, 13, 17, 21, 22, 24])
     expect(getGs(37)).to.eql([2, 5, 13, 15, 17, 18, 19, 20, 22, 24, 32, 35])
-    expect(getGs(41)).to.eql([
-      6,
-      7,
-      11,
-      12,
-      13,
-      15,
-      17,
-      19,
-      22,
-      24,
-      26,
-      28,
-      29,
-      30,
-      34,
-      35,
-    ])
+    expect(getGs(41)).to.eql([6, 7, 11, 12, 13, 15, 17, 19, 22, 24, 26, 28, 29, 30, 34, 35])
     expect(getGs(43)).to.eql([3, 5, 12, 18, 19, 20, 26, 28, 29, 30, 33, 34])
-    expect(getGs(47)).to.eql([
-      5,
-      10,
-      11,
-      13,
-      15,
-      19,
-      20,
-      22,
-      23,
-      26,
-      29,
-      30,
-      31,
-      33,
-      35,
-      38,
-      39,
-      40,
-      41,
-      43,
-      44,
-      45,
-    ])
+    expect(getGs(47)).to.eql([5, 10, 11, 13, 15, 19, 20, 22, 23, 26, 29, 30, 31, 33, 35, 38, 39, 40, 41, 43, 44, 45])
   })
 })
