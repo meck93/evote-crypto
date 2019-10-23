@@ -135,17 +135,3 @@ export const decrypt2 = (
 
   return m
 }
-
-const [pk, sk] = generateKeys(7, 3)
-
-// plaintext check may be wrong as it is checked against the message from above
-const m1 = new BN(2, 10)
-const e_m1 = encrypt(m1, pk)
-//const d_m1 = decrypt(e_m1, sk, p, gen);
-
-const m2 = new BN(3, 10)
-const e_m2 = encrypt(m2, pk)
-//const d_m2 = decrypt(e_m2, sk, p, gen);
-
-const d_sum = decrypt1(add(e_m1, e_m2, pk), sk, pk)
-console.log(d_sum)
