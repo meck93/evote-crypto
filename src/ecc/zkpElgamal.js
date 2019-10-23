@@ -6,9 +6,9 @@ const BN = require('bn.js')
 const UPPER_BOUND_RANDOM = ec.curve.p.sub(new BN(2, 10))
 const RAND_SIZE_BYTES = 33
 
-// fix constants for values 1 -> 4 and 0 -> 2
-const M_1 = ec.curve.pointFromX(4)
-const M_0 = ec.curve.pointFromX(2)
+// fix constants for values 1 -> generator and 0 -> generator^-1
+const M_1 = ec.curve.g
+const M_0 = ec.curve.g.neg()
 console.log(
   'are the chosen on the curve?',
   ec.curve.validate(M_1) && ec.curve.validate(M_0)
@@ -56,10 +56,12 @@ function createZKP(message, pubK) {
   // TODO: Think about how the negative number problem here can be fixed
   let d2 = c.sub(d1)
   d2 = d2.isNeg() ? d2.neg().mod(ec.curve.p) : d2.mod(ec.curve.p)
+  console.log(d2)
 
   const intermediate = alpha.mul(d2).mod(ec.curve.p)
   let r2 = w.sub(intermediate)
   r2 = r2.isNeg() ? r2.neg().mod(ec.curve.p) : r2.mod(ec.curve.p)
+  console.log(r2)
 
   return [x, y, a1, a2, b1, b2, d1, d2, r1, r2, c]
 }
@@ -150,7 +152,7 @@ function demo() {
   // console.log('are the messages the same?', plainText.eq(M_1))
   // console.log('plaintext is:', plainText.getX())
 
-  const proof = createZKP(ec.curve.g, publicKey)
+  const proof = createZKP(M_1, publicKey)
   const result = verifyZKP(proof, publicKey)
 }
 
