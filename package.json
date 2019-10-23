@@ -6,7 +6,8 @@
   "scripts": {
     "test": "nyc ts-mocha ./**/*.spec.ts",
     "ts-node": "./node_modules/.bin/ts-node",
-    "ts-mocha": "./node_modules/.bin/ts-mocha"
+    "ts-mocha": "./node_modules/.bin/ts-mocha",
+    "format": "prettier --write \"src/**/*.js\" \"src/**/*.ts\" \"src/**/*.tsx\" \"src/**/*.json\""
   },
   "license": "MIT",
   "dependencies": {
@@ -20,8 +21,11 @@
     "@types/elliptic": "^6.4.10",
     "@types/mocha": "^5.2.7",
     "chai": "^4.2.0",
+    "husky": "^3.0.9",
+    "lint-staged": "^9.4.2",
     "mocha": "^6.2.2",
     "nyc": "^14.1.1",
+    "prettier": "^1.18.2",
     "sinon": "^7.5.0",
     "source-map-loader": "^0.2.4",
     "ts-loader": "^6.2.0",
@@ -30,5 +34,32 @@
     "typescript": "^3.6.4",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.ts": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.tsx": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.json": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.graphql": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }
