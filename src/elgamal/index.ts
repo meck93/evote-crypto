@@ -14,11 +14,33 @@ export const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
   return [pk, sk]
 }
 
+export const getGs = (p: number): number[] => {
+  // source: https://asecuritysite.com/encryption/pickg
+  const g: number[] = []
+  for (let i = 1; i < p; i++) {
+    let exp = 1
+    let next = i % p
+
+    while (next != 1) {
+      next = (next * i) % p
+      exp += 1
+    }
+
+    if (exp == p - 1) {
+      g.push(i)
+    }
+  }
+
+  return g
+}
+
 export const encrypt = (
-  message: any,
+  message: number,
   pk: PublicKey,
   log: boolean = false
 ): Cipher => {
+  const msg = new BN(message, 10)
+
   // generate a random value
   const randomValue = new BN(random.int(1, pk.p - 2), 10)
   log && console.log('enc secret   (r)', randomValue)
@@ -33,7 +55,7 @@ export const encrypt = (
   log && console.log('s\t\t', s)
 
   // compute mh: generator^message
-  const mh = pk.g.pow(message).mod(pk.p)
+  const mh = pk.g.pow(msg).mod(pk.p)
   log && console.log('mh\t\t', mh)
 
   // compute c2: s*message_homomorphic
@@ -135,17 +157,3 @@ export const decrypt2 = (
 
   return m
 }
-
-const [pk, sk] = generateKeys(7, 3)
-
-// plaintext check may be wrong as it is checked against the message from above
-const m1 = new BN(2, 10)
-const e_m1 = encrypt(m1, pk)
-//const d_m1 = decrypt(e_m1, sk, p, gen);
-
-const m2 = new BN(3, 10)
-const e_m2 = encrypt(m2, pk)
-//const d_m2 = decrypt(e_m2, sk, p, gen);
-
-const d_sum = decrypt1(add(e_m1, e_m2, pk), sk, pk)
-console.log(d_sum)
