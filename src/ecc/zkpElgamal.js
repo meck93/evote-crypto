@@ -9,10 +9,7 @@ const RAND_SIZE_BYTES = 33
 // fix constants for values 1 -> generator and 0 -> generator^-1
 const M_1 = ec.curve.g
 const M_0 = ec.curve.g.neg()
-console.log(
-  'are the chosen on the curve?',
-  ec.curve.validate(M_1) && ec.curve.validate(M_0)
-)
+console.log('are the chosen on the curve?', ec.curve.validate(M_1) && ec.curve.validate(M_0))
 
 function getSecureRandom() {
   let randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
