@@ -3,8 +3,8 @@ const ec = new EC('secp256k1')
 const crypto = require('crypto')
 const BN = require('bn.js')
 
-const UPPER_BOUND_RANDOM = ec.curve.p.sub(new BN(2, 10))
-const RAND_SIZE_BYTES = 33
+const UPPER_BOUND_RANDOM = ec.curve.n.sub(new BN(2, 10))
+const RAND_SIZE_BYTES = 32
 
 const shouldLog = false
 
@@ -12,8 +12,8 @@ function getRandomValue() {
   let randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
   let randomValue = new BN(randomBytes)
 
-  // ensure that the random value is in range [1,p-1]
-  while (!randomValue.lte(UPPER_BOUND_RANDOM)) {
+  // ensure that the random value is in range [1,n-1]
+  while (!randomValue.lte(UPPER_BOUND_RANDOM) && randomValue.gte(1)) {
     randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
     randomValue = new BN(randomBytes)
   }
