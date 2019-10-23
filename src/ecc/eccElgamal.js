@@ -3,11 +3,7 @@ const ec = new EC('secp256k1')
 const crypto = require('crypto')
 const BN = require('bn.js')
 
-const UPPER_BOUND_RANDOM = new BN(
-  'ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff fffffffe fffffc2d',
-  'hex',
-  'be'
-)
+const UPPER_BOUND_RANDOM = ec.curve.p.sub(new BN(2, 10))
 const RAND_SIZE_BYTES = 33
 
 const shouldLog = false
