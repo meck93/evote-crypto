@@ -14,6 +14,26 @@ export const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
   return [pk, sk]
 }
 
+export const getGs = (p: number): number[] => {
+  // source: https://asecuritysite.com/encryption/pickg
+  const g: number[] = []
+  for (let i = 1; i < p; i++) {
+    let exp = 1
+    let next = i % p
+
+    while (next != 1) {
+      next = (next * i) % p
+      exp += 1
+    }
+
+    if (exp == p - 1) {
+      g.push(i)
+    }
+  }
+
+  return g
+}
+
 export const encrypt = (
   message: number,
   pk: PublicKey,
