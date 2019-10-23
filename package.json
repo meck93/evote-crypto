@@ -56,10 +56,6 @@
     "*.json": [
       "prettier --write",
       "git add"
-    ],
-    "*.graphql": [
-      "prettier --write",
-      "git add"
     ]
   }
 }
