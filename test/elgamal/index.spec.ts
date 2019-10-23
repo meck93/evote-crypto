@@ -6,6 +6,12 @@ import {
   decrypt2,
   add,
 } from '../../src/elgamal'
+import { Cipher } from '../../src/elgamal/models'
+import {
+  generateNoVote,
+  generateYesVote,
+  tallyVotes,
+} from '../../src/elgamal/voting'
 
 const BN = require('bn.js')
 const random = require('random')
@@ -16,7 +22,7 @@ describe('ElGamal Index', () => {
     const prnt = false
     const [pk, sk] = generateKeys(7, 3)
 
-    const message = new BN(random.int(1, pk.p - 1), 10)
+    const message = random.int(1, pk.p - 1)
     for (let i = 0; i < 10; i++) {
       prnt && console.log(i)
       prnt && console.log('prime      (p)\t', pk.p)
@@ -30,8 +36,8 @@ describe('ElGamal Index', () => {
       const m_d1 = decrypt1(m_enc, sk, pk, prnt)
       const m_d2 = decrypt2(m_enc, sk, pk, prnt)
 
-      expect(m_d1.eq(message)).to.be.true
-      expect(m_d2.eq(message)).to.be.true
+      expect(m_d1.toNumber()).to.equal(message)
+      expect(m_d2.toNumber()).to.equal(message)
       expect(m_d1.eq(m_d2)).to.be.true
     }
   })
@@ -40,23 +46,43 @@ describe('ElGamal Index', () => {
     const _p = 137
     const _g = 51
 
-    // generate random masseges of max size (p - 1)/2
-    // so that the sum is max p-1
-    const _m1 = random.int(1, (_p - 1) / 2)
-    const _m2 = random.int(1, (_p - 1) / 2)
-
     for (let i = 0; i < 10; i++) {
       const [pk, sk] = generateKeys(_p, _g)
 
-      const m1 = new BN(_m1, 10)
-      const e_m1 = encrypt(m1, pk)
+      // generate random messages of max size (p - 1)/2
+      // so that the sum is max p-1
+      const m1 = random.int(1, (_p - 1) / 2)
+      const m2 = random.int(1, (_p - 1) / 2)
 
-      const m2 = new BN(_m2, 10)
+      const e_m1 = encrypt(m1, pk)
       const e_m2 = encrypt(m2, pk)
 
       const d_sum = decrypt1(add(e_m1, e_m2, pk), sk, pk)
 
-      expect(d_sum.toNumber()).to.equal(_m1 + _m2)
+      expect(d_sum.toNumber()).to.equal(m1 + m2)
     }
+  })
+
+  it('vote', () => {
+    const [pk, sk] = generateKeys(137, 51)
+    const log = true
+
+    const yesVotes = 55
+    const noVotes = 14
+    let votes: Cipher[] = []
+
+    for (let i = 0; i < yesVotes; i++) {
+      votes.push(generateYesVote(pk))
+      log && console.log(votes[votes.length - 1])
+    }
+
+    for (let i = 0; i < noVotes; i++) {
+      votes.push(generateNoVote(pk))
+      log && console.log(votes[votes.length - 1])
+    }
+
+    const result = tallyVotes(pk, sk, votes)
+
+    expect(result).to.equal(yesVotes)
   })
 })

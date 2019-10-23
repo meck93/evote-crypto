@@ -15,10 +15,12 @@ export const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
 }
 
 export const encrypt = (
-  message: any,
+  message: number,
   pk: PublicKey,
   log: boolean = false
 ): Cipher => {
+  const msg = new BN(message, 10)
+
   // generate a random value
   const randomValue = new BN(random.int(1, pk.p - 2), 10)
   log && console.log('enc secret   (r)', randomValue)
@@ -33,7 +35,7 @@ export const encrypt = (
   log && console.log('s\t\t', s)
 
   // compute mh: generator^message
-  const mh = pk.g.pow(message).mod(pk.p)
+  const mh = pk.g.pow(msg).mod(pk.p)
   log && console.log('mh\t\t', mh)
 
   // compute c2: s*message_homomorphic
