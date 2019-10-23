@@ -1,10 +1,8 @@
 export {}
 
-const { expect, assert } = require('chai')
+const { assert } = require('chai')
 const EC = require('elliptic').ec
 const ec = new EC('secp256k1')
-const crypto = require('crypto')
-const BN = require('bn.js')
 const eccElgamal = require('../../src/ecc/eccElgamal.js')
 
 // fix constants for values 0 -> 2 and 1 -> 4
