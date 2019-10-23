@@ -1,6 +1,5 @@
 const BN = require('bn.js')
 const random = require('random')
-const printConsole = false
 
 import { PublicKey, Cipher } from './models'
 
@@ -106,7 +105,7 @@ export const decrypt1 = (
   }
 
   log && console.log('plaintext d1\t', m)
-  printConsole && console.log('------------------------')
+  log && console.log('------------------------')
 
   return m
 }
