@@ -11,27 +11,28 @@ const UPPER_BOUND_RANDOM = new BN(
 const RAND_SIZE_BYTES = 33
 
 // fix constants for values 1 -> 4 and 0 -> 2
-const M_1 = ec.curve.pointFromX(4)
 const M_0 = ec.curve.pointFromX(2)
+const M_1 = ec.curve.pointFromX(4)
+
 console.log(
   'are the chosen on the curve?',
   ec.curve.validate(M_1) && ec.curve.validate(M_0)
 )
 
-function getRandomPointOnCurve() {
+function getRandomValue() {
   let randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
-  let randomPoint = new BN(randomBytes)
+  let randomValue = new BN(randomBytes)
 
   // ensure that the random value is in range [1,p-1]
-  while (!randomPoint.lte(UPPER_BOUND_RANDOM)) {
+  while (!randomValue.lte(UPPER_BOUND_RANDOM)) {
     randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
-    randomPoint = new BN(randomBytes)
+    randomValue = new BN(randomBytes)
   }
-  return randomPoint
+  return randomValue
 }
 
 function encrypt(message, pubK) {
-  const randBN = getRandomPointOnCurve()
+  const randBN = getRandomValue()
 
   // compute c1: generator ecc-multiply randomValue
   let c1 = ec.g.mul(randBN)
@@ -68,16 +69,35 @@ function decrypt(cipherText, privK) {
   return m
 }
 
+function homomorphicAdd(cipher0, cipher1) {
+  // adds two cipher texts together
+  const c1 = cipher0[0].add(cipher1[0])
+  const c2 = cipher0[1].add(cipher1[1])
+  return [c1, c2]
+}
+
 function demo() {
   const keyPair = ec.genKeyPair()
   const privateKey = keyPair.getPrivate()
   const publicKey = keyPair.getPublic()
 
-  const cipherText = encrypt(M_1, publicKey)
-  const plainText = decrypt(cipherText, privateKey)
+  const cipherText_0 = encrypt(M_0, publicKey)
+  const cipherText_1 = encrypt(M_1, publicKey)
 
-  console.log('are the messages the same?', plainText.eq(M_1))
-  console.log('plaintext is:', plainText.getX())
+  const additiveCipher = homomorphicAdd(cipherText_0, cipherText_1)
+
+  const plainText_0 = decrypt(cipherText_0, privateKey)
+  const plainText_1 = decrypt(cipherText_1, privateKey)
+
+  const additivePlainText = decrypt(additiveCipher, privateKey)
+
+  console.log(
+    'Addition of two ciphertext is the same as adding two plaintexts? : -> ',
+    additivePlainText.eq(M_0.add(M_1))
+  )
+
+  console.log('are the messages the same?', plainText_1.eq(M_1))
+  console.log('plaintext is:', plainText_1.getX())
 }
 
 demo()
