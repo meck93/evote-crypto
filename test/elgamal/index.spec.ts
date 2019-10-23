@@ -64,26 +64,65 @@ describe('ElGamal Index', () => {
   })
 
   it('vote', () => {
-    const [pk, sk] = generateKeys(137, 51)
-    const log = false
+    const vote = (_result: number, _votes: number[]) => {
+      const [pk, sk] = generateKeys(137, 51)
 
-    const yesVotes = 55
-    const noVotes = 14
-    let votes: Cipher[] = []
+      const votes: Cipher[] = []
+      for (const vote of _votes) {
+        vote === 1 && votes.push(generateYesVote(pk))
+        vote === 0 && votes.push(generateNoVote(pk))
+      }
 
-    for (let i = 0; i < yesVotes; i++) {
-      votes.push(generateYesVote(pk))
-      log && console.log(votes[votes.length - 1])
+      const result = tallyVotes(pk, sk, votes)
+      console.log(_result, _votes, result)
+      expect(result).to.equal(_result)
     }
 
-    for (let i = 0; i < noVotes; i++) {
-      votes.push(generateNoVote(pk))
-      log && console.log(votes[votes.length - 1])
-    }
+    // voters:  0
+    // results: 2^0 = 1
+    vote(0, [])
 
-    const result = tallyVotes(pk, sk, votes)
+    // voters:  1
+    // results: 2^1 = 2
+    vote(0, [0])
+    vote(1, [1])
 
-    expect(result).to.equal(yesVotes)
+    // voters:  2
+    // results: 2^2 = 4
+    vote(0, [0, 0])
+    vote(1, [0, 1])
+    vote(1, [1, 0])
+    vote(2, [1, 1])
+
+    // voters:  3
+    // results: 2^3 = 8
+    vote(0, [0, 0, 0])
+    vote(1, [0, 0, 1])
+    vote(1, [0, 1, 0])
+    vote(2, [0, 1, 1])
+    vote(1, [1, 0, 0])
+    vote(2, [1, 0, 1])
+    vote(2, [1, 1, 0])
+    vote(3, [1, 1, 1])
+
+    // voters:  4
+    // results: 2^4 = 16
+    vote(0, [0, 0, 0, 0])
+    vote(1, [0, 0, 0, 1])
+    vote(1, [0, 0, 1, 0])
+    vote(2, [0, 0, 1, 1])
+    vote(1, [0, 1, 0, 0])
+    vote(2, [0, 1, 0, 1])
+    vote(2, [0, 1, 1, 0])
+    vote(3, [0, 1, 1, 1])
+    vote(1, [1, 0, 0, 0])
+    vote(2, [1, 0, 0, 1])
+    vote(2, [1, 0, 1, 0])
+    vote(3, [1, 0, 1, 1])
+    vote(2, [1, 1, 0, 0])
+    vote(3, [1, 1, 0, 1])
+    vote(3, [1, 1, 1, 0])
+    vote(4, [1, 1, 1, 1])
   })
 
   it('test', () => {

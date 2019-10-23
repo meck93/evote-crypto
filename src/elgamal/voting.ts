@@ -1,5 +1,6 @@
 import { PublicKey, Cipher } from './models'
 import { encrypt, add, decrypt1 } from '.'
+const BN = require('bn.js')
 
 // The message to be encrypted needs to be between 1 and p-1 (both inclusive).
 // Because of that, a 'yes' vote is of value '2' and a 'no' vote of value '1'.
@@ -15,21 +16,24 @@ export const generateNoVote = (pk: PublicKey): Cipher => {
   return encrypt(1, pk)
 }
 
-export const tallyVotes = (pk: PublicKey, sk: any, votes: Cipher[]) => {
-  const zeroVote = generateNoVote(pk)
+export const addVotes = (votes: Cipher[], pk: PublicKey): Cipher => {
+  let sum = generateNoVote(pk) // zero vote
 
-  let sum = zeroVote
   for (const vote of votes) {
     sum = add(sum, vote, pk)
   }
 
-  let sumDecrypted = decrypt1(sum, sk, pk)
+  return sum
+}
+
+export const tallyVotes = (pk: PublicKey, sk: any, votes: Cipher[]) => {
+  let sum = decrypt1(addVotes(votes, pk), sk, pk)
 
   // remove zeroVote
-  sumDecrypted -= 1
+  sum -= 1
 
   // decrease sum by the total number of voters
-  sumDecrypted -= votes.length
+  sum -= votes.length
 
-  return sumDecrypted
+  return sum
 }
