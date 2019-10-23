@@ -1,7 +1,7 @@
 export {}
 import { generateKeys, encrypt, decrypt1, decrypt2, add, getGs } from '../../src/elgamal'
 import { Cipher } from '../../src/elgamal/models'
-import { generateNoVote, generateYesVote, tallyVotes } from '../../src/elgamal/voting'
+import { generateNoVote, generateYesVote, tallyVotes, getSummary } from '../../src/elgamal/voting'
 
 const random = require('random')
 const { expect } = require('chai')
@@ -63,8 +63,12 @@ describe('ElGamal Index', () => {
       }
 
       const result = tallyVotes(pk, sk, votes)
-      console.log(_result, _votes, result)
+      const summary = getSummary(votes.length, result)
+      console.log(_result, _votes, result, 'Total:', summary.total, '| Yes:', summary.yes, '| No:', summary.no)
+
       expect(result).to.equal(_result)
+      expect(summary.yes).to.equal(_votes.filter(v => v === 1).length)
+      expect(summary.no).to.equal(_votes.filter(v => v === 0).length)
     }
 
     // voters:  0

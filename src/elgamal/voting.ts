@@ -37,3 +37,9 @@ export const tallyVotes = (pk: PublicKey, sk: any, votes: Cipher[]) => {
 
   return sum
 }
+
+export const getSummary = (total: number, tallyResult: number) => {
+  let yes = tallyResult
+  let no = total - yes
+  return { total, yes, no }
+}
