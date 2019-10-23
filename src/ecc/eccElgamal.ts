@@ -4,8 +4,8 @@ const ec = new EC('secp256k1')
 import crypto = require('crypto')
 import { Cipher } from './models'
 
-const UPPER_BOUND_RANDOM = ec.curve.p.sub(new BN(2, 10))
-const RAND_SIZE_BYTES = 33
+const UPPER_BOUND_RANDOM = ec.curve.n.sub(new BN(2, 10))
+const RAND_SIZE_BYTES = 32
 
 const shouldLog = false
 
@@ -13,8 +13,8 @@ export const getRandomValue = (): any => {
   let randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
   let randomValue = new BN(randomBytes)
 
-  // ensure that the random value is in range [1,p-1]
-  while (!randomValue.lte(UPPER_BOUND_RANDOM)) {
+  // ensure that the random value is in range [1,n-1]
+  while (!randomValue.lte(UPPER_BOUND_RANDOM) && randomValue.gte(1)) {
     randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
     randomValue = new BN(randomBytes)
   }
@@ -50,8 +50,7 @@ export const decrypt = (cipherText: Cipher, privK: any): any => {
 
   // compute s^-1: the multiplicative inverse of s (probably the most difficult)
   let s_inverse = s.neg()
-  shouldLog &&
-    console.log('is s^-1 on the curve?', ec.curve.validate(s_inverse))
+  shouldLog && console.log('is s^-1 on the curve?', ec.curve.validate(s_inverse))
 
   // compute m: c2 ecc-add s^-1
   const m = c2.add(s_inverse)
