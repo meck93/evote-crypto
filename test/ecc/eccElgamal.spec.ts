@@ -1,9 +1,6 @@
 import { Cipher } from '../../src/ecc/models'
-import {
-  generateYesVote,
-  generateNoVote,
-  tallyVotes,
-} from '../../src/ecc/voting'
+import { generateYesVote, generateNoVote, tallyVotes } from '../../src/ecc/voting'
+import { getSummary } from '../../src/ecc/voting'
 const BN = require('bn.js')
 export {}
 
@@ -64,8 +61,12 @@ describe('ECC Elgamal', function() {
       }
 
       const result = tallyVotes(publicKey, privateKey, votes)
-      console.log(_result, _votes, result)
+      const summary = getSummary(votes.length, result)
+      console.log(_result, _votes, result, 'Total:', summary.total, '| Yes:', summary.yes, '| No:', summary.no)
+
       assert(result === _result)
+      assert(summary.yes === _votes.filter(v => v === 1).length)
+      assert(summary.no === _votes.filter(v => v === 0).length)
     }
 
     // voters:  0

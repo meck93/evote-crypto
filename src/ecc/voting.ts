@@ -39,11 +39,26 @@ export const findPoint = (point: any): number => {
   return point.eq(pointNegative) ? -counter : counter
 }
 
-export const tallyVotes = (
-  publicKey: any,
-  sk: any,
-  votes: Cipher[]
-): number => {
+export const tallyVotes = (publicKey: any, sk: any, votes: Cipher[]): number => {
   const sum = decrypt(addVotes(votes, publicKey), sk)
   return sum.eq(infinityPoint) ? 0 : findPoint(sum)
+}
+
+export const getSummary = (total: number, tallyResult: number) => {
+  let yes = 0
+  let no = 0
+  if (tallyResult === 0) {
+    // total % 2 = 0
+    yes = total / 2
+    no = total / 2
+  } else if (tallyResult < 0) {
+    const diff = (total + tallyResult) / 2
+    no = -1 * tallyResult + diff
+    yes = total - no
+  } else if (tallyResult > 0) {
+    const diff = (total - tallyResult) / 2
+    yes = tallyResult + diff
+    no = total - yes
+  }
+  return { total, yes, no }
 }
