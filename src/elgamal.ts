@@ -1,6 +1,6 @@
 const BN = require("bn.js");
 const random = require("random");
-const printConsole = true;
+const printConsole = false;
 
 interface PublicKey {
   p: any; // prime
@@ -12,6 +12,17 @@ interface Cipher {
   c1: any;
   c2: any;
 }
+
+const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
+  const p = new BN(_p, 10);
+  const g = new BN(_g, 10);
+  const sk = new BN(random.int(1, _p - 2), 10);
+  const h = g.pow(sk).mod(p);
+  const pk = { p: p, g: g, h: h };
+
+  return [pk, sk];
+};
+
 
 const encrypt = (message: any, pk: PublicKey): Cipher => {
   // generate a random value
@@ -39,10 +50,10 @@ const encrypt = (message: any, pk: PublicKey): Cipher => {
   return { c1: c1, c2: c2 };
 };
 
-const add = (em1: Cipher, em2: Cipher): Cipher => {
+const add = (em1: Cipher, em2: Cipher, pk: PublicKey): Cipher => {
   return {
-    c1: em1.c1.mul(em2.c1).mod(p),
-    c2: em1.c2.mul(em2.c2).mod(p)
+    c1: em1.c1.mul(em2.c1).mod(pk.p),
+    c2: em1.c2.mul(em2.c2).mod(pk.p)
   };
 };
 
@@ -109,16 +120,11 @@ const decrypt = (cipherText: Cipher, sk: any, pk: PublicKey): any => {
   return msg;
 };
 
-const p = new BN(7, 10);
-const g = new BN(3, 10);
-const sk = new BN(random.int(1, p - 2), 10);
-const h = g.pow(sk).mod(p);
-
-const pk = { p: p, g: g, h: h };
+const [pk, sk] = generateKeys(7, 3);
 
 const message = new BN(random.int(1, pk.p - 1), 10);
 for (let i = 0; i < 10; i++) {
-  printConsole && console.log(i)
+  printConsole && console.log(i);
   printConsole && console.log("prime      (p)\t", pk.p);
   printConsole && console.log("generator  (g)\t", pk.g);
   printConsole && console.log("dec secret (x)\t", sk);
@@ -138,5 +144,5 @@ const m2 = new BN(3, 10);
 const e_m2 = encrypt(m2, pk);
 //const d_m2 = decrypt(e_m2, sk, p, gen);
 
-const d_sum = decrypt(add(e_m1, e_m2), sk, pk);
+const d_sum = decrypt(add(e_m1, e_m2, pk), sk, pk);
 console.log(d_sum);
