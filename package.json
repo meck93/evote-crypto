@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "nyc --reporter=text ts-mocha ./**/*.spec.ts",
-    "test-report": "nyc --reporter=lcov ts-mocha ./**/*.spec.ts",
+    "test:watch": "ts-mocha ./**/*.spec.ts -w --watch-extensions ts ",
+    "test:report": "nyc --reporter=lcov ts-mocha ./**/*.spec.ts",
     "ts-node": "./node_modules/.bin/ts-node",
     "ts-mocha": "./node_modules/.bin/ts-mocha",
     "format": "prettier --write \"src/**/*.js\" \"src/**/*.ts\" \"src/**/*.tsx\" \"src/**/*.json\""
