@@ -3,7 +3,7 @@ const ec = new EC('secp256k1')
 const crypto = require('crypto')
 const BN = require('bn.js')
 
-const UPPER_BOUND_RANDOM = ec.curve.p.sub(new BN(2, 10))
+const UPPER_BOUND_RANDOM = ec.curve.n.sub(new BN(2, 10))
 const RAND_SIZE_BYTES = 33
 
 // fix constants for values 1 -> generator and 0 -> generator^-1
@@ -15,7 +15,7 @@ function getSecureRandom() {
   let randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
   let randomValue = new BN(randomBytes)
 
-  // ensure that the random value is in range [1,p-1]
+  // ensure that the random value is in range [1,n-2]
   while (!randomValue.lte(UPPER_BOUND_RANDOM)) {
     randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
     randomValue = new BN(randomBytes)
@@ -48,17 +48,13 @@ function createZKP(message, pubK) {
   const b2 = pubK.mul(w)
   console.log('b2 is on the curve?', ec.curve.validate(b2))
 
-  const c = hash()
+  const c = generateChallenge()
 
   // TODO: Think about how the negative number problem here can be fixed
-  let d2 = c.sub(d1)
-  d2 = d2.isNeg() ? d2.neg().mod(ec.curve.p) : d2.mod(ec.curve.p)
-  console.log(d2)
+  const d2 = c.sub(d1).mod(ec.curve.n)
 
-  const intermediate = alpha.mul(d2).mod(ec.curve.p)
-  let r2 = w.sub(intermediate)
-  r2 = r2.isNeg() ? r2.neg().mod(ec.curve.p) : r2.mod(ec.curve.p)
-  console.log(r2)
+  const intermediate = alpha.mul(d2).mod(ec.curve.n)
+  const r2 = w.sub(intermediate)
 
   return [x, y, a1, a2, b1, b2, d1, d2, r1, r2, c]
 }
@@ -67,7 +63,7 @@ function verifyZKP(proof, pubK) {
   const [x, y, a1, a2, b1, b2, d1, d2, r1, r2, c] = proof
 
   // validation of the hash - digest == hash(challenge)
-  const d1d2 = d1.add(d2).mod(ec.curve.p)
+  const d1d2 = d1.add(d2).mod(ec.curve.n)
   console.log('Is the hash the same?', d1d2.eq(c))
 
   // validation of a1
@@ -98,8 +94,8 @@ function verifyZKP(proof, pubK) {
   console.log('Is b2 the same?', pubKTr2yMinusGTd2.eq(b2))
 }
 
-function hash(uniqueID, c1, c2, a1, a2, b1, b2) {
-  return new BN(50, 10)
+function generateChallenge(uniqueID, c1, c2, a1, a2, b1, b2) {
+  return getSecureRandom()
 }
 
 function encrypt(message, pubK, randomValue) {
