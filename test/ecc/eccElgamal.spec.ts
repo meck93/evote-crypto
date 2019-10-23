@@ -1,4 +1,4 @@
-const { describe } = require("mocha");
+export {};
 
 const { expect } = require("chai");
 
