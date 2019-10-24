@@ -1,16 +1,19 @@
 {
-  "name": "ecc-elgamal",
+  "name": "my-crypto",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsc",
     "test": "nyc --reporter=text ts-mocha ./**/*.spec.ts",
     "test:timeout": "nyc --reporter=text ts-mocha ./**/*.spec.ts --timeout 10000",
     "test:watch": "ts-mocha ./**/*.spec.ts -w --watch-extensions ts ",
     "test:report": "nyc --reporter=lcov ts-mocha ./**/*.spec.ts",
-    "ts-node": "./node_modules/.bin/ts-node",
+    "format": "prettier --write \"src/**/*.js\" \"src/**/*.ts\" \"src/**/*.tsx\" \"src/**/*.json\"",
     "ts-mocha": "./node_modules/.bin/ts-mocha",
-    "format": "prettier --write \"src/**/*.js\" \"src/**/*.ts\" \"src/**/*.tsx\" \"src/**/*.json\""
+    "ts-node": "./node_modules/.bin/ts-node",
+    "tsc": "./node_modules/.bin/tsc"
   },
   "license": "MIT",
   "dependencies": {

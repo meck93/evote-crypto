@@ -1,4 +1,5 @@
-import { PublicKey, Cipher } from './models'
+import { PublicKey } from './models'
+import { Cipher } from '../models'
 
 const BN = require('bn.js')
 const random = require('random')

@@ -1,6 +1,6 @@
-import { PublicKey, Cipher } from './models'
 import { encrypt, add, decrypt1 } from '.'
-const BN = require('bn.js')
+import { PublicKey } from './models'
+import { Cipher } from '../models'
 
 // The message to be encrypted needs to be between 1 and p-1 (both inclusive).
 // Because of that, a 'yes' vote is of value '2' and a 'no' vote of value '1'.

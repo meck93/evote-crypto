@@ -1,8 +1,9 @@
+import { Cipher } from '../models'
+import crypto = require('crypto')
+
 const BN = require('bn.js')
 const EC = require('elliptic').ec
 const ec = new EC('secp256k1')
-import crypto = require('crypto')
-import { Cipher } from './models'
 
 const UPPER_BOUND_RANDOM = ec.curve.n.sub(new BN(2, 10))
 const RAND_SIZE_BYTES = 32

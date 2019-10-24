@@ -1,13 +1,9 @@
-import { Cipher } from '../../src/ecc/models'
-import { generateYesVote, generateNoVote, tallyVotes } from '../../src/ecc/voting'
-import { getSummary } from '../../src/ecc/voting'
-const BN = require('bn.js')
 export {}
+import { Cipher, EccElGamal, EccElGamalVoting } from '../../src/index'
 
 const { assert } = require('chai')
 const EC = require('elliptic').ec
 const ec = new EC('secp256k1')
-const eccElgamal = require('../../src/ecc/eccElgamal.ts')
 
 // fix constants for values 0 -> 2 and 1 -> 4
 const M_0 = ec.curve.pointFromX(2)
@@ -24,8 +20,8 @@ describe('ECC Elgamal', function() {
     const publicKey = keyPair.getPublic()
 
     const plaintextMessage = M_0
-    const cipherText_0 = eccElgamal.encrypt(plaintextMessage, publicKey)
-    const decryptedCipherText = eccElgamal.decrypt(cipherText_0, privateKey)
+    const cipherText_0 = EccElGamal.encrypt(plaintextMessage, publicKey)
+    const decryptedCipherText = EccElGamal.decrypt(cipherText_0, privateKey)
 
     assert(decryptedCipherText.eq(plaintextMessage))
   })
@@ -38,12 +34,12 @@ describe('ECC Elgamal', function() {
     const plaintextMessage0 = M_0
     const plaintextMessage1 = M_1
 
-    const cipher0 = eccElgamal.encrypt(plaintextMessage0, publicKey)
-    const cipher1 = eccElgamal.encrypt(plaintextMessage1, publicKey)
+    const cipher0 = EccElGamal.encrypt(plaintextMessage0, publicKey)
+    const cipher1 = EccElGamal.encrypt(plaintextMessage1, publicKey)
 
-    const additiveCipher = eccElgamal.homomorphicAdd(cipher0, cipher1)
+    const additiveCipher = EccElGamal.homomorphicAdd(cipher0, cipher1)
 
-    const additivePlainText = eccElgamal.decrypt(additiveCipher, privateKey)
+    const additivePlainText = EccElGamal.decrypt(additiveCipher, privateKey)
 
     assert(additivePlainText.eq(M_0.add(M_1)))
   })
@@ -56,12 +52,12 @@ describe('ECC Elgamal', function() {
 
       const votes: Cipher[] = []
       for (const vote of _votes) {
-        vote === 1 && votes.push(generateYesVote(publicKey))
-        vote === 0 && votes.push(generateNoVote(publicKey))
+        vote === 1 && votes.push(EccElGamalVoting.generateYesVote(publicKey))
+        vote === 0 && votes.push(EccElGamalVoting.generateNoVote(publicKey))
       }
 
-      const result = tallyVotes(publicKey, privateKey, votes)
-      const summary = getSummary(votes.length, result)
+      const result = EccElGamalVoting.tallyVotes(publicKey, privateKey, votes)
+      const summary = EccElGamalVoting.getSummary(votes.length, result)
       console.log(_result, _votes, result, 'Total:', summary.total, '| Yes:', summary.yes, '| No:', summary.no)
 
       assert(result === _result)

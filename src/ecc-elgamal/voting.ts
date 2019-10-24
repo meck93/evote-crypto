@@ -1,5 +1,5 @@
-import { encrypt, homomorphicAdd, decrypt } from './eccElgamal'
-import { Cipher } from './models'
+import { encrypt, homomorphicAdd, decrypt } from '.'
+import { Cipher } from '../models'
 
 const EC = require('elliptic').ec
 const ec = new EC('secp256k1')
