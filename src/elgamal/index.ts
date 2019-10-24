@@ -1,7 +1,7 @@
+import { PublicKey, Cipher } from './models'
+
 const BN = require('bn.js')
 const random = require('random')
-
-import { PublicKey, Cipher } from './models'
 
 export const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
   const p = new BN(_p, 10)
@@ -20,12 +20,12 @@ export const getGs = (p: number): number[] => {
     let exp = 1
     let next = i % p
 
-    while (next != 1) {
+    while (next !== 1) {
       next = (next * i) % p
       exp += 1
     }
 
-    if (exp == p - 1) {
+    if (exp === p - 1) {
       g.push(i)
     }
   }

@@ -26,8 +26,8 @@ export const addVotes = (votes: Cipher[], pk: PublicKey): Cipher => {
   return sum
 }
 
-export const tallyVotes = (pk: PublicKey, sk: any, votes: Cipher[]) => {
-  let sum = decrypt1(addVotes(votes, pk), sk, pk)
+export const tallyVotes = (pk: PublicKey, sk: any, votes: Cipher[]): number => {
+  let sum = decrypt1(addVotes(votes, pk), sk, pk).toNumber()
 
   // remove zeroVote
   sum -= 1
