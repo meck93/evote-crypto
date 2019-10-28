@@ -8,12 +8,12 @@ module.exports = {
 
   output: {
     path: '/',
-    filename: 'out.js'
+    filename: 'out.js',
   },
 
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
-    extensions: ['.ts', '.tsx', '.js', '.json']
+    extensions: ['.ts', '.tsx', '.js', '.json'],
   },
 
   module: {
@@ -23,16 +23,16 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           {
-            loader: 'ts-loader'
-          }
-        ]
+            loader: 'ts-loader',
+          },
+        ],
       },
       // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
       {
         enforce: 'pre',
         test: /\.js$/,
-        loader: 'source-map-loader'
-      }
-    ]
-  }
-};
+        loader: 'source-map-loader',
+      },
+    ],
+  },
+}
