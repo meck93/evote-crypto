@@ -10,20 +10,20 @@ const RAND_SIZE_BYTES = 32
 
 const shouldLog = false
 
-export const getRandomValue = (): any => {
+export const getSecureRandomValue = (): any => {
   let randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
   let randomValue = new BN(randomBytes)
 
   // ensure that the random value is in range [1,n-1]
   while (!randomValue.lte(UPPER_BOUND_RANDOM) && randomValue.gte(1)) {
     randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
-    randomValue = new BN(randomBytes)
+    randomValue = new BN(randomBytes, 'hex')
   }
   return randomValue
 }
 
 export const encrypt = (message: any, pubK: any): Cipher => {
-  const randBN = getRandomValue()
+  const randBN = getSecureRandomValue()
 
   // compute c1: generator ecc-multiply randomValue
   let c1 = ec.g.mul(randBN)

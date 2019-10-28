@@ -1,5 +1,5 @@
-import { Cipher, Summary } from './models'
-export { Cipher, Summary }
+import { Cipher, Summary, Proof } from './models'
+export { Cipher, Summary, Proof }
 
 // ElGamal
 import * as ElGamal from './elgamal'
@@ -11,5 +11,6 @@ export { ElGamal, ElGamalVoting, PublicKey }
 // ECC ElGamal
 import * as EccElGamal from './ecc-elgamal'
 import * as EccElGamalVoting from './ecc-elgamal/voting'
+import * as EccElGamalZKP from './zkp'
 
-export { EccElGamal, EccElGamalVoting }
+export { EccElGamal, EccElGamalVoting, EccElGamalZKP }
