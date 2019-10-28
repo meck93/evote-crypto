@@ -10,7 +10,7 @@
     "test:timeout": "nyc --reporter=text ts-mocha ./**/*.spec.ts --timeout 10000",
     "test:watch": "ts-mocha ./**/*.spec.ts -w --watch-extensions ts ",
     "test:report": "nyc --reporter=lcov ts-mocha ./**/*.spec.ts",
-    "format": "prettier --write \"src/**/*.js\" \"src/**/*.ts\" \"src/**/*.tsx\" \"src/**/*.json\"",
+    "format": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|css|md)\"",
     "ts-mocha": "./node_modules/.bin/ts-mocha",
     "ts-node": "./node_modules/.bin/ts-node",
     "tsc": "./node_modules/.bin/tsc"
