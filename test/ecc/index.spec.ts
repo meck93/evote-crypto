@@ -5,13 +5,19 @@ const { assert } = require('chai')
 const EC = require('elliptic').ec
 const ec = new EC('secp256k1')
 
-// fix constants for values 0 -> 2 and 1 -> 4
-const M_0 = ec.curve.pointFromX(2)
-const M_1 = ec.curve.pointFromX(4)
+// Fixed values for testing purposes
+// NO Vote:  mapped to integer 2
+// YES Vote:  mapped to integer 4
+const noVoteInt = 2
+const yesVoteInt = 4
 
-describe('ECC Elgamal', function() {
-  it('Points to encode messages should lie on curve', function() {
-    assert(ec.curve.validate(M_1) && ec.curve.validate(M_0))
+// Map/encode votes to points on the elliptic curve
+const noVoteOnCurve = ec.curve.pointFromX(noVoteInt)
+const yesVoteOnCurve = ec.curve.pointFromX(yesVoteInt)
+
+describe('EccElGamal Library Tests', function() {
+  it('Points that encode the plaintexts should lie on the curve', function() {
+    assert(ec.curve.validate(yesVoteOnCurve) && ec.curve.validate(noVoteOnCurve))
   })
 
   it('Decrypted value is the same as the original message', function() {
@@ -19,11 +25,11 @@ describe('ECC Elgamal', function() {
     const privateKey = keyPair.getPrivate()
     const publicKey = keyPair.getPublic()
 
-    const plaintextMessage = M_0
-    const cipherText_0 = EccElGamal.encrypt(plaintextMessage, publicKey)
-    const decryptedCipherText = EccElGamal.decrypt(cipherText_0, privateKey)
+    const messageToEncrypt = noVoteOnCurve
+    const cipherText = EccElGamal.encrypt(noVoteOnCurve, publicKey)
+    const decryptedCipherText = EccElGamal.decrypt(cipherText, privateKey)
 
-    assert(decryptedCipherText.eq(plaintextMessage))
+    assert(decryptedCipherText.eq(messageToEncrypt))
   })
 
   it('Two added ciphertexts should be the same as adding two plain texts', function() {
@@ -31,20 +37,22 @@ describe('ECC Elgamal', function() {
     const privateKey = keyPair.getPrivate()
     const publicKey = keyPair.getPublic()
 
-    const plaintextMessage0 = M_0
-    const plaintextMessage1 = M_1
+    const voteToEncrypt0 = noVoteOnCurve
+    const voteToEncrypt1 = yesVoteOnCurve
 
-    const cipher0 = EccElGamal.encrypt(plaintextMessage0, publicKey)
-    const cipher1 = EccElGamal.encrypt(plaintextMessage1, publicKey)
+    const cipher0 = EccElGamal.encrypt(voteToEncrypt0, publicKey)
+    const cipher1 = EccElGamal.encrypt(voteToEncrypt1, publicKey)
 
-    const additiveCipher = EccElGamal.homomorphicAdd(cipher0, cipher1)
+    const cipherHomomorphicSum = EccElGamal.homomorphicAdd(cipher0, cipher1)
 
-    const additivePlainText = EccElGamal.decrypt(additiveCipher, privateKey)
+    const decryptedHomomorphicSum = EccElGamal.decrypt(cipherHomomorphicSum, privateKey)
 
-    assert(additivePlainText.eq(M_0.add(M_1)))
+    assert(decryptedHomomorphicSum.eq(noVoteOnCurve.add(yesVoteOnCurve)))
   })
+})
 
-  it('vote', () => {
+describe('EccElGamal Voting Tests', () => {
+  it('Voting works correctly in various scenarii', () => {
     const vote = (_result: number, _votes: number[]) => {
       const keyPair = ec.genKeyPair()
       const privateKey = keyPair.getPrivate()
