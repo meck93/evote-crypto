@@ -11,19 +11,11 @@ export const generateNoVote = (pk: PublicKey): Cipher => {
 }
 
 export const addVotes = (votes: Cipher[], pk: PublicKey): Cipher => {
-  let sum = generateNoVote(pk) // zero vote
-
-  for (const vote of votes) {
-    sum = add(sum, vote, pk)
-  }
-
-  return sum
+  return votes.reduce((previous, current) => add(previous, current, pk), generateNoVote(pk))
 }
 
 export const tallyVotes = (pk: PublicKey, sk: any, votes: Cipher[]): number => {
-  let sum = decrypt1(addVotes(votes, pk), sk, pk).toNumber()
-
-  return sum
+  return decrypt1(addVotes(votes, pk), sk, pk).toNumber()
 }
 
 export const getSummary = (total: number, tallyResult: number) => {
