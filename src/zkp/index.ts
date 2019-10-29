@@ -7,10 +7,6 @@ import { Proof } from '../models'
 
 const printConsole = false
 
-export function say() {
-  console.log('hi')
-}
-
 export function createZKP(message: any, pubK: any): Proof {
   const alpha = EccElGamal.getSecureRandomValue()
   const r1 = EccElGamal.getSecureRandomValue()
