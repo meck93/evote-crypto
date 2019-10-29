@@ -2,18 +2,12 @@ import { encrypt, add, decrypt1 } from '.'
 import { PublicKey } from './models'
 import { Cipher } from '../models'
 
-// The message to be encrypted needs to be between 1 and p-1 (both inclusive).
-// Because of that, a 'yes' vote is of value '2' and a 'no' vote of value '1'.
-// After summing up all votes, the sum needs to be decreased by
-// (i)  the value of the 'zeroVote'
-// (ii) the number of votes
-
 export const generateYesVote = (pk: PublicKey): Cipher => {
-  return encrypt(2, pk)
+  return encrypt(1, pk)
 }
 
 export const generateNoVote = (pk: PublicKey): Cipher => {
-  return encrypt(1, pk)
+  return encrypt(0, pk)
 }
 
 export const addVotes = (votes: Cipher[], pk: PublicKey): Cipher => {
@@ -28,12 +22,6 @@ export const addVotes = (votes: Cipher[], pk: PublicKey): Cipher => {
 
 export const tallyVotes = (pk: PublicKey, sk: any, votes: Cipher[]): number => {
   let sum = decrypt1(addVotes(votes, pk), sk, pk).toNumber()
-
-  // remove zeroVote
-  sum -= 1
-
-  // decrease sum by the total number of voters
-  sum -= votes.length
 
   return sum
 }

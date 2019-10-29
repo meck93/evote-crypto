@@ -86,7 +86,7 @@ export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolea
   log && console.log('m_h\t\t', m_h)
 
   // 4.
-  let m = new BN(1, 10)
+  let m = new BN(0, 10)
   while (
     !pk.g
       .pow(m)
