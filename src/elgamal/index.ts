@@ -4,12 +4,16 @@ import { Cipher } from '../models'
 const BN = require('bn.js')
 const random = require('random')
 
+export const newBN = (n: number) => {
+  return new BN(n, 10)
+}
+
 export const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
-  const p = new BN(_p, 10)
-  const g = new BN(_g, 10)
-  const sk = new BN(random.int(1, _p - 2), 10)
+  const p = newBN(_p)
+  const g = newBN(_g)
+  const sk = newBN(random.int(1, _p - 2))
   const h = g.pow(sk).mod(p)
-  const pk = { p: p, g: g, h: h }
+  const pk = { p, g, h }
 
   return [pk, sk]
 }
@@ -35,10 +39,10 @@ export const getGs = (p: number): number[] => {
 }
 
 export const encrypt = (message: number, pk: PublicKey, log: boolean = false): Cipher => {
-  const msg = new BN(message, 10)
+  const msg = newBN(message)
 
   // generate a random value
-  const randomValue = new BN(random.int(1, pk.p - 2), 10)
+  const randomValue = newBN(random.int(1, pk.p - 2))
   log && console.log('enc secret   (r)', randomValue)
 
   // compute c1: generator^randomValue
@@ -86,14 +90,14 @@ export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolea
   log && console.log('m_h\t\t', m_h)
 
   // 4.
-  let m = new BN(0, 10)
+  let m = newBN(0)
   while (
     !pk.g
       .pow(m)
       .mod(pk.p)
       .eq(m_h)
   ) {
-    m = m.add(new BN(1, 10))
+    m = m.add(newBN(1))
   }
 
   log && console.log('plaintext d1\t', m)
@@ -116,8 +120,7 @@ export const decrypt2 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolea
 
   // alternative computation
   // 1. compute p-2
-  const pMinusX = pk.p.sub(new BN(2, 10))
-  //const pMinusX = p.sub(new BN(2, 10));
+  const pMinusX = pk.p.sub(newBN(2))
   log && console.log('p - 2\t\t', pMinusX)
 
   // 2. compute pre-result s^(p-x)
@@ -128,14 +131,14 @@ export const decrypt2 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolea
   let m_h = c2.mul(sPowPMinusX).mod(pk.p)
   log && console.log('msg_homo\t', m_h)
 
-  let m = new BN(1, 10)
+  let m = newBN(1)
   while (
     !pk.g
       .pow(m)
       .mod(pk.p)
       .eq(m_h)
   ) {
-    m = m.add(new BN(1, 10))
+    m = m.add(newBN(1))
   }
 
   log && console.log('plaintext d2\t', m)
