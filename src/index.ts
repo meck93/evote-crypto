@@ -14,3 +14,6 @@ import * as EccElGamalVoting from './ecc-elgamal/voting'
 import * as EccElGamalZKP from './zkp'
 
 export { EccElGamal, EccElGamalVoting, EccElGamalZKP }
+
+// ECC Utils
+export { serializeCurvePoint, serializeAndPrintProof } from './zkp/utils'
