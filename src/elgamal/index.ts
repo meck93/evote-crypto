@@ -22,57 +22,38 @@ const random = require('random')
 //   return randomValue
 // }
 
-export const newBN = (n: number) => {
-  return new BN(n, 10)
-}
+export const newBN = (n: number) => new BN(n, 10)
+
+// modulo operations
+const mul = (a: any, b: any, pk: PublicKey) => a.mul(b).mod(pk.p)
+const pow = (a: any, b: any, pk: PublicKey) => a.pow(b).mod(pk.p)
+const invm = (a: any, pk: PublicKey) => a.invm(pk.p)
 
 // calculate q given p
-const getQofP = (p: any) => (p - 1) / 2
+export const getQofP = (p: any) => (p - 1) / 2
 
-// get all primes that have a q = (p-1)/2
-const getPCandidates = (primes: any) =>
-  primes.reduce((previous: any, current: any) => {
-    return primes.includes(getQofP(current)) ? [...previous, current] : previous
-  }, [])
-
-// get all generators g given a prime
-const getGCandidates = (prime: any) =>
-  Array.from(Array(prime).keys()).reduce((previous: any, current: any) => {
-    return Math.pow(current, getQofP(prime)) % prime === 1 ? [...previous, current] : previous
-  }, [])
-
-const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
-
-export const findSuitableInputs = () => {
-  const prime = 11
-  console.log('p', prime)
-  console.log('p candidates', getPCandidates(primes))
-  console.log('g candidates', getGCandidates(prime))
-  console.log()
-}
-
-export const generateKeys = (_p: number, _q: number, _g: number): [PublicKey, any] => {
-  const p = new BN(_p, 10)
-  const q = new BN(_q, 10)
-  let g = new BN(_g, 10)
-  const sk = new BN(random.int(1, q - 1), 10)
+export const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
+  const p = newBN(_p)
+  const q = newBN(getQofP(_p))
+  const g = newBN(_g)
+  const sk = newBN(random.int(1, q - 1))
   const h = g.pow(sk).mod(p)
 
-  const test1 = g.pow(q).mod(p)
-  if (!test1.eq(new BN(1, 10))) {
+  const pk = { p, g, h, q }
+
+  const test1 = pow(g, q, pk)
+  if (!test1.eq(newBN(1))) {
     console.error('g^q mod p != 1', test1.toNumber())
   }
 
-  const test2 = h.pow(q).mod(p)
-  if (!test2.eq(new BN(1, 10))) {
+  const test2 = pow(h, q, pk)
+  if (!test2.eq(newBN(1))) {
     console.error('h^q mod p != 1', test2.toNumber())
   }
 
-  if (h.mod(p).eq(new BN(1, 10))) {
-    console.error('h mod p == 1', h.mod(p).toNumber())
+  if (h.mod(pk.p).eq(newBN(1))) {
+    console.error('h mod p == 1', h.mod(pk.p).toNumber())
   }
-
-  const pk = { p: p, g: g, h: h, q: q }
 
   return [pk, sk]
 }
@@ -102,23 +83,24 @@ export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Ciph
 
   // generate a random value
   const randomValue = newBN(random.int(1, pk.q - 1))
-  log && console.log('enc secret   (r)', randomValue)
-
+  
   // compute c1: generator^randomValue
-  let c1 = pk.g.pow(randomValue).mod(pk.p)
-  log && console.log('c1\t\t', c1)
-
+  let c1 = pow(pk.g, randomValue, pk)
+  
   // compute s: h^randomValue whereby
   // h = publicKey => h = g^privateKeyOfReceiver (h is publically available)
-  const s = pk.h.pow(randomValue).mod(pk.p)
-  log && console.log('s\t\t', s)
-
+  const s = pow(pk.h, randomValue, pk)
+  
   // compute mh: generator^message
-  const mh = pk.g.pow(msg).mod(pk.p)
-  log && console.log('mh\t\t', mh)
-
+  const mh = pow(pk.g, msg, pk)
+  
   // compute c2: s*message_homomorphic
-  const c2 = s.mul(mh).mod(pk.p)
+  const c2 = mul(s, mh, pk)
+  
+  log && console.log('enc secret   (r)', randomValue)
+  log && console.log('c1\t\t', c1)
+  log && console.log('s\t\t', s)
+  log && console.log('mh\t\t', mh)
   log && console.log('c2\t\t', c2)
   log && console.log('------------------------')
 
@@ -127,8 +109,8 @@ export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Ciph
 
 export const add = (em1: Cipher, em2: Cipher, pk: PublicKey): Cipher => {
   return {
-    a: em1.a.mul(em2.a).mod(pk.p),
-    b: em1.b.mul(em2.b).mod(pk.p),
+    a: mul(em1.a, em2.a, pk),
+    b: mul(em1.b, em2.b, pk),
     r: null,
   }
 }
@@ -138,28 +120,23 @@ export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolea
   let c2 = cipherText.b
 
   // compute s: c1^privateKey
-  let s = c1.pow(sk).mod(pk.p)
-  log && console.log('s\t\t', s)
-
+  let s = pow(c1, sk, pk)
+  
   // compute s^-1: the multiplicative inverse of s (probably the most difficult)
-  let s_inverse = s.invm(pk.p)
-  log && console.log('s^-1\t\t', s_inverse)
-
+  let s_inverse = invm(s, pk)
+  
   // compute m: c2 * s^-1 | c2 / s
-  let m_h = c2.mul(s_inverse).mod(pk.p)
-  log && console.log('m_h\t\t', m_h)
-
+  let m_h = mul(c2, s_inverse, pk)
+  
   // 4.
   let m = newBN(0)
-  while (
-    !pk.g
-      .pow(m)
-      .mod(pk.p)
-      .eq(m_h)
-  ) {
+  while (!pow(pk.g, m, pk).eq(m_h)) {
     m = m.add(newBN(1))
   }
-
+  
+  log && console.log('s\t\t', s)
+  log && console.log('s^-1\t\t', s_inverse)
+  log && console.log('m_h\t\t', m_h)
   log && console.log('plaintext d1\t', m)
   log && console.log('------------------------')
 
@@ -171,36 +148,31 @@ export const decrypt2 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolea
   let c2 = cipherText.b
 
   // compute s: c1^privateKey
-  let s = c1.pow(sk).mod(pk.p)
-  log && console.log('s\t\t', s)
-
+  let s = pow(c1, sk, pk)
+  
   // compute s^-1: the multiplicative inverse of s (probably the most difficult)
-  let s_inverse = s.invm(pk.p)
-  log && console.log('s^-1\t\t', s_inverse)
-
+  let s_inverse = invm(s, pk)
+  
   // alternative computation
   // 1. compute p-2
   const pMinusX = pk.p.sub(newBN(2))
-  log && console.log('p - 2\t\t', pMinusX)
-
+  
   // 2. compute pre-result s^(p-x)
-  const sPowPMinusX = s.pow(pMinusX).mod(pk.p)
-  log && console.log('s^(p-x)\t\t', sPowPMinusX)
-
+  const sPowPMinusX = pow(s, pMinusX, pk)
+  
   // 3. compute message - msg = c2*s^(p-x)
-  let m_h = c2.mul(sPowPMinusX).mod(pk.p)
-  log && console.log('msg_homo\t', m_h)
-
+  let m_h = mul(c2, sPowPMinusX, pk)
+  
   let m = newBN(1)
-  while (
-    !pk.g
-      .pow(m)
-      .mod(pk.p)
-      .eq(m_h)
-  ) {
+  while (!pow(pk.g, m, pk).eq(m_h)) {
     m = m.add(newBN(1))
   }
-
+  
+  log && console.log('s\t\t', s)
+  log && console.log('s^-1\t\t', s_inverse)
+  log && console.log('p - 2\t\t', pMinusX)
+  log && console.log('s^(p-x)\t\t', sPowPMinusX)
+  log && console.log('msg_homo\t', m_h)
   log && console.log('plaintext d2\t', m)
   log && console.log('------------------------')
 

@@ -1,27 +1,27 @@
 export {}
-import { Cipher, ElGamal, ElGamalVoting } from '../../src/index'
-import { createProofForEncryptedVote, verifyZKP } from '../../src/zkp/elgamalZKP'
-import BN = require('bn.js')
+import { ElGamal, ELGamalZKP } from '../../src/index'
 
 const random = require('random')
 const { expect } = require('chai')
 
 describe('ElGamal ZKP Proof', () => {
-  it('create and verify proof', () => {
+  it.only('create and verify proof', () => {
+    const uniqueID = '0xAd4E7D8f03904b175a1F8AE0D88154f329ac9329'
+
     for (let i = 0; i < 10; i++) {
       const prnt = false
 
       // suitable pairs found so far:
       // (p,q,g) = (11,5,3), (23,11,6)
-      const [pk, sk] = ElGamal.generateKeys(11, 5, 3)
+      const [pk, sk] = ElGamal.generateKeys(11, 3)
 
       const yesVote = 1
 
       const m_enc = ElGamal.encrypt(yesVote, pk, prnt)
       prnt && console.log(m_enc)
-      const proof = createProofForEncryptedVote(m_enc, pk)
+      const proof = ELGamalZKP.generateProof(m_enc, pk, uniqueID)
 
-      const verifiedProof = verifyZKP(proof, pk)
+      const verifiedProof = ELGamalZKP.verifyProof(proof, pk)
       expect(verifiedProof).to.be.true
 
       const m_d1 = ElGamal.decrypt1(m_enc, sk, pk, prnt)

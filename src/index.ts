@@ -8,6 +8,11 @@ import { PublicKey } from './elgamal/models'
 
 export { ElGamal, ElGamalVoting, PublicKey }
 
+// ElGamal ZKP
+import * as ELGamalZKP from './zkp/elgamalZKP'
+
+export {ELGamalZKP}
+
 // ECC ElGamal
 import * as EccElGamal from './ecc-elgamal'
 import * as EccElGamalVoting from './ecc-elgamal/voting'

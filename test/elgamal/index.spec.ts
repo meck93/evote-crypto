@@ -7,7 +7,7 @@ const { expect } = require('chai')
 describe('ElGamal Index', () => {
   it('compare decryption implementations', () => {
     const prnt = false
-    const [pk, sk] = ElGamal.generateKeys(11, 5, 3)
+    const [pk, sk] = ElGamal.generateKeys(11, 3)
 
     const message = random.int(1, pk.q - 1)
     for (let i = 0; i < 10; i++) {
@@ -31,11 +31,10 @@ describe('ElGamal Index', () => {
 
   it('homomorphic addition', () => {
     const _p = 137
-    const _q = 68
     const _g = 51
 
     for (let i = 0; i < 10; i++) {
-      const [pk, sk] = ElGamal.generateKeys(_p, _q, _g)
+      const [pk, sk] = ElGamal.generateKeys(_p, _g)
 
       // generate random messages of max size (p - 1)/2
       // so that the sum is max p-1
@@ -53,7 +52,7 @@ describe('ElGamal Index', () => {
 
   it('vote', () => {
     const vote = (_result: number, _votes: number[]) => {
-      const [pk, sk] = ElGamal.generateKeys(137, 68, 51)
+      const [pk, sk] = ElGamal.generateKeys(137, 51)
 
       const votes: Cipher[] = []
       for (const vote of _votes) {
