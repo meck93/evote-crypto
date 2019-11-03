@@ -21,7 +21,7 @@ describe('ElGamal ZKP Proof', () => {
         const yesEnc = ElGamal.encrypt(yesVote, pk, prnt)
         const yesProof = ELGamalZKP.generateYesProof(yesEnc, pk, uniqueID)
 
-        const verifiedYesProof = ELGamalZKP.verifyProof(yesProof, pk)
+        const verifiedYesProof = ELGamalZKP.verifyProof(yesEnc, yesProof, pk, uniqueID)
         expect(verifiedYesProof).to.be.true
 
         // no vote
@@ -30,7 +30,7 @@ describe('ElGamal ZKP Proof', () => {
         const noEnc = ElGamal.encrypt(noVote, pk, prnt)
         const noProof = ELGamalZKP.generateNoProof(noEnc, pk, uniqueID)
 
-        const verifiedNoProof = ELGamalZKP.verifyProof(noProof, pk)
+        const verifiedNoProof = ELGamalZKP.verifyProof(noEnc, noProof, pk, uniqueID)
         expect(verifiedNoProof).to.be.true
       }
     }

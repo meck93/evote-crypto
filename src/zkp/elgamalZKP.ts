@@ -61,7 +61,7 @@ export function generateYesProof(cipher: Cipher, pk: PublicKey, uniqueID: string
   printConsole && console.log('f1 = x + c1*r\t\t', f1.toNumber())
   printConsole && console.log()
 
-  return { a, b, a0, a1, b0, b1, c0, c1, f0, f1, challenge }
+  return { a0, a1, b0, b1, c0, c1, f0, f1 }
 }
 
 // Generates a proof for an encrypted no vote.
@@ -93,11 +93,12 @@ export function generateNoProof(cipher: Cipher, pk: PublicKey, uniqueID: string)
   // compute f0 = x + c0 * r (NOTE: mod q!)
   const f0 = add(x, c0.mul(r).mod(pk.q), pk)
 
-  return { a, b, a0, a1, b0, b1, c0, c1, f0, f1, challenge }
+  return { a0, a1, b0, b1, c0, c1, f0, f1 }
 }
 
-export function verifyProof(proof: Proof, pk: any): boolean {
-  const { a, b, a0, a1, b0, b1, c0, c1, f0, f1, challenge } = proof
+export function verifyProof(cipher: Cipher, proof: Proof, pk: any, uniqueID: string): boolean {
+  const { a, b } = cipher
+  const { a0, a1, b0, b1, c0, c1, f0, f1 } = proof
 
   // verification g^f0 == a0*a^c0
   const l1 = pow(pk.g, f0, pk)
@@ -122,7 +123,7 @@ export function verifyProof(proof: Proof, pk: any): boolean {
   // recompute the hash and verify
   const c = c1.add(c0).mod(pk.q)
 
-  // TODO: Recompute the hash here instead of using the passed hash
+  const challenge = generateChallenge(pk.q, uniqueID, a, b, a0, b0, a1, b1)
   const v5 = challenge.eq(c)
 
   printConsole && console.log('g^f0 == a0*a^c0:\t', v1)

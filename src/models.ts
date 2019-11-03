@@ -11,8 +11,6 @@ export interface Summary {
 }
 
 export interface Proof {
-  a: any
-  b: any
   a0: any
   a1: any
   b0: any
@@ -21,5 +19,4 @@ export interface Proof {
   c1: any
   f0: any
   f1: any
-  challenge: any
 }
