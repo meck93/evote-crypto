@@ -7,7 +7,7 @@ const random = require('random')
 const { expect } = require('chai')
 
 describe('ElGamal ZKP Proof', () => {
-  it.only('create and verify proof', () => {
+  it('create and verify proof', () => {
     for (let i = 0; i < 10; i++) {
       const prnt = false
 
