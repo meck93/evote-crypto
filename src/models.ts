@@ -1,6 +1,7 @@
 export interface Cipher {
-  c1: any
-  c2: any
+  a: any
+  b: any
+  r: any
 }
 
 export interface Summary {
@@ -10,15 +11,15 @@ export interface Summary {
 }
 
 export interface Proof {
-  x: any
-  y: any
+  a: any
+  b: any
+  a0: any
   a1: any
-  a2: any
+  b0: any
   b1: any
-  b2: any
-  d1: any
-  d2: any
-  r1: any
-  r2: any
+  c0: any
+  c1: any
+  f0: any
+  f1: any
   challenge: any
 }

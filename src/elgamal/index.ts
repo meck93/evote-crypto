@@ -3,17 +3,72 @@ import { Cipher } from '../models'
 
 const BN = require('bn.js')
 const random = require('random')
+// const crypto = require('crypto')
 
-export const newBN = (n: number) => {
-  return new BN(n, 10)
+// export const getSecureRandomValue = (): any => {
+//   const RAND_SIZE_BYTES = 32
+
+//   // TODO: Fix upper limit to p-2
+//   const UPPER_BOUND_RANDOM = null
+
+//   let randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
+//   let randomValue = new BN(randomBytes)
+
+//   // ensure that the random value is in range [1,n-1]
+//   while (!randomValue.lte(UPPER_BOUND_RANDOM) && randomValue.gte(1)) {
+//     randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
+//     randomValue = new BN(randomBytes, 'hex')
+//   }
+//   return randomValue
+// }
+
+// calculate q given p
+const getQofP = (p: any) => (p - 1) / 2
+
+// get all primes that have a q = (p-1)/2
+const getPCandidates = (primes: any) =>
+  primes.reduce((previous: any, current: any) => {
+    return primes.includes(getQofP(current)) ? [...previous, current] : previous
+  }, [])
+
+// get all generators g given a prime
+const getGCandidates = (prime: any) =>
+  Array.from(Array(prime).keys()).reduce((previous: any, current: any) => {
+    return Math.pow(current, getQofP(prime)) % prime === 1 ? [...previous, current] : previous
+  }, [])
+
+const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+
+export const findSuitableInputs = () => {
+  const prime = 11
+  console.log('p', prime)
+  console.log('p candidates', getPCandidates(primes))
+  console.log('g candidates', getGCandidates(prime))
+  console.log()
 }
 
-export const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
-  const p = newBN(_p)
-  const g = newBN(_g)
-  const sk = newBN(random.int(1, _p - 2))
+export const generateKeys = (_p: number, _q: number, _g: number): [PublicKey, any] => {
+  const p = new BN(_p, 10)
+  const q = new BN(_q, 10)
+  let g = new BN(_g, 10)
+  const sk = new BN(random.int(1, q - 1), 10)
   const h = g.pow(sk).mod(p)
-  const pk = { p, g, h }
+
+  const test1 = g.pow(q).mod(p)
+  if (!test1.eq(new BN(1, 10))) {
+    console.error('g^q mod p != 1', test1.toNumber())
+  }
+
+  const test2 = h.pow(q).mod(p)
+  if (!test2.eq(new BN(1, 10))) {
+    console.error('h^q mod p != 1', test2.toNumber())
+  }
+
+  if (h.mod(p).eq(new BN(1, 10))) {
+    console.error('h mod p == 1', h.mod(p).toNumber())
+  }
+
+  const pk = { p: p, g: g, h: h, q: q }
 
   return [pk, sk]
 }
@@ -38,11 +93,19 @@ export const getGs = (p: number): number[] => {
   return g
 }
 
+<<<<<<< HEAD
 export const encrypt = (message: number, pk: PublicKey, log: boolean = false): Cipher => {
   const msg = newBN(message)
 
   // generate a random value
   const randomValue = newBN(random.int(1, pk.p - 2))
+=======
+export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Cipher => {
+  const msg = typeof message === 'number' ? new BN(message, 10) : message
+
+  // generate a random value
+  const randomValue = new BN(random.int(1, pk.q - 1), 10)
+>>>>>>> working disjunctive zkp for proof of encrypted vote
   log && console.log('enc secret   (r)', randomValue)
 
   // compute c1: generator^randomValue
@@ -63,19 +126,20 @@ export const encrypt = (message: number, pk: PublicKey, log: boolean = false): C
   log && console.log('c2\t\t', c2)
   log && console.log('------------------------')
 
-  return { c1: c1, c2: c2 }
+  return { a: c1, b: c2, r: randomValue }
 }
 
 export const add = (em1: Cipher, em2: Cipher, pk: PublicKey): Cipher => {
   return {
-    c1: em1.c1.mul(em2.c1).mod(pk.p),
-    c2: em1.c2.mul(em2.c2).mod(pk.p),
+    a: em1.a.mul(em2.a).mod(pk.p),
+    b: em1.b.mul(em2.b).mod(pk.p),
+    r: null,
   }
 }
 
 export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolean = false): any => {
-  let c1 = cipherText.c1
-  let c2 = cipherText.c2
+  let c1 = cipherText.a
+  let c2 = cipherText.b
 
   // compute s: c1^privateKey
   let s = c1.pow(sk).mod(pk.p)
@@ -107,8 +171,8 @@ export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolea
 }
 
 export const decrypt2 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolean = false): any => {
-  let c1 = cipherText.c1
-  let c2 = cipherText.c2
+  let c1 = cipherText.a
+  let c2 = cipherText.b
 
   // compute s: c1^privateKey
   let s = c1.pow(sk).mod(pk.p)
