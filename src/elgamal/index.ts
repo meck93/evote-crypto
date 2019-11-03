@@ -22,6 +22,10 @@ const random = require('random')
 //   return randomValue
 // }
 
+export const newBN = (n: number) => {
+  return new BN(n, 10)
+}
+
 // calculate q given p
 const getQofP = (p: any) => (p - 1) / 2
 
@@ -93,19 +97,11 @@ export const getGs = (p: number): number[] => {
   return g
 }
 
-<<<<<<< HEAD
-export const encrypt = (message: number, pk: PublicKey, log: boolean = false): Cipher => {
-  const msg = newBN(message)
-
-  // generate a random value
-  const randomValue = newBN(random.int(1, pk.p - 2))
-=======
 export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Cipher => {
-  const msg = typeof message === 'number' ? new BN(message, 10) : message
+  const msg = typeof message === 'number' ? newBN(message) : message
 
   // generate a random value
-  const randomValue = new BN(random.int(1, pk.q - 1), 10)
->>>>>>> working disjunctive zkp for proof of encrypted vote
+  const randomValue = newBN(random.int(1, pk.q - 1))
   log && console.log('enc secret   (r)', randomValue)
 
   // compute c1: generator^randomValue
