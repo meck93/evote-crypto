@@ -12,14 +12,26 @@ describe('ElGamal ZKP Proof', () => {
     const test = (p: number, g: number) => {
       for (let i = 0; i < 10; i++) {
         const prnt = false
+        prnt && console.log('p:', p, ', g:', g)
         const [pk, sk] = ElGamal.generateKeys(p, g)
 
+        // yes vote
+        prnt && console.log('yes proof')
         const yesVote = 1
-        const m_enc = ElGamal.encrypt(yesVote, pk, prnt)
-        const proof = ELGamalZKP.generateProof(m_enc, pk, uniqueID)
+        const yesEnc = ElGamal.encrypt(yesVote, pk, prnt)
+        const yesProof = ELGamalZKP.generateYesProof(yesEnc, pk, uniqueID)
 
-        const verifiedProof = ELGamalZKP.verifyProof(proof, pk)
-        expect(verifiedProof).to.be.true
+        const verifiedYesProof = ELGamalZKP.verifyProof(yesProof, pk)
+        expect(verifiedYesProof).to.be.true
+
+        // no vote
+        prnt && console.log('no proof')
+        const noVote = 0
+        const noEnc = ElGamal.encrypt(noVote, pk, prnt)
+        const noProof = ELGamalZKP.generateNoProof(noEnc, pk, uniqueID)
+
+        const verifiedNoProof = ELGamalZKP.verifyProof(noProof, pk)
+        expect(verifiedNoProof).to.be.true
       }
     }
 

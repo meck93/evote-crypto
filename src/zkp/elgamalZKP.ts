@@ -17,7 +17,8 @@ const div = (a: any, b: any, pk: PublicKey) => mul(a, invm(b, pk), pk).mod(pk.p)
 const pow = (a: any, b: any, pk: PublicKey) => a.pow(b).mod(pk.p)
 const invm = (a: any, pk: PublicKey) => a.invm(pk.p)
 
-export function generateProof(cipher: Cipher, pk: PublicKey, uniqueID: string): Proof {
+// Generates a proof for an encrypted yes vote.
+export function generateYesProof(cipher: Cipher, pk: PublicKey, uniqueID: string): Proof {
   // extract encrypted message parts
   // a = g^r, b = public_key i.e. h^r*g^m
   const { a, b, r } = cipher
@@ -63,6 +64,38 @@ export function generateProof(cipher: Cipher, pk: PublicKey, uniqueID: string): 
   return { a, b, a0, a1, b0, b1, c0, c1, f0, f1, challenge }
 }
 
+// Generates a proof for an encrypted no vote.
+export function generateNoProof(cipher: Cipher, pk: PublicKey, uniqueID: string): Proof {
+  // a = g^r, b = public_key i.e. h^r*g^m
+  const { a, b, r } = cipher
+
+  // Generate fake values for m=1
+  const c1 = newBN(random.int(1, pk.q - 1))
+  const f1 = newBN(random.int(1, pk.q - 1))
+
+  // compute fake b
+  const b_ = div(b, pk.g, pk)
+
+  // compute fake a1
+  const a1 = div(pow(pk.g, f1, pk), pow(a, c1, pk), pk)
+
+  // compute fake b1
+  const b1 = div(pow(pk.h, f1, pk), pow(b_, c1, pk), pk)
+
+  // Generate proof for m=0
+  const x = newBN(random.int(1, pk.q - 1))
+  const a0 = pow(pk.g, x, pk)
+  const b0 = pow(pk.h, x, pk)
+
+  const challenge = generateChallenge(pk.q, uniqueID, a, b, a0, b0, a1, b1)
+  const c0 = add(pk.q, sub(challenge, c1, pk), pk)
+
+  // compute f0 = x + c0 * r (NOTE: mod q!)
+  const f0 = add(x, c0.mul(r).mod(pk.q), pk)
+
+  return { a, b, a0, a1, b0, b1, c0, c1, f0, f1, challenge }
+}
+
 export function verifyProof(proof: Proof, pk: any): boolean {
   const { a, b, a0, a1, b0, b1, c0, c1, f0, f1, challenge } = proof
 
@@ -70,28 +103,28 @@ export function verifyProof(proof: Proof, pk: any): boolean {
   const l1 = pow(pk.g, f0, pk)
   const r1 = mul(a0, pow(a, c0, pk), pk)
   const v1 = l1.eq(r1)
-  
+
   // verification g^f1 == a1*a^c1Test
   const l2 = pow(pk.g, f1, pk)
   const r2 = mul(a1, pow(a, c1, pk), pk)
   const v2 = l2.eq(r2)
-  
+
   // verification h^f0 == b0 * b^c0
   const l3 = pow(pk.h, f0, pk)
-  const r3 = mul(b0,pow(b, c0, pk), pk)
+  const r3 = mul(b0, pow(b, c0, pk), pk)
   const v3 = l3.eq(r3)
-  
+
   // verification h^f1 == b1 * (b/g)^c1Test
   const l4 = pow(pk.h, f1, pk)
   const r4 = mul(b1, pow(div(b, pk.g, pk), c1, pk), pk)
   const v4 = l4.eq(r4)
-  
+
   // recompute the hash and verify
   const c = c1.add(c0).mod(pk.q)
-  
+
   // TODO: Recompute the hash here instead of using the passed hash
   const v5 = challenge.eq(c)
-  
+
   printConsole && console.log('g^f0 == a0*a^c0:\t', v1)
   printConsole && console.log('g^f1 == a1*a^c1Test\t', v2)
   printConsole && console.log('h^f0 == b0*b^c0\t\t', v3)
