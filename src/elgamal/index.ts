@@ -36,23 +36,28 @@ export const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
   const p = newBN(_p)
   const q = newBN(getQofP(_p))
   const g = newBN(_g)
+
   const sk = newBN(random.int(1, q - 1))
   const h = g.pow(sk).mod(p)
 
   const pk = { p, g, h, q }
 
+  // verify that g^q mod p == 1 (this means: gcd(q,p) == 1)
   const test1 = pow(g, q, pk)
   if (!test1.eq(newBN(1))) {
-    console.error('g^q mod p != 1', test1.toNumber())
+    throw new Error(`g^q mod p != 1 (== ${test1.toNumber()}. for p: ${_p}, q: ${q.toNumber()} and g: ${_g}`)
   }
 
+  // verify that h^q mod p == 1 (this means: gcd(h,p) == 1)
   const test2 = pow(h, q, pk)
   if (!test2.eq(newBN(1))) {
-    console.error('h^q mod p != 1', test2.toNumber())
+    throw new Error(`h^q mod p != 1 (== ${test2.toNumber()}. for p: ${_p}, q: ${q.toNumber()} and g: ${_g}`)
   }
 
-  if (h.mod(pk.p).eq(newBN(1))) {
-    console.error('h mod p == 1', h.mod(pk.p).toNumber())
+  // verify that the public key h is not 1
+  const test3 = h.mod(pk.p)
+  if (test3.eq(newBN(1))) {
+    throw new Error(`h mod p == 1. for p: ${_p}, q: ${q.toNumber()} and g: ${_g}`)
   }
 
   return [pk, sk]
@@ -83,20 +88,20 @@ export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Ciph
 
   // generate a random value
   const randomValue = newBN(random.int(1, pk.q - 1))
-  
+
   // compute c1: generator^randomValue
   let c1 = pow(pk.g, randomValue, pk)
-  
+
   // compute s: h^randomValue whereby
   // h = publicKey => h = g^privateKeyOfReceiver (h is publically available)
   const s = pow(pk.h, randomValue, pk)
-  
+
   // compute mh: generator^message
   const mh = pow(pk.g, msg, pk)
-  
+
   // compute c2: s*message_homomorphic
   const c2 = mul(s, mh, pk)
-  
+
   log && console.log('enc secret   (r)', randomValue)
   log && console.log('c1\t\t', c1)
   log && console.log('s\t\t', s)
@@ -121,19 +126,19 @@ export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolea
 
   // compute s: c1^privateKey
   let s = pow(c1, sk, pk)
-  
+
   // compute s^-1: the multiplicative inverse of s (probably the most difficult)
   let s_inverse = invm(s, pk)
-  
+
   // compute m: c2 * s^-1 | c2 / s
   let m_h = mul(c2, s_inverse, pk)
-  
+
   // 4.
   let m = newBN(0)
   while (!pow(pk.g, m, pk).eq(m_h)) {
     m = m.add(newBN(1))
   }
-  
+
   log && console.log('s\t\t', s)
   log && console.log('s^-1\t\t', s_inverse)
   log && console.log('m_h\t\t', m_h)
@@ -149,25 +154,25 @@ export const decrypt2 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolea
 
   // compute s: c1^privateKey
   let s = pow(c1, sk, pk)
-  
+
   // compute s^-1: the multiplicative inverse of s (probably the most difficult)
   let s_inverse = invm(s, pk)
-  
+
   // alternative computation
   // 1. compute p-2
   const pMinusX = pk.p.sub(newBN(2))
-  
+
   // 2. compute pre-result s^(p-x)
   const sPowPMinusX = pow(s, pMinusX, pk)
-  
+
   // 3. compute message - msg = c2*s^(p-x)
   let m_h = mul(c2, sPowPMinusX, pk)
-  
+
   let m = newBN(1)
   while (!pow(pk.g, m, pk).eq(m_h)) {
     m = m.add(newBN(1))
   }
-  
+
   log && console.log('s\t\t', s)
   log && console.log('s^-1\t\t', s_inverse)
   log && console.log('p - 2\t\t', pMinusX)
