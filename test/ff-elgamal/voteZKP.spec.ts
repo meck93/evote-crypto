@@ -24,18 +24,18 @@ describe('Finite Field ElGamal ZKP Proof', () => {
         prnt && console.log('yes proof')
         const yesVote = 1
         const yesEnc = FFelGamal.Encryption.encrypt(yesVote, pk, prnt)
-        const yesProof = FFelGamal.ZKP.generateYesProof(yesEnc, pk, uniqueID)
+        const yesProof = FFelGamal.VoteZKP.generateYesProof(yesEnc, pk, uniqueID)
 
-        const verifiedYesProof = FFelGamal.ZKP.verifyVoteProof(yesEnc, yesProof, pk, uniqueID)
+        const verifiedYesProof = FFelGamal.VoteZKP.verifyVoteProof(yesEnc, yesProof, pk, uniqueID)
         expect(verifiedYesProof).to.be.true
 
         // no vote
         prnt && console.log('no proof')
         const noVote = 0
         const noEnc = FFelGamal.Encryption.encrypt(noVote, pk, prnt)
-        const noProof = FFelGamal.ZKP.generateNoProof(noEnc, pk, uniqueID)
+        const noProof = FFelGamal.VoteZKP.generateNoProof(noEnc, pk, uniqueID)
 
-        const verifiedNoProof = FFelGamal.ZKP.verifyVoteProof(noEnc, noProof, pk, uniqueID)
+        const verifiedNoProof = FFelGamal.VoteZKP.verifyVoteProof(noEnc, noProof, pk, uniqueID)
         expect(verifiedNoProof).to.be.true
       }
     }

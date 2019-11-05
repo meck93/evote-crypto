@@ -76,10 +76,10 @@ export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Ciph
   const c2 = mul(s, mh, pk)
 
   log && console.log('enc secret   (r)', randomValue)
-  log && console.log('c1\t\t', c1)
-  log && console.log('s\t\t', s)
-  log && console.log('mh\t\t', mh)
-  log && console.log('c2\t\t', c2)
+  log && console.log('a\t\t', c1)
+  log && console.log('h^r\t\t', s)
+  log && console.log('g^m\t\t', mh)
+  log && console.log('b\t\t', c2)
   log && console.log('------------------------')
 
   return { a: c1, b: c2, r: randomValue }
@@ -88,7 +88,7 @@ export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Ciph
 export const add = (em1: Cipher, em2: Cipher, pk: PublicKey): Cipher => {
   return {
     a: mul(em1.a, em2.a, pk),
-    b: mul(em1.b, em2.b, pk)
+    b: mul(em1.b, em2.b, pk),
   }
 }
 

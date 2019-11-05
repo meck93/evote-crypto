@@ -20,3 +20,10 @@ export interface ValidVoteProof {
   f0: any
   f1: any
 }
+
+export interface SumProof {
+  a1: any
+  b1: any
+  c: any
+  f: any
+}

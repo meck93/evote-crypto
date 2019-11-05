@@ -1,9 +1,8 @@
-import { Cipher, Summary, ValidVoteProof } from './models'
-export { Cipher, Summary, ValidVoteProof }
+import { Cipher, Summary, ValidVoteProof, SumProof } from './models'
+export { Cipher, Summary, ValidVoteProof, SumProof }
 
 import * as FFelGamal from './ff-elgamal'
-export { FFelGamal}
-
+export { FFelGamal }
 
 // ECC ElGamal
 import * as EccElGamal from './ecc-elgamal'
