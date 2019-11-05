@@ -63,7 +63,7 @@ export function verifySumProof(cipher: Cipher, proof: SumProof, pk: any, uniqueI
   const r2 = mul(b1, pow(pk.h, c, pk), pk)
   const v2 = l2.eq(r2)
 
-  printConsole && console.log('a^f == a1*d^c:\t\t', v1)
+  printConsole && console.log('a^f == a1*d^c:\t\t', v1, l1.toNumber(), r1.toNumber())
   printConsole && console.log('g^f == b1*h^c\t\t', v2, l2.toNumber(), r2.toNumber())
   printConsole && console.log()
 

@@ -4,7 +4,7 @@ import { FFelGamal } from '../../src/index'
 const random = require('random')
 const { expect } = require('chai')
 
-describe.only('ElGamal ZKP Sum Proof', () => {
+describe('ElGamal Finite Field ZKP Sum Proof', () => {
   it('create and verify sum proof', () => {
     const uniqueID = '0xAd4E7D8f03904b175a1F8AE0D88154f329ac9329'
 
