@@ -16,13 +16,7 @@ export const generateNoVote = (publicKey: any): any => {
 }
 
 export const addVotes = (votes: Cipher[], publicKey: any): Cipher => {
-  let sum = encrypt(infinityPoint, publicKey) // zero vote
-
-  for (const vote of votes) {
-    sum = homomorphicAdd(sum, vote)
-  }
-
-  return sum
+  return votes.reduce((previous, current) => homomorphicAdd(previous, current), encrypt(infinityPoint, publicKey))
 }
 
 export const findPoint = (point: any): number => {
