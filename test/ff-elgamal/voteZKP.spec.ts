@@ -3,7 +3,7 @@ import { FFelGamal } from '../../src/index'
 
 const { expect } = require('chai')
 
-describe('Finite Field ElGamal ZKP Proof', () => {
+describe('Finite Field ElGamal Vote ZKP', () => {
   it('create and verify proof', () => {
     const uniqueID = '0xAd4E7D8f03904b175a1F8AE0D88154f329ac9329'
 

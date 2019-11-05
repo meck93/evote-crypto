@@ -1,5 +1,5 @@
 export {}
-import { EccElGamalZKP, Proof } from '../../src/index'
+import { ECelGamal } from '../../src/index'
 
 const { assert } = require('chai')
 const EC = require('elliptic').ec
@@ -9,7 +9,7 @@ const ec = new EC('secp256k1')
 const yesVoteOnCurve = ec.curve.g
 const noVoteOnCurve = ec.curve.g.neg()
 
-describe('EccElGamal Zero Knowledge Proofs', () => {
+describe('Elliptic Curve ElGamal Vote ZKP', () => {
   it('Points that encode the plaintexts should lie on the curve', function() {
     assert(ec.curve.validate(noVoteOnCurve) && ec.curve.validate(yesVoteOnCurve))
   })
@@ -19,10 +19,10 @@ describe('EccElGamal Zero Knowledge Proofs', () => {
     const privateKey = keyPair.getPrivate()
     const publicKey = keyPair.getPublic()
 
-    const proof: Proof = EccElGamalZKP.createZKP(yesVoteOnCurve, publicKey)
+    const proof: Proof = ECelGamal.VoteZKP.createZKP(yesVoteOnCurve, publicKey)
 
     // TODO: verifyZKP is not finished -> something wrong with the challenge (hash)
-    const result: boolean = EccElGamalZKP.verifyZKP(proof, publicKey)
+    const result: boolean = ECelGamal.VoteZKP.verifyZKP(proof, publicKey)
     assert(result)
   })
 })

@@ -1,5 +1,5 @@
 export {}
-import { EccElGamal } from '../../src/index'
+import { ECelGamal } from '../../src/index'
 
 const { assert } = require('chai')
 const EC = require('elliptic').ec
@@ -15,7 +15,7 @@ const yesVoteInt = 4
 const noVoteOnCurve = ec.curve.pointFromX(noVoteInt)
 const yesVoteOnCurve = ec.curve.pointFromX(yesVoteInt)
 
-describe('EccElGamal Library Tests', function() {
+describe('Elliptic Curve ElGamal Encryption', function() {
   it('Points that encode the plaintexts should lie on the curve', function() {
     assert(ec.curve.validate(yesVoteOnCurve) && ec.curve.validate(noVoteOnCurve))
   })
@@ -26,8 +26,8 @@ describe('EccElGamal Library Tests', function() {
     const publicKey = keyPair.getPublic()
 
     const messageToEncrypt = noVoteOnCurve
-    const cipherText = EccElGamal.encrypt(noVoteOnCurve, publicKey)
-    const decryptedCipherText = EccElGamal.decrypt(cipherText, privateKey)
+    const cipherText = ECelGamal.Encryption.encrypt(noVoteOnCurve, publicKey)
+    const decryptedCipherText = ECelGamal.Encryption.decrypt(cipherText, privateKey)
 
     assert(decryptedCipherText.eq(messageToEncrypt))
   })
@@ -40,12 +40,12 @@ describe('EccElGamal Library Tests', function() {
     const voteToEncrypt0 = noVoteOnCurve
     const voteToEncrypt1 = yesVoteOnCurve
 
-    const cipher0 = EccElGamal.encrypt(voteToEncrypt0, publicKey)
-    const cipher1 = EccElGamal.encrypt(voteToEncrypt1, publicKey)
+    const cipher0 = ECelGamal.Encryption.encrypt(voteToEncrypt0, publicKey)
+    const cipher1 = ECelGamal.Encryption.encrypt(voteToEncrypt1, publicKey)
 
-    const cipherHomomorphicSum = EccElGamal.homomorphicAdd(cipher0, cipher1)
+    const cipherHomomorphicSum = ECelGamal.Encryption.homomorphicAdd(cipher0, cipher1)
 
-    const decryptedHomomorphicSum = EccElGamal.decrypt(cipherHomomorphicSum, privateKey)
+    const decryptedHomomorphicSum = ECelGamal.Encryption.decrypt(cipherHomomorphicSum, privateKey)
 
     assert(decryptedHomomorphicSum.eq(noVoteOnCurve.add(yesVoteOnCurve)))
   })

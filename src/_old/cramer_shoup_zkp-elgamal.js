@@ -92,7 +92,7 @@ function hashMe(a, b, c) {
 }
 
 function encrypt(message, pk, randomValue) {
-  // INPUTS: message is a ECC point, publicKey is a
+  // INPUTS: message is a EC point, publicKey is a
 
   console.log('public key\t', pk)
 

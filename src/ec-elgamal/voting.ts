@@ -1,4 +1,4 @@
-import { encrypt, homomorphicAdd, decrypt } from '.'
+import { encrypt, homomorphicAdd, decrypt } from './encryption'
 import { Cipher } from '../models'
 
 const EC = require('elliptic').ec

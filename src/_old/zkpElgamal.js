@@ -130,7 +130,7 @@ function generateChallenge(uniqueID, c1, c2, a1, a2, b1, b2) {
 }
 
 function encrypt(message, pubK, randomValue) {
-  // compute c1: generator ecc-multiply randomValue
+  // compute c1: generator ec-multiply randomValue
   let c1 = ec.curve.g.mul(randomValue)
   printConsole && console.log('Is c1 on the curve?', ec.curve.validate(c1))
 
@@ -139,7 +139,7 @@ function encrypt(message, pubK, randomValue) {
   const s = pubK.mul(randomValue)
   printConsole && console.log('Is point s on the curve?', ec.curve.validate(s))
 
-  // compute c2: s ecc-multiply message
+  // compute c2: s ec-multiply message
   const c2 = s.add(message)
   printConsole && console.log('Is c2 on curve?', ec.curve.validate(c2))
 
@@ -158,7 +158,7 @@ function decrypt(cipherText, privK) {
   let s_inverse = s.neg()
   printConsole && console.log('is s^-1 on the curve?', ec.curve.validate(s_inverse))
 
-  // compute m: c2 ecc-add s^-1
+  // compute m: c2 ec-add s^-1
   const m = c2.add(s_inverse)
   printConsole && console.log('is m on curve?', ec.curve.validate(m))
 

@@ -1,20 +1,20 @@
 const EC = require('elliptic').ec
 const ec = new EC('secp256k1')
 const BN = require('bn.js')
-import { EccElGamal } from '../index'
+import { ECelGamal } from '../index'
 import { ValidVoteProof } from '../models'
 
-// TODO: implement me (based on ff elgamal zkp)
+// TODO: implement me (based on ff elgamal vote zkp)
 
 const printConsole = false
 
 export function createZKP(message: any, pubK: any): ValidVoteProof {
-  const alpha = EccElGamal.getSecureRandomValue()
-  const r1 = EccElGamal.getSecureRandomValue()
-  const d1 = EccElGamal.getSecureRandomValue()
-  const w = EccElGamal.getSecureRandomValue()
+  const alpha = ECelGamal.Helper.getSecureRandomValue()
+  const r1 = ECelGamal.Helper.getSecureRandomValue()
+  const d1 = ECelGamal.Helper.getSecureRandomValue()
+  const w = ECelGamal.Helper.getSecureRandomValue()
 
-  const cipher = EccElGamal.encrypt(message, pubK)
+  const cipher = ECelGamal.Encryption.encrypt(message, pubK)
 
   const x = cipher.c1
   const y = cipher.c2

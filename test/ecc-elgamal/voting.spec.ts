@@ -1,11 +1,11 @@
 export {}
-import { Cipher, EccElGamalVoting } from '../../src/index'
+import { Cipher, ECelGamal } from '../../src/index'
 
 const { assert } = require('chai')
 const EC = require('elliptic').ec
 const ec = new EC('secp256k1')
 
-describe('EccElGamal Voting Tests', () => {
+describe('Elliptic Curve ElGamal Voting', () => {
   it('Voting works correctly in various scenarii', () => {
     const vote = (_result: number, _votes: number[]) => {
       const keyPair = ec.genKeyPair()
@@ -14,12 +14,12 @@ describe('EccElGamal Voting Tests', () => {
 
       const votes: Cipher[] = []
       for (const vote of _votes) {
-        vote === 1 && votes.push(EccElGamalVoting.generateYesVote(publicKey))
-        vote === 0 && votes.push(EccElGamalVoting.generateNoVote(publicKey))
+        vote === 1 && votes.push(ECelGamal.Voting.generateYesVote(publicKey))
+        vote === 0 && votes.push(ECelGamal.Voting.generateNoVote(publicKey))
       }
 
-      const result = EccElGamalVoting.tallyVotes(publicKey, privateKey, votes)
-      const summary = EccElGamalVoting.getSummary(votes.length, result)
+      const result = ECelGamal.Voting.tallyVotes(publicKey, privateKey, votes)
+      const summary = ECelGamal.Voting.getSummary(votes.length, result)
       console.log(_result, _votes, result, 'Total:', summary.total, '| Yes:', summary.yes, '| No:', summary.no)
 
       assert(result === _result)

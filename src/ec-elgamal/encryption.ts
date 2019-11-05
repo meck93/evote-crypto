@@ -1,31 +1,16 @@
 import { Cipher } from '../models'
-import crypto = require('crypto')
+import { getSecureRandomValue } from './helper'
 
 const BN = require('bn.js')
 const EC = require('elliptic').ec
 const ec = new EC('secp256k1')
 
-const UPPER_BOUND_RANDOM = ec.curve.n.sub(new BN(2, 10))
-const RAND_SIZE_BYTES = 32
-
 const shouldLog = false
-
-export const getSecureRandomValue = (): any => {
-  let randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
-  let randomValue = new BN(randomBytes)
-
-  // ensure that the random value is in range [1,n-1]
-  while (!randomValue.lte(UPPER_BOUND_RANDOM) && randomValue.gte(1)) {
-    randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
-    randomValue = new BN(randomBytes, 'hex')
-  }
-  return randomValue
-}
 
 export const encrypt = (message: any, pubK: any): Cipher => {
   const randBN = getSecureRandomValue()
 
-  // compute c1: generator ecc-multiply randomValue
+  // compute c1: generator ec-multiply randomValue
   let c1 = ec.g.mul(randBN)
   shouldLog && console.log('Is c1 on the curve?', ec.curve.validate(c1))
 
@@ -53,7 +38,7 @@ export const decrypt = (cipherText: Cipher, privK: any): any => {
   let s_inverse = s.neg()
   shouldLog && console.log('is s^-1 on the curve?', ec.curve.validate(s_inverse))
 
-  // compute m: c2 ecc-add s^-1
+  // compute m: c2 ec-add s^-1
   const m = c2.add(s_inverse)
   shouldLog && console.log('is m on curve?', ec.curve.validate(m))
 
