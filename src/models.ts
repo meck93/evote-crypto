@@ -10,7 +10,7 @@ export interface Summary {
   no: number
 }
 
-export interface Proof {
+export interface ValidVoteProof {
   a0: any
   a1: any
   b0: any

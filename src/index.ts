@@ -1,24 +1,16 @@
-import { Cipher, Summary, Proof } from './models'
-export { Cipher, Summary, Proof }
+import { Cipher, Summary, ValidVoteProof } from './models'
+export { Cipher, Summary, ValidVoteProof }
 
-// ElGamal
-import * as ElGamal from './elgamal'
-import * as ElGamalVoting from './elgamal/voting'
-import { PublicKey } from './elgamal/models'
+import * as FFelGamal from './ff-elgamal'
+export { FFelGamal}
 
-export { ElGamal, ElGamalVoting, PublicKey }
-
-// ElGamal ZKP
-import * as ELGamalZKP from './zkp/elgamalZKP'
-
-export {ELGamalZKP}
 
 // ECC ElGamal
 import * as EccElGamal from './ecc-elgamal'
 import * as EccElGamalVoting from './ecc-elgamal/voting'
-import * as EccElGamalZKP from './zkp'
+import * as EccElGamalZKP from './ecc-elgamal/zkp'
 
 export { EccElGamal, EccElGamalVoting, EccElGamalZKP }
 
 // ECC Utils
-export { serializeCurvePoint, serializeAndPrintProof } from './zkp/utils'
+export { serializeCurvePoint, serializeAndPrintProof } from './ecc-elgamal/utils'

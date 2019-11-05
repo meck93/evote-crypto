@@ -1,10 +1,9 @@
 export {}
-import { ElGamal, ELGamalZKP } from '../../src/index'
+import { FFelGamal } from '../../src/index'
 
-const random = require('random')
 const { expect } = require('chai')
 
-describe('ElGamal ZKP Proof', () => {
+describe('Finite Field ElGamal ZKP Proof', () => {
   it('create and verify proof', () => {
     const uniqueID = '0xAd4E7D8f03904b175a1F8AE0D88154f329ac9329'
 
@@ -15,7 +14,7 @@ describe('ElGamal ZKP Proof', () => {
         prnt && console.log('p:', p, ', g:', g)
         let pk
         try {
-          pk = ElGamal.generateKeysZKP(p, g)[0]
+          pk = FFelGamal.Encryption.generateKeysZKP(p, g)[0]
         } catch (error) {
           console.error(error)
           break
@@ -24,19 +23,19 @@ describe('ElGamal ZKP Proof', () => {
         // yes vote
         prnt && console.log('yes proof')
         const yesVote = 1
-        const yesEnc = ElGamal.encrypt(yesVote, pk, prnt)
-        const yesProof = ELGamalZKP.generateYesProof(yesEnc, pk, uniqueID)
+        const yesEnc = FFelGamal.Encryption.encrypt(yesVote, pk, prnt)
+        const yesProof = FFelGamal.ZKP.generateYesProof(yesEnc, pk, uniqueID)
 
-        const verifiedYesProof = ELGamalZKP.verifyProof(yesEnc, yesProof, pk, uniqueID)
+        const verifiedYesProof = FFelGamal.ZKP.verifyVoteProof(yesEnc, yesProof, pk, uniqueID)
         expect(verifiedYesProof).to.be.true
 
         // no vote
         prnt && console.log('no proof')
         const noVote = 0
-        const noEnc = ElGamal.encrypt(noVote, pk, prnt)
-        const noProof = ELGamalZKP.generateNoProof(noEnc, pk, uniqueID)
+        const noEnc = FFelGamal.Encryption.encrypt(noVote, pk, prnt)
+        const noProof = FFelGamal.ZKP.generateNoProof(noEnc, pk, uniqueID)
 
-        const verifiedNoProof = ELGamalZKP.verifyProof(noEnc, noProof, pk, uniqueID)
+        const verifiedNoProof = FFelGamal.ZKP.verifyVoteProof(noEnc, noProof, pk, uniqueID)
         expect(verifiedNoProof).to.be.true
       }
     }

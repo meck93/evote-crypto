@@ -1,9 +1,10 @@
-export {}
 const EC = require('elliptic').ec
 const ec = new EC('secp256k1')
 const BN = require('bn.js')
 import { EccElGamal } from '../index'
 import { Proof } from '../models'
+
+// TODO: implement me (based on ff elgamal zkp)
 
 const printConsole = false
 

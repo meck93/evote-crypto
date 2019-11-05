@@ -1,36 +1,16 @@
 import { PublicKey } from './models'
 import { Cipher } from '../models'
+import { getQofP } from './helper'
 
 const BN = require('bn.js')
 const random = require('random')
-// const crypto = require('crypto')
 
-// export const getSecureRandomValue = (): any => {
-//   const RAND_SIZE_BYTES = 32
-
-//   // TODO: Fix upper limit to p-2
-//   const UPPER_BOUND_RANDOM = null
-
-//   let randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
-//   let randomValue = new BN(randomBytes)
-
-//   // ensure that the random value is in range [1,n-1]
-//   while (!randomValue.lte(UPPER_BOUND_RANDOM) && randomValue.gte(1)) {
-//     randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
-//     randomValue = new BN(randomBytes, 'hex')
-//   }
-//   return randomValue
-// }
-
-export const newBN = (n: number) => new BN(n, 10)
+const newBN = (n: number) => new BN(n, 10)
 
 // modulo operations
 const mul = (a: any, b: any, pk: PublicKey) => a.mul(b).mod(pk.p)
 const pow = (a: any, b: any, pk: PublicKey) => a.pow(b).mod(pk.p)
 const invm = (a: any, pk: PublicKey) => a.invm(pk.p)
-
-// calculate q given p
-export const getQofP = (p: any) => (p - 1) / 2
 
 export const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
   const p = newBN(_p)
@@ -44,6 +24,7 @@ export const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
 
   return [pk, sk]
 }
+
 export const generateKeysZKP = (_p: number, _g: number): [PublicKey, any] => {
   const p = newBN(_p)
   const q = newBN(getQofP(_p))
@@ -73,26 +54,6 @@ export const generateKeysZKP = (_p: number, _g: number): [PublicKey, any] => {
   }
 
   return [pk, sk]
-}
-
-export const getGs = (p: number): number[] => {
-  // source: https://asecuritysite.com/encryption/pickg
-  const g: number[] = []
-  for (let i = 1; i < p; i++) {
-    let exp = 1
-    let next = i % p
-
-    while (next !== 1) {
-      next = (next * i) % p
-      exp += 1
-    }
-
-    if (exp === p - 1) {
-      g.push(i)
-    }
-  }
-
-  return g
 }
 
 export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Cipher => {

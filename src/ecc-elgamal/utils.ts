@@ -7,6 +7,7 @@ export function serializeCurvePoint(point: any) {
   return [c1, c2]
 }
 
+// FIXME: use new proof interface and create serialization method for cipher/point
 export function serializeAndPrintProof(proof: Proof) {
   console.log('x: \n', serializeCurvePoint(proof.x))
   console.log('y: \n', serializeCurvePoint(proof.y))

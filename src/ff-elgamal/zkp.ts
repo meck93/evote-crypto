@@ -2,8 +2,8 @@ const BN = require('bn.js')
 const hash = require('hash.js')
 const random = require('random')
 
-import { Proof, Cipher } from '../models'
-import { PublicKey } from '../elgamal/models'
+import { ValidVoteProof, Cipher } from '../models'
+import { PublicKey } from './models'
 
 const printConsole = false
 
@@ -18,7 +18,7 @@ const pow = (a: any, b: any, pk: PublicKey) => a.pow(b).mod(pk.p)
 const invm = (a: any, pk: PublicKey) => a.invm(pk.p)
 
 // Generates a proof for an encrypted yes vote.
-export function generateYesProof(cipher: Cipher, pk: PublicKey, uniqueID: string): Proof {
+export function generateYesProof(cipher: Cipher, pk: PublicKey, uniqueID: string): ValidVoteProof {
   // a = g^r, b = public_key i.e. h^r*g^m
   const { a, b, r } = cipher
 
@@ -62,7 +62,7 @@ export function generateYesProof(cipher: Cipher, pk: PublicKey, uniqueID: string
 }
 
 // Generates a proof for an encrypted no vote.
-export function generateNoProof(cipher: Cipher, pk: PublicKey, uniqueID: string): Proof {
+export function generateNoProof(cipher: Cipher, pk: PublicKey, uniqueID: string): ValidVoteProof {
   // a = g^r, b = public_key i.e. h^r*g^m
   const { a, b, r } = cipher
 
@@ -106,7 +106,7 @@ export function generateNoProof(cipher: Cipher, pk: PublicKey, uniqueID: string)
   return { a0, a1, b0, b1, c0, c1, f0, f1 }
 }
 
-export function verifyProof(cipher: Cipher, proof: Proof, pk: any, uniqueID: string): boolean {
+export function verifyVoteProof(cipher: Cipher, proof: ValidVoteProof, pk: any, uniqueID: string): boolean {
   const { a, b } = cipher
   const { a0, a1, b0, b1, c0, c1, f0, f1 } = proof
 

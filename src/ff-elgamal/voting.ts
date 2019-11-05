@@ -1,4 +1,4 @@
-import { encrypt, add, decrypt1 } from '.'
+import { encrypt, add, decrypt1 } from './encryption'
 import { PublicKey } from './models'
 import { Cipher } from '../models'
 
