@@ -24,6 +24,6 @@ export interface ValidVoteProof {
 export interface SumProof {
   a1: any
   b1: any
-  c: any
   f: any
+  d: any
 }
