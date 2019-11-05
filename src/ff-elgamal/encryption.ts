@@ -56,33 +56,108 @@ export const generateKeysZKP = (_p: number, _g: number): [PublicKey, any] => {
   return [pk, sk]
 }
 
+// Finite Field ElGamal Encryption
+//
+// given:
+// - g: generator
+// - h: public key (g^privateKey)
+// - m: message
+// (- p: prime number)
+//
+// steps:
+// 1. pick random value r: 0 < r < p
+// 2. compute c1 = g^r
+// 3. compute s = h^r
+// 4. compute mh = g^message (to make it "homomorphic")
+// 5. compute c2 = s*mh
 export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Cipher => {
-  const msg = typeof message === 'number' ? newBN(message) : message
+  const m = typeof message === 'number' ? newBN(message) : message
 
-  // generate a random value
-  const randomValue = newBN(random.int(1, pk.q - 1))
-
-  // compute c1: generator^randomValue
-  let c1 = pow(pk.g, randomValue, pk)
-
-  // compute s: h^randomValue whereby
-  // h = publicKey => h = g^privateKeyOfReceiver (h is publically available)
-  const s = pow(pk.h, randomValue, pk)
-
-  // compute mh: generator^message
-  const mh = pow(pk.g, msg, pk)
-
-  // compute c2: s*message_homomorphic
+  const r = newBN(random.int(1, pk.q - 1))
+  const c1 = pow(pk.g, r, pk)
+  const s = pow(pk.h, r, pk)
+  const mh = pow(pk.g, m, pk)
   const c2 = mul(s, mh, pk)
 
-  log && console.log('enc secret   (r)', randomValue)
+  log && console.log('enc secret   (r)', r)
   log && console.log('a\t\t', c1)
   log && console.log('h^r\t\t', s)
   log && console.log('g^m\t\t', mh)
   log && console.log('b\t\t', c2)
   log && console.log('------------------------')
 
-  return { a: c1, b: c2, r: randomValue }
+  return { a: c1, b: c2, r }
+}
+
+// Finite Field ElGamal Decryption
+//
+// given:
+// - g: generator
+// - x: private key
+// - c1,c2: cipher
+// (- p: prime number)
+//
+// steps:
+// 1. compute s = c1^x
+// 2. compute s^-1 = multiplicative inverse of s
+// 3. compute mh = c2 * s^-1
+// 4. compute m using brute force
+// TODO: use baby-step giant-step instead of brute force
+export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolean = false): any => {
+  const { a: c1, b: c2 } = cipherText
+
+  const s = pow(c1, sk, pk)
+  const sInverse = invm(s, pk)
+  const mh = mul(c2, sInverse, pk)
+
+  let m = newBN(0)
+  while (!pow(pk.g, m, pk).eq(mh)) {
+    m = m.add(newBN(1))
+  }
+
+  log && console.log('s\t\t', s)
+  log && console.log('s^-1\t\t', sInverse)
+  log && console.log('mh\t\t', mh)
+  log && console.log('plaintext d1\t', m)
+  log && console.log('------------------------')
+
+  return m
+}
+
+// Finite Field ElGamal Decryption Alternative (using Euler's Theorem)
+//
+// given:
+// - g: generator
+// - x: private key
+// - c1,c2: cipher
+// (- p: prime number)
+//
+// steps:
+// 1. compute s = c1^x
+// 2. compute s^-1 = multiplicative inverse of s
+// 3. compute s^(p-2)
+// 4. compute mh = c2 * s^(p-2)
+// 5. compute m using brute force
+// TODO: use baby-step giant-step instead of brute force
+export const decrypt2 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolean = false): any => {
+  const { a: c1, b: c2 } = cipherText
+
+  const s = pow(c1, sk, pk)
+  const sPowPMinus2 = pow(s, pk.p.sub(newBN(2)), pk)
+  const mh = mul(c2, sPowPMinus2, pk)
+
+  let m = newBN(1)
+  while (!pow(pk.g, m, pk).eq(mh)) {
+    m = m.add(newBN(1))
+  }
+
+  log && console.log('s\t\t', s)
+  log && console.log('s^(p-2)\t\t', sPowPMinus2)
+  log && console.log('mh\t', mh)
+  log && console.log('plaintext d2\t', m)
+  log && console.log('------------------------')
+
+  return m
 }
 
 export const add = (em1: Cipher, em2: Cipher, pk: PublicKey): Cipher => {
@@ -90,68 +165,4 @@ export const add = (em1: Cipher, em2: Cipher, pk: PublicKey): Cipher => {
     a: mul(em1.a, em2.a, pk),
     b: mul(em1.b, em2.b, pk),
   }
-}
-
-export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolean = false): any => {
-  let c1 = cipherText.a
-  let c2 = cipherText.b
-
-  // compute s: c1^privateKey
-  let s = pow(c1, sk, pk)
-
-  // compute s^-1: the multiplicative inverse of s (probably the most difficult)
-  let s_inverse = invm(s, pk)
-
-  // compute m: c2 * s^-1 | c2 / s
-  let m_h = mul(c2, s_inverse, pk)
-
-  // 4.
-  let m = newBN(0)
-  while (!pow(pk.g, m, pk).eq(m_h)) {
-    m = m.add(newBN(1))
-  }
-
-  log && console.log('s\t\t', s)
-  log && console.log('s^-1\t\t', s_inverse)
-  log && console.log('m_h\t\t', m_h)
-  log && console.log('plaintext d1\t', m)
-  log && console.log('------------------------')
-
-  return m
-}
-
-export const decrypt2 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolean = false): any => {
-  let c1 = cipherText.a
-  let c2 = cipherText.b
-
-  // compute s: c1^privateKey
-  let s = pow(c1, sk, pk)
-
-  // compute s^-1: the multiplicative inverse of s (probably the most difficult)
-  let s_inverse = invm(s, pk)
-
-  // alternative computation
-  // 1. compute p-2
-  const pMinusX = pk.p.sub(newBN(2))
-
-  // 2. compute pre-result s^(p-x)
-  const sPowPMinusX = pow(s, pMinusX, pk)
-
-  // 3. compute message - msg = c2*s^(p-x)
-  let m_h = mul(c2, sPowPMinusX, pk)
-
-  let m = newBN(1)
-  while (!pow(pk.g, m, pk).eq(m_h)) {
-    m = m.add(newBN(1))
-  }
-
-  log && console.log('s\t\t', s)
-  log && console.log('s^-1\t\t', s_inverse)
-  log && console.log('p - 2\t\t', pMinusX)
-  log && console.log('s^(p-x)\t\t', sPowPMinusX)
-  log && console.log('msg_homo\t', m_h)
-  log && console.log('plaintext d2\t', m)
-  log && console.log('------------------------')
-
-  return m
 }
