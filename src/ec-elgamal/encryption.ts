@@ -7,47 +7,60 @@ const ec = new EC('secp256k1')
 
 const shouldLog = false
 
+// Elliptic Curve ElGamal Encryption
+//
+// given:
+// - g: generator
+// - h: public key (g^privateKey)
+// - m: message
+//
+// steps:
+// 1. pick random value r
+// 2. compute c1 = g^r (ec-multiplication)
+// 3. compute s = h^r (ec-multiplication)
+// 4. compute c2 = s*m
 export const encrypt = (message: any, pubK: any): Cipher => {
-  const randBN = getSecureRandomValue()
+  const r = getSecureRandomValue()
 
-  // compute c1: generator ec-multiply randomValue
-  let c1 = ec.g.mul(randBN)
-  shouldLog && console.log('Is c1 on the curve?', ec.curve.validate(c1))
-
-  // compute s: h^randomValue
-  // whereby h = publicKey => h = g^privateKeyOfReceiver (h is publically available)
-  const s = pubK.mul(randBN)
-  shouldLog && console.log('Is point s on the curve?', ec.curve.validate(s))
-
-  // compute c2: s*message
+  const c1 = ec.g.mul(r)
+  const s = pubK.mul(r)
   const c2 = s.add(message)
+
+  shouldLog && console.log('Is c1 on the curve?', ec.curve.validate(c1))
+  shouldLog && console.log('Is point s on the curve?', ec.curve.validate(s))
   shouldLog && console.log('is c2 on curve?', ec.curve.validate(c2))
 
   return { a: c1, b: c2 }
 }
 
+// Elliptic Curve ElGamal Decryption
+//
+// given:
+// - g: generator
+// - x: private key
+// - c1,c2: cipher
+//
+// steps:
+// 1. compute s = c1^x (ec-multiplication)
+// 2. compute s^-1 = multiplicative inverse of s
+// 3. compute m = c2 * s^-1 (ec-addition)
 export const decrypt = (cipherText: Cipher, privK: any): any => {
-  const c1 = cipherText.a
-  const c2 = cipherText.b
+  const { a: c1, b: c2 } = cipherText
 
-  // compute s: c1^privateKey
   const s = c1.mul(privK)
+  const sInverse = s.neg()
+  const m = c2.add(sInverse)
+
   shouldLog && console.log('is s on the curve?', ec.curve.validate(s))
-
-  // compute s^-1: the multiplicative inverse of s (probably the most difficult)
-  let s_inverse = s.neg()
-  shouldLog && console.log('is s^-1 on the curve?', ec.curve.validate(s_inverse))
-
-  // compute m: c2 ec-add s^-1
-  const m = c2.add(s_inverse)
+  shouldLog && console.log('is s^-1 on the curve?', ec.curve.validate(sInverse))
   shouldLog && console.log('is m on curve?', ec.curve.validate(m))
 
   return m
 }
 
 export const homomorphicAdd = (cipher0: Cipher, cipher1: Cipher): Cipher => {
-  // adds two cipher texts together
-  const c1 = cipher0.a.add(cipher1.a)
-  const c2 = cipher0.b.add(cipher1.b)
-  return { a: c1, b: c2 }
+  return {
+    a: cipher0.a.add(cipher1.a),
+    b: cipher0.b.add(cipher1.b),
+  }
 }
