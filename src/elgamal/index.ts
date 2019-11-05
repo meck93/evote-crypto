@@ -42,6 +42,18 @@ export const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
 
   const pk = { p, g, h, q }
 
+  return [pk, sk]
+}
+export const generateKeysZKP = (_p: number, _g: number): [PublicKey, any] => {
+  const p = newBN(_p)
+  const q = newBN(getQofP(_p))
+  const g = newBN(_g)
+
+  const sk = newBN(random.int(1, q - 1))
+  const h = g.pow(sk).mod(p)
+
+  const pk = { p, g, h, q }
+
   // verify that g^q mod p == 1 (this means: gcd(q,p) == 1)
   const test1 = pow(g, q, pk)
   if (!test1.eq(newBN(1))) {

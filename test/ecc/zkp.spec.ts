@@ -14,7 +14,7 @@ describe('EccElGamal Zero Knowledge Proofs', () => {
     assert(ec.curve.validate(noVoteOnCurve) && ec.curve.validate(yesVoteOnCurve))
   })
 
-  it('Should generate a valid proof for a vote', () => {
+  xit('Should generate a valid proof for a vote', () => {
     const keyPair = ec.genKeyPair()
     const privateKey = keyPair.getPrivate()
     const publicKey = keyPair.getPublic()

@@ -5,7 +5,7 @@ const random = require('random')
 const { expect } = require('chai')
 
 describe('ElGamal ZKP Proof', () => {
-  it.only('create and verify proof', () => {
+  it('create and verify proof', () => {
     const uniqueID = '0xAd4E7D8f03904b175a1F8AE0D88154f329ac9329'
 
     // generate and verify 10 proofs (with different random variables)
@@ -14,9 +14,8 @@ describe('ElGamal ZKP Proof', () => {
         const prnt = false
         prnt && console.log('p:', p, ', g:', g)
         let pk
-        let sk
         try {
-          ;[pk, sk] = ElGamal.generateKeys(p, g)
+          pk = ElGamal.generateKeysZKP(p, g)[0]
         } catch (error) {
           console.error(error)
           break
@@ -42,30 +41,18 @@ describe('ElGamal ZKP Proof', () => {
       }
     }
 
-    //  5 => 4
-    test(5, 4)
-
-    //  7 => 2, 4
+    //  7 => 2
     test(7, 2)
-    test(7, 4)
 
-    // 11 => 3, 4, 5, 9
+    // 11 => 3
     test(11, 3)
-    test(11, 4)
-    test(11, 5)
-    test(11, 9)
 
-    // 23 => 2, 3, 4, 6, 8, 9, 12, 13, 16, 18
+    // 23 => 2, 6, 8
     test(23, 2)
-    test(23, 3)
-    test(23, 4)
     test(23, 6)
     test(23, 8)
-    test(23, 9)
-    test(23, 12)
-    test(23, 13)
-    test(23, 16)
-    test(23, 18)
+
+    // TODO: adjust test cases below
 
     // 47 => 2, 3, 4, 6, 8, 9, 12, 16, 18, 24, 32, 36
     test(47, 2)
