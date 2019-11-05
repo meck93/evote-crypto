@@ -115,8 +115,7 @@ export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Ciph
 export const add = (em1: Cipher, em2: Cipher, pk: PublicKey): Cipher => {
   return {
     a: mul(em1.a, em2.a, pk),
-    b: mul(em1.b, em2.b, pk),
-    r: null,
+    b: mul(em1.b, em2.b, pk)
   }
 }
 

@@ -38,12 +38,12 @@ export const encrypt = (message: any, pubK: any): Cipher => {
   const c2 = s.add(message)
   shouldLog && console.log('is c2 on curve?', ec.curve.validate(c2))
 
-  return { c1, c2 }
+  return { a: c1, b: c2 }
 }
 
 export const decrypt = (cipherText: Cipher, privK: any): any => {
-  const c1 = cipherText.c1
-  const c2 = cipherText.c2
+  const c1 = cipherText.a
+  const c2 = cipherText.b
 
   // compute s: c1^privateKey
   const s = c1.mul(privK)
@@ -62,7 +62,7 @@ export const decrypt = (cipherText: Cipher, privK: any): any => {
 
 export const homomorphicAdd = (cipher0: Cipher, cipher1: Cipher): Cipher => {
   // adds two cipher texts together
-  const c1 = cipher0.c1.add(cipher1.c1)
-  const c2 = cipher0.c2.add(cipher1.c2)
-  return { c1, c2 }
+  const c1 = cipher0.a.add(cipher1.a)
+  const c2 = cipher0.b.add(cipher1.b)
+  return { a: c1, b: c2 }
 }

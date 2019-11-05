@@ -1,7 +1,7 @@
 export interface Cipher {
   a: any
   b: any
-  r: any
+  r?: any
 }
 
 export interface Summary {
