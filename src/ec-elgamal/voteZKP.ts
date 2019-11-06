@@ -6,10 +6,11 @@ import { ECParams, ECCipher } from './models'
 import BN = require('bn.js')
 import { curve, ec } from 'elliptic'
 
-const printConsole = false
+const printConsole = true
 
 const BNadd = (a: BN, b: BN, params: ECParams) => a.add(b).mod(params.n)
 const BNsub = (a: BN, b: BN, params: ECParams) => a.sub(b).mod(params.n)
+const BNmul = (a: BN, b: BN, params: ECParams) => a.mul(b).mod(params.n)
 
 const ECpow = (a: curve.base.BasePoint, b: BN): curve.base.BasePoint => a.mul(b)
 const ECmul = (a: curve.base.BasePoint, b: curve.base.BasePoint): curve.base.BasePoint => a.add(b)
@@ -41,7 +42,7 @@ export function generateYesProof(encryptedVote: ECCipher, params: ECParams, id: 
   const c1 = BNadd(n, BNsub(c, c0, params), params)
 
   // compute f1 = x + c1 * r (NOTE: mod q!)
-  const c1r = c1.mul(r).mod(params.n)
+  const c1r = BNmul(c1, r, params)
   const f1 = BNadd(x, c1r, params)
 
   printConsole && console.log('a0 is on the curve?\t', secp256k1.curve.validate(a0))
@@ -89,7 +90,7 @@ export function generateNoProof(encryptedVote: ECCipher, params: ECParams, id: s
   const c0 = BNadd(n, BNsub(c, c1, params), params)
 
   // compute f0 = x + c0 * r (NOTE: mod q!)
-  const c0r = c0.mul(r).mod(params.n)
+  const c0r = BNmul(c0, r, params)
   const f0 = BNadd(x, c0r, params)
 
   printConsole && console.log('a1 is on the curve?\t', secp256k1.curve.validate(a1))
@@ -125,9 +126,9 @@ export function verifyZKP(encryptedVote: ECCipher, proof: ValidVoteProof, params
 
   // verification h^f0 == b0 * b^c0
   const l3 = ECpow(h, f0)
-  console.log(l3.isInfinity(), l3)
+  console.log('l3', l3.isInfinity())
   const r3 = ECmul(b0, ECpow(b, c0))
-  console.log(r3.isInfinity(), r3)
+  console.log('r3', r3.isInfinity(), 'r3 == l3?', l3.eq(r3))
   const v3 = l3.eq(r3)
 
   // verification h^f1 == b1 * (b/g)^c1
@@ -136,7 +137,7 @@ export function verifyZKP(encryptedVote: ECCipher, proof: ValidVoteProof, params
   const v4 = l4.eq(r4)
 
   // recompute the hash and verify
-  const lc = c1.add(c0).mod(n)
+  const lc = BNadd(c0, c1, params)
 
   const rc = generateChallenge(n, id, a, b, a0, b0, a1, b1)
   const v5 = lc.eq(rc)
