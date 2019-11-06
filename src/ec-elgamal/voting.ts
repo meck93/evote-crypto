@@ -1,25 +1,28 @@
 import { encrypt, homomorphicAdd, decrypt } from './encryption'
-import { Cipher } from '../models'
+import { ECCipher } from './models'
+import { curve } from 'elliptic'
+
+import BN = require('bn.js')
 
 const EC = require('elliptic').ec
-const ec = new EC('secp256k1')
+const secp256k1 = new EC('secp256k1')
 
-const startingPoint = ec.curve.g
+const startingPoint = secp256k1.curve.g
 const infinityPoint = startingPoint.add(startingPoint.neg())
 
-export const generateYesVote = (publicKey: any): any => {
+export const generateYesVote = (publicKey: curve.base.BasePoint): ECCipher => {
   return encrypt(startingPoint, publicKey)
 }
 
-export const generateNoVote = (publicKey: any): any => {
+export const generateNoVote = (publicKey: curve.base.BasePoint): ECCipher => {
   return encrypt(startingPoint.neg(), publicKey)
 }
 
-export const addVotes = (votes: Cipher[], publicKey: any): Cipher => {
+export const addVotes = (votes: ECCipher[], publicKey: any): ECCipher => {
   return votes.reduce((previous, current) => homomorphicAdd(previous, current), encrypt(infinityPoint, publicKey))
 }
 
-export const findPoint = (point: any): number => {
+export const findPoint = (point: curve.base.BasePoint): number => {
   let pointPositive = startingPoint
   let pointNegative = startingPoint.neg()
   let counter = 1
@@ -33,9 +36,13 @@ export const findPoint = (point: any): number => {
   return point.eq(pointNegative) ? -counter : counter
 }
 
-export const tallyVotes = (publicKey: any, sk: any, votes: Cipher[]): number => {
+export const tallyVotes = (publicKey: curve.base.BasePoint, sk: BN, votes: ECCipher[]): number => {
   const sum = decrypt(addVotes(votes, publicKey), sk)
   return sum.eq(infinityPoint) ? 0 : findPoint(sum)
+}
+
+export const checkDecrypedSum = (decryptedSum: curve.base.BasePoint): number => {
+  return decryptedSum.eq(infinityPoint) ? 0 : findPoint(decryptedSum)
 }
 
 export const getSummary = (total: number, tallyResult: number) => {
