@@ -1,10 +1,9 @@
-const BN = require('bn.js')
-const hash = require('hash.js')
-const random = require('random')
-
-import { SumProof, Cipher } from '../models'
+import { Cipher, SumProof } from '../models'
 import { PublicKey } from './models'
 
+const BN = require('bn.js')
+const random = require('random')
+const web3 = require('web3')
 const printConsole = false
 
 export const newBN = (n: number) => new BN(n, 10)
@@ -79,16 +78,8 @@ export function numbersToString(numbers: Array<any>) {
 }
 
 export function generateChallenge(q: any, uniqueID: any, a: any, b: any, a1: any, b1: any) {
-  const pointsAsString = numbersToString([a, b, a1, b1])
-  const input = uniqueID + pointsAsString
-
-  let c = hash
-    .sha256()
-    .update(input)
-    .digest('hex')
-
-  c = new BN(c, 'hex')
+  let c = web3.utils.soliditySha3(uniqueID, a, b, a1, b1)
+  c = web3.utils.toBN(c)
   c = c.mod(q)
-
   return c
 }
