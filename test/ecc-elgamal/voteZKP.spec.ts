@@ -1,28 +1,50 @@
 export {}
 import { ECelGamal } from '../../src/index'
+import { ValidVoteProof } from '../../src/models'
+import { ec, curve } from 'elliptic'
+import BN = require('bn.js')
 
-const { assert } = require('chai')
+import { expect, assert } from 'chai'
+import { ECParams, ECCipher } from '../../src/ec-elgamal/models'
+
 const EC = require('elliptic').ec
-const ec = new EC('secp256k1')
+const secp256k1 = new EC('secp256k1')
+
+const prnt = true
 
 // fixed constants for values 1 -> generator and 0 -> generator^-1
-const yesVoteOnCurve = ec.curve.g
-const noVoteOnCurve = ec.curve.g.neg()
+const yesVoteOnCurve = secp256k1.curve.g
+const noVoteOnCurve = secp256k1.curve.g.neg()
 
-describe('Elliptic Curve ElGamal Vote ZKP', () => {
+describe.only('Elliptic Curve ElGamal Vote ZKP', () => {
   it('Points that encode the plaintexts should lie on the curve', function() {
-    assert(ec.curve.validate(noVoteOnCurve) && ec.curve.validate(yesVoteOnCurve))
+    assert(secp256k1.curve.validate(noVoteOnCurve) && secp256k1.curve.validate(yesVoteOnCurve))
   })
 
-  xit('Should generate a valid proof for a vote', () => {
-    const keyPair = ec.genKeyPair()
-    const privateKey = keyPair.getPrivate()
-    const publicKey = keyPair.getPublic()
+  it('Should generate a valid proof for a vote', () => {
+    const keyPair: ec.KeyPair = secp256k1.genKeyPair()
+    const privateKey: BN = keyPair.getPrivate()
+    const publicKey: curve.base.BasePoint = keyPair.getPublic()
 
-    const proof: Proof = ECelGamal.VoteZKP.createZKP(yesVoteOnCurve, publicKey)
+    const params: ECParams = { p: secp256k1.curve.p, h: publicKey, g: secp256k1.curve.g, n: secp256k1.curve.n }
+    const uniqueID = '0xAd4E7D8f03904b175a1F8AE0D88154f329ac9329'
 
-    // TODO: verifyZKP is not finished -> something wrong with the challenge (hash)
-    const result: boolean = ECelGamal.VoteZKP.verifyZKP(proof, publicKey)
-    assert(result)
+    // encrypted yes vote + generate proof
+    prnt && console.log('yes proof\n')
+    const encryptedYesVote: ECCipher = ECelGamal.Encryption.encrypt(yesVoteOnCurve, publicKey)
+    const yesProof: ValidVoteProof = ECelGamal.VoteZKP.generateYesProof(encryptedYesVote, params, uniqueID)
+
+    // verify yes vote proof
+    const verifiedYesProof: boolean = ECelGamal.VoteZKP.verifyZKP(encryptedYesVote, yesProof, params, uniqueID)
+    expect(verifiedYesProof).to.be.true
+
+    // encrypt no vote + generate proof
+    prnt && console.log('no proof\n')
+    const encryptedNoVote: ECCipher = ECelGamal.Encryption.encrypt(noVoteOnCurve, publicKey)
+    const noProof = ECelGamal.VoteZKP.generateNoProof(encryptedNoVote, params, uniqueID)
+
+    // verify no vote proof
+    const verifiedNoProof: boolean = ECelGamal.VoteZKP.verifyZKP(encryptedNoVote, noProof, params, uniqueID)
+    expect(verifiedNoProof).to.be.true
   })
 })
