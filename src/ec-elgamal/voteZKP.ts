@@ -1,109 +1,169 @@
 const EC = require('elliptic').ec
-const ec = new EC('secp256k1')
-const BN = require('bn.js')
+const secp256k1 = new EC('secp256k1')
 import { ECelGamal } from '../index'
 import { ValidVoteProof } from '../models'
-
-// TODO: implement me (based on ff elgamal vote zkp)
+import { ECParams, ECCipher } from './models'
+import BN = require('bn.js')
+import { curve, ec } from 'elliptic'
 
 const printConsole = false
 
-export function createZKP(message: any, pubK: any): ValidVoteProof {
-  const alpha = ECelGamal.Helper.getSecureRandomValue()
-  const r1 = ECelGamal.Helper.getSecureRandomValue()
-  const d1 = ECelGamal.Helper.getSecureRandomValue()
-  const w = ECelGamal.Helper.getSecureRandomValue()
+const BNadd = (a: BN, b: BN, params: ECParams) => a.add(b).mod(params.n)
+const BNsub = (a: BN, b: BN, params: ECParams) => a.sub(b).mod(params.n)
 
-  const cipher = ECelGamal.Encryption.encrypt(message, pubK)
+const ECpow = (a: curve.base.BasePoint, b: BN): curve.base.BasePoint => a.mul(b)
+const ECmul = (a: curve.base.BasePoint, b: curve.base.BasePoint): curve.base.BasePoint => a.add(b)
+const ECdiv = (a: curve.base.BasePoint, b: curve.base.BasePoint): curve.base.BasePoint => a.add(b.neg())
 
-  const x = cipher.c1
-  const y = cipher.c2
+// Generates a proof for an encrypted yes vote.
+export function generateYesProof(encryptedVote: ECCipher, params: ECParams, id: string): ValidVoteProof {
+  const { a, b, r } = encryptedVote
+  const { h, g, n } = params
 
-  const xTd1 = x.mul(d1)
-  const gTr1 = ec.curve.g.mul(r1)
-  const a1 = gTr1.add(xTd1)
-  printConsole && console.log('a1 is on curve?', ec.curve.validate(a1))
+  // generate fake values for m=0 part
+  const c0: BN = ECelGamal.Helper.getSecureRandomValue()
+  const f0: BN = ECelGamal.Helper.getSecureRandomValue()
 
-  const pubKTr1 = pubK.mul(r1)
-  const yG = y.add(ec.curve.g)
-  const yGTd1 = yG.mul(d1)
-  const b1 = pubKTr1.add(yGTd1)
-  printConsole && console.log('b1 is on the curve?', ec.curve.validate(b1))
+  // compute fake a0. g^f0/a^c0
+  const a0 = ECdiv(ECpow(g, f0), ECpow(a, c0))
 
-  const a2 = ec.curve.g.mul(w)
-  printConsole && console.log('a2 is on the curve?', ec.curve.validate(a2))
+  // compute fake b0. h^f0/b^c0
+  const b0 = ECdiv(ECpow(h, f0), ECpow(b, c0))
 
-  const b2 = pubK.mul(w)
-  printConsole && console.log('b2 is on the curve?', ec.curve.validate(b2))
+  // generate proof for m=1 part
+  const x: BN = ECelGamal.Helper.getSecureRandomValue()
 
-  // TODO: change this ID with real ethereum address
-  const uniqueID = '0xAd4E7D8f03904b175a1F8AE0D88154f329ac9329'
+  const a1 = ECpow(g, x)
+  const b1 = ECpow(h, x)
 
-  // TODO: fix the challenge generation such that the hash function output is always valid
-  const challenge = generateChallenge(uniqueID, x, y, a1, a2, b1, b2)
-  printConsole &&
-    console.log('challence is greater than n', challenge.gt(ec.curve.n), 'c is greater than 1', challenge.gt(1))
+  // generate the challenge
+  const c = generateChallenge(n, id, a, b, a0, b0, a1, b1)
+  const c1 = BNadd(n, BNsub(c, c0, params), params)
 
-  let d2 = challenge.sub(d1).mod(ec.curve.n)
-  printConsole && console.log('d2:', d2.isNeg(), 'c:', challenge.isNeg(), 'd1:', d1.isNeg())
+  // compute f1 = x + c1 * r (NOTE: mod q!)
+  const c1r = c1.mul(r).mod(params.n)
+  const f1 = BNadd(x, c1r, params)
 
-  const intermediate = alpha.mul(d2).mod(ec.curve.n)
-  const r2 = w.sub(intermediate)
+  printConsole && console.log('a0 is on the curve?\t', secp256k1.curve.validate(a0))
+  printConsole && console.log('b0 is on the curve?\t', secp256k1.curve.validate(b0))
+  printConsole && console.log('a1 is on the curve?\t', secp256k1.curve.validate(a1))
+  printConsole && console.log('b1 is on the curve?\t', secp256k1.curve.validate(b1))
 
-  return { x, y, a1, a2, b1, b2, d1, d2, r1, r2, challenge }
+  printConsole && console.log('c0\t\t\t', c0)
+  printConsole && console.log('f0\t\t\t', f0)
+  printConsole && console.log('x\t\t\t', x)
+  printConsole && console.log('c\t\t', c)
+  printConsole && console.log('c1 = (q + (c - c0) % q) % q\t', c1)
+  printConsole && console.log('f1 = x + c1*r\t\t', f1)
+  printConsole && console.log()
+
+  return { a0, a1, b0, b1, c0, c1, f0, f1 }
 }
 
-export function verifyZKP(proof: ValidVoteProof, pubK: any): boolean {
-  const { x, y, a1, a2, b1, b2, d1, d2, r1, r2, challenge } = proof
+// Generates a proof for an encrypted no vote.
+export function generateNoProof(encryptedVote: ECCipher, params: ECParams, id: string): ValidVoteProof {
+  const { a, b, r } = encryptedVote
+  const { h, g, n } = params
 
-  // validation of the hash - digest == hash(challenge)
-  const d1d2 = d1.add(d2).mod(ec.curve.n)
-  printConsole && console.log('Is the hash the same?', d1d2.eq(challenge))
+  // generate fake values for m=0 part
+  const c1: BN = ECelGamal.Helper.getSecureRandomValue()
+  const f1: BN = ECelGamal.Helper.getSecureRandomValue()
 
-  // validation of a1
-  const gTr1 = ec.curve.g.mul(r1)
-  const xTd1 = x.mul(d1)
-  const gTr1xTd1 = gTr1.add(xTd1)
-  printConsole && console.log('Is a1 the same?', gTr1xTd1.eq(a1))
+  // compute fake b: b/g
+  const b_ = ECdiv(b, g)
 
-  // validation of b1
-  const pubKTr1 = pubK.mul(r1)
-  const yG = y.add(ec.curve.g)
-  const yGTd1 = yG.mul(d1)
-  const pubKTr1yGTd1 = pubKTr1.add(yGTd1)
-  printConsole && console.log('Is b1 the same?', pubKTr1yGTd1.eq(b1))
+  // compute fake a0. g^f1/a^c1
+  const a1 = ECdiv(ECpow(g, f1), ECpow(a, c1))
 
-  // validation of a2
-  const gTr2 = ec.curve.g.mul(r2)
-  const xTd2 = x.mul(d2)
-  const gTr2xTd2 = gTr2.add(xTd2)
-  printConsole && console.log('Is a2 the same?', gTr2xTd2.eq(a2))
-  // console.log('a2', a2.getX().toString('hex'), a2.getY().toString('hex'))
-  // console.log('a2', gTr2xTd2.getX().toString('hex'), gTr2xTd2.getY().toString('hex'))
+  // compute fake b0. h^f1/b^(b/g)
+  const b1 = ECdiv(ECpow(h, f1), ECpow(b_, c1))
 
-  // validation of b2
-  const pubKTr2 = pubK.mul(r2)
-  const generator_inverted = ec.curve.g.neg()
-  const yMinusG = y.add(generator_inverted)
-  const yMinusGTd2 = yMinusG.mul(d2)
-  const pubKTr2yMinusGTd2 = pubKTr2.add(yMinusGTd2)
-  printConsole && console.log('Is b2 the same?', pubKTr2yMinusGTd2.eq(b2))
+  // generate proof for m=1 part
+  const x: BN = ECelGamal.Helper.getSecureRandomValue()
 
-  // TODO: implement how the verify function should calculate the final result
-  return true
+  const a0 = ECpow(g, x)
+  const b0 = ECpow(h, x)
+
+  // generate the challenge
+  const c = generateChallenge(n, id, a, b, a0, b0, a1, b1)
+  const c0 = BNadd(n, BNsub(c, c1, params), params)
+
+  // compute f0 = x + c0 * r (NOTE: mod q!)
+  const c0r = c0.mul(r).mod(params.n)
+  const f0 = BNadd(x, c0r, params)
+
+  printConsole && console.log('a1 is on the curve?\t', secp256k1.curve.validate(a1))
+  printConsole && console.log('b1 is on the curve?\t', secp256k1.curve.validate(b1))
+  printConsole && console.log('a0 is on the curve?\t', secp256k1.curve.validate(a0))
+  printConsole && console.log('b0 is on the curve?\t', secp256k1.curve.validate(b0))
+
+  printConsole && console.log('c1\t\t\t', c1)
+  printConsole && console.log('f1\t\t\t', f1)
+  printConsole && console.log('x\t\t\t', x)
+  printConsole && console.log('c\t\t', c)
+  printConsole && console.log('c0 = (q + (c - c1) % q) % q\t', c0)
+  printConsole && console.log('f0 = x + c0*r\t\t', f0)
+  printConsole && console.log()
+
+  return { a0, a1, b0, b1, c0, c1, f0, f1 }
 }
 
-export function generateChallenge(uniqueID: any, c1: any, c2: any, a1: any, a2: any, b1: any, b2: any) {
+export function verifyZKP(encryptedVote: ECCipher, proof: ValidVoteProof, params: ECParams, id: string): boolean {
+  const { a0, a1, b0, b1, c0, c1, f0, f1 } = proof
+  const { h, g, n } = params
+  const { a, b } = encryptedVote
+
+  // verification g^f0 == a0*a^c0
+  const l1 = ECpow(g, f0)
+  const r1 = ECmul(a0, ECpow(a, c0))
+  const v1 = l1.eq(r1)
+
+  // verification g^f1 == a1*a^c1
+  const l2 = ECpow(g, f1)
+  const r2 = ECmul(a1, ECpow(a, c1))
+  const v2 = l2.eq(r2)
+
+  // verification h^f0 == b0 * b^c0
+  const l3 = ECpow(h, f0)
+  console.log(l3.isInfinity(), l3)
+  const r3 = ECmul(b0, ECpow(b, c0))
+  console.log(r3.isInfinity(), r3)
+  const v3 = l3.eq(r3)
+
+  // verification h^f1 == b1 * (b/g)^c1
+  const l4 = ECpow(h, f1)
+  const r4 = ECmul(b1, ECpow(ECdiv(b, g), c1))
+  const v4 = l4.eq(r4)
+
+  // recompute the hash and verify
+  const lc = c1.add(c0).mod(n)
+
+  const rc = generateChallenge(n, id, a, b, a0, b0, a1, b1)
+  const v5 = lc.eq(rc)
+
+  printConsole && console.log('g^f0 == a0*a^c0:\t', v1)
+  printConsole && console.log('g^f1 == a1*a^c1\t\t', v2)
+  printConsole && console.log('h^f0 == b0*b^c0\t\t', v3)
+  printConsole && console.log('h^f1 == b1*(b/g)^c1\t', v4)
+  printConsole && console.log('c == c1 + c0\t\t', v5)
+  printConsole && console.log()
+
+  return v1 && v2 && v3 && v4 && v5
+}
+
+export function generateChallenge(n: BN, id: any, c1: any, c2: any, a1: any, a2: any, b1: any, b2: any) {
   const pointsAsString = convertAllECPointsToString([c1, c2, a1, a2, b1, b2])
-  const input = uniqueID + pointsAsString
+  const input = id + pointsAsString
 
-  const challenge = ec
+  let c = secp256k1
     .hash()
-    .update('test')
+    .update(input)
     .digest('hex')
 
-  return new BN(challenge, 'hex')
-  // return new BN(10, 'hex')
+  c = new BN(c, 'hex')
+  c = c.mod(n)
+
+  return c
 }
 
 export function convertECPointToString(point: any) {
