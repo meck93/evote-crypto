@@ -1,9 +1,10 @@
-import { Cipher } from '../models'
 import { getSecureRandomValue } from './helper'
+import { ECCipher } from './models'
+import { curve } from 'elliptic'
 
-const BN = require('bn.js')
+import BN = require('bn.js')
 const EC = require('elliptic').ec
-const ec = new EC('secp256k1')
+const secp256k1 = new EC('secp256k1')
 
 const shouldLog = false
 
@@ -19,16 +20,16 @@ const shouldLog = false
 // 2. compute c1 = g^r (ec-multiplication)
 // 3. compute s = h^r (ec-multiplication)
 // 4. compute c2 = s*m
-export const encrypt = (message: any, pubK: any): Cipher => {
+export const encrypt = (message: curve.base.BasePoint, pubK: curve.base.BasePoint): ECCipher => {
   const r = getSecureRandomValue()
 
-  const c1 = ec.g.mul(r)
+  const c1 = secp256k1.g.mul(r)
   const s = pubK.mul(r)
   const c2 = s.add(message)
 
-  shouldLog && console.log('Is c1 on the curve?', ec.curve.validate(c1))
-  shouldLog && console.log('Is point s on the curve?', ec.curve.validate(s))
-  shouldLog && console.log('is c2 on curve?', ec.curve.validate(c2))
+  shouldLog && console.log('Is c1 on the curve?', secp256k1.curve.validate(c1))
+  shouldLog && console.log('Is point s on the curve?', secp256k1.curve.validate(s))
+  shouldLog && console.log('is c2 on curve?', secp256k1.curve.validate(c2))
 
   return { a: c1, b: c2, r: r }
 }
@@ -44,21 +45,21 @@ export const encrypt = (message: any, pubK: any): Cipher => {
 // 1. compute s = c1^x (ec-multiplication)
 // 2. compute s^-1 = multiplicative inverse of s
 // 3. compute m = c2 * s^-1 (ec-addition)
-export const decrypt = (cipherText: Cipher, privK: any): any => {
+export const decrypt = (cipherText: ECCipher, privK: BN): any => {
   const { a: c1, b: c2 } = cipherText
 
   const s = c1.mul(privK)
   const sInverse = s.neg()
   const m = c2.add(sInverse)
 
-  shouldLog && console.log('is s on the curve?', ec.curve.validate(s))
-  shouldLog && console.log('is s^-1 on the curve?', ec.curve.validate(sInverse))
-  shouldLog && console.log('is m on curve?', ec.curve.validate(m))
+  shouldLog && console.log('is s on the curve?', secp256k1.curve.validate(s))
+  shouldLog && console.log('is s^-1 on the curve?', secp256k1.curve.validate(sInverse))
+  shouldLog && console.log('is m on curve?', secp256k1.curve.validate(m))
 
   return m
 }
 
-export const homomorphicAdd = (cipher0: Cipher, cipher1: Cipher): Cipher => {
+export const homomorphicAdd = (cipher0: ECCipher, cipher1: ECCipher): ECCipher => {
   return {
     a: cipher0.a.add(cipher1.a),
     b: cipher0.b.add(cipher1.b),
