@@ -30,7 +30,7 @@ export const encrypt = (message: any, pubK: any): Cipher => {
   shouldLog && console.log('Is point s on the curve?', ec.curve.validate(s))
   shouldLog && console.log('is c2 on curve?', ec.curve.validate(c2))
 
-  return { a: c1, b: c2 }
+  return { a: c1, b: c2, r: r }
 }
 
 // Elliptic Curve ElGamal Decryption
