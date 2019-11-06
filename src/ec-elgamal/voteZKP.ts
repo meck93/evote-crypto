@@ -41,7 +41,7 @@ export function generateYesProof(encryptedVote: ECCipher, params: ECParams, id: 
   const c = generateChallenge(n, id, a, b, a0, b0, a1, b1)
   const c1 = BNadd(n, BNsub(c, c0, params), params)
 
-  // compute f1 = x + c1 * r (NOTE: mod q!)
+  // compute f1 = x + c1 * r (NOTE: mod q!) => in the EC case this is (mod n) instead of (mod p)
   const c1r = BNmul(c1, r, params)
   const f1 = BNadd(x, c1r, params)
 
@@ -50,12 +50,12 @@ export function generateYesProof(encryptedVote: ECCipher, params: ECParams, id: 
   printConsole && console.log('a1 is on the curve?\t', secp256k1.curve.validate(a1))
   printConsole && console.log('b1 is on the curve?\t', secp256k1.curve.validate(b1))
 
-  printConsole && console.log('c0\t\t\t', c0)
-  printConsole && console.log('f0\t\t\t', f0)
-  printConsole && console.log('x\t\t\t', x)
-  printConsole && console.log('c\t\t', c)
-  printConsole && console.log('c1 = (q + (c - c0) % q) % q\t', c1)
-  printConsole && console.log('f1 = x + c1*r\t\t', f1)
+  printConsole && console.log('c0\t\t\t\t', c0.toString('hex'))
+  printConsole && console.log('f0\t\t\t\t', f0.toString('hex'))
+  printConsole && console.log('x\t\t\t\t', x.toString('hex'))
+  printConsole && console.log('c\t\t\t\t', c.toString('hex'))
+  printConsole && console.log('c1 = (q + (c - c0) % q) % q\t', c1.toString('hex'))
+  printConsole && console.log('f1 = x + c1*r\t\t\t', f1.toString('hex'))
   printConsole && console.log()
 
   return { a0, a1, b0, b1, c0, c1, f0, f1 }
@@ -65,6 +65,10 @@ export function generateYesProof(encryptedVote: ECCipher, params: ECParams, id: 
 export function generateNoProof(encryptedVote: ECCipher, params: ECParams, id: string): ValidVoteProof {
   const { a, b, r } = encryptedVote
   const { h, g, n } = params
+
+  if (typeof r === undefined || r === null || r.lte(new BN(1))) {
+    throw new Error('value r is undefined')
+  }
 
   // generate fake values for m=0 part
   const c1: BN = ECelGamal.Helper.getSecureRandomValue()
@@ -89,7 +93,7 @@ export function generateNoProof(encryptedVote: ECCipher, params: ECParams, id: s
   const c = generateChallenge(n, id, a, b, a0, b0, a1, b1)
   const c0 = BNadd(n, BNsub(c, c1, params), params)
 
-  // compute f0 = x + c0 * r (NOTE: mod q!)
+  // compute f0 = x + c0 * r (NOTE: mod q!) => in the EC case this is (mod n) instead of (mod p)
   const c0r = BNmul(c0, r, params)
   const f0 = BNadd(x, c0r, params)
 
@@ -98,12 +102,12 @@ export function generateNoProof(encryptedVote: ECCipher, params: ECParams, id: s
   printConsole && console.log('a0 is on the curve?\t', secp256k1.curve.validate(a0))
   printConsole && console.log('b0 is on the curve?\t', secp256k1.curve.validate(b0))
 
-  printConsole && console.log('c1\t\t\t', c1)
-  printConsole && console.log('f1\t\t\t', f1)
-  printConsole && console.log('x\t\t\t', x)
-  printConsole && console.log('c\t\t', c)
-  printConsole && console.log('c0 = (q + (c - c1) % q) % q\t', c0)
-  printConsole && console.log('f0 = x + c0*r\t\t', f0)
+  printConsole && console.log('c1\t\t\t\t', c1.toString('hex'))
+  printConsole && console.log('f1\t\t\t\t', f1.toString('hex'))
+  printConsole && console.log('x\t\t\t\t', x.toString('hex'))
+  printConsole && console.log('c\t\t\t\t', c.toString('hex'))
+  printConsole && console.log('c0 = (q + (c - c1) % q) % q\t', c0.toString('hex'))
+  printConsole && console.log('f0 = x + c0*r\t\t\t', f0.toString('hex'))
   printConsole && console.log()
 
   return { a0, a1, b0, b1, c0, c1, f0, f1 }
@@ -126,9 +130,8 @@ export function verifyZKP(encryptedVote: ECCipher, proof: ValidVoteProof, params
 
   // verification h^f0 == b0 * b^c0
   const l3 = ECpow(h, f0)
-  console.log('l3', l3.isInfinity())
   const r3 = ECmul(b0, ECpow(b, c0))
-  console.log('r3', r3.isInfinity(), 'r3 == l3?', l3.eq(r3))
+  console.log('r3 == l3?\t\t', l3.eq(r3), '\n')
   const v3 = l3.eq(r3)
 
   // verification h^f1 == b1 * (b/g)^c1
@@ -138,7 +141,6 @@ export function verifyZKP(encryptedVote: ECCipher, proof: ValidVoteProof, params
 
   // recompute the hash and verify
   const lc = BNadd(c0, c1, params)
-
   const rc = generateChallenge(n, id, a, b, a0, b0, a1, b1)
   const v5 = lc.eq(rc)
 
