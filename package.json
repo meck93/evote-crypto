@@ -20,7 +20,8 @@
     "bn.js": "^5.0.0",
     "elliptic": "^6.5.1",
     "hash.js": "^1.1.7",
-    "random": "^2.1.1"
+    "random": "^2.1.1",
+    "web3": "^1.2.2"
   },
   "devDependencies": {
     "@types/chai": "^4.2.4",

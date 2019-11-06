@@ -1,6 +1,7 @@
 const BN = require('bn.js')
 const hash = require('hash.js')
 const random = require('random')
+const web3 = require('web3')
 
 import { ValidVoteProof, Cipher } from '../models'
 import { PublicKey } from './models'
@@ -155,15 +156,8 @@ export function numbersToString(numbers: Array<any>) {
 }
 
 export function generateChallenge(q: any, uniqueID: any, a: any, b: any, a0: any, b0: any, a1: any, b1: any) {
-  const pointsAsString = numbersToString([a, b, a0, b0, a1, b1])
-  const input = uniqueID + pointsAsString
-
-  let c = hash
-    .sha256()
-    .update(input)
-    .digest('hex')
-
-  c = new BN(c, 'hex')
+  let c = web3.utils.soliditySha3(uniqueID, a, b, a0, b0, a1, b1)
+  c = web3.utils.toBN(c)
   c = c.mod(q)
 
   return c

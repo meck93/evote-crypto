@@ -3,6 +3,7 @@ import { Cipher, FFelGamal, ValidVoteProof } from '../../src/index'
 
 const random = require('random')
 const { expect } = require('chai')
+const web3 = require('web3')
 
 describe('ElGamal Finite Field E2E Test', () => {
   it('complete vote', () => {
@@ -26,7 +27,7 @@ describe('ElGamal Finite Field E2E Test', () => {
 
       // generate votes and proofs with random IDs
       for (const vote of _votes) {
-        const id = baseID + random.int(1, Math.pow(2, 16))
+        const id = web3.utils.soliditySha3(random.int(1, Math.pow(2, 16)))
 
         if (vote === 1) {
           const encYesVote = FFelGamal.Voting.generateYesVote(pk)
