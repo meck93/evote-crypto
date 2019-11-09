@@ -1,6 +1,6 @@
 import { PublicKey } from './models'
 import { Cipher } from '../models'
-import { getQofP } from './helper'
+import { getQofP, getSecureRandomValue } from './helper'
 
 const BN = require('bn.js')
 const random = require('random')
@@ -73,7 +73,7 @@ export const generateKeysZKP = (_p: number, _g: number): [PublicKey, any] => {
 export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Cipher => {
   const m = typeof message === 'number' ? newBN(message) : message
 
-  const r = newBN(random.int(1, pk.q - 1))
+  const r = getSecureRandomValue(pk.q)
   const c1 = pow(pk.g, r, pk)
   const s = pow(pk.h, r, pk)
   const mh = pow(pk.g, m, pk)

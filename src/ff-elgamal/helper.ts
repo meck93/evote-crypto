@@ -62,21 +62,30 @@ export const getGCandidates = (p: any) =>
     return isGValid(current, p) ? [...previous, current] : previous
   }, [])
 
-// const crypto = require('crypto')
+import crypto = require('crypto')
+import BN = require('bn.js')
 
-// export const getSecureRandomValue = (): any => {
-//   const RAND_SIZE_BYTES = 32
+export const getSecureRandomValue = (q: BN): BN => {
+  const one = new BN(1, 10)
 
-//   // TODO: Fix upper limit to p-2
-//   const UPPER_BOUND_RANDOM = null
+  // TODO: Fix upper limit to q-1
+  const UPPER_BOUND_RANDOM: BN = q.sub(one)
+  const RAND_SIZE_BYTES = 1
 
-//   let randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
-//   let randomValue = new BN(randomBytes)
+  let randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
+  let randomValue = new BN(randomBytes)
 
-//   // ensure that the random value is in range [1,n-1]
-//   while (!randomValue.lte(UPPER_BOUND_RANDOM) && randomValue.gte(1)) {
-//     randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
-//     randomValue = new BN(randomBytes, 'hex')
-//   }
-//   return randomValue
-// }
+  // ensure that the random value is in range [1,n-1]
+  while (!(randomValue.lte(UPPER_BOUND_RANDOM) && randomValue.gte(one))) {
+    randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
+    randomValue = new BN(randomBytes, 'hex')
+  }
+  return randomValue
+}
+
+export const newBN = (num: number, base: number = 10): BN => new BN(num, base)
+export const BNadd = (a: BN, b: BN, modulus: BN) => a.add(b).mod(modulus)
+export const BNmul = (a: BN, b: BN, modulus: BN) => a.mul(b).mod(modulus)
+export const BNpow = (a: BN, b: BN, modulus: BN) => a.pow(b).mod(modulus)
+export const BNinvm = (a: BN, modulus: BN) => a.invm(modulus)
+export const BNdiv = (a: BN, b: BN, modulus: BN) => BNmul(a, BNinvm(b, modulus), modulus)

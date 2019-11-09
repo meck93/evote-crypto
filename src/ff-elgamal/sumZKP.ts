@@ -1,8 +1,8 @@
 import { Cipher, SumProof } from '../models'
 import { PublicKey } from './models'
+import { getSecureRandomValue } from './helper'
 
-const BN = require('bn.js')
-const random = require('random')
+import BN = require('bn.js')
 const web3 = require('web3')
 const printConsole = false
 
@@ -19,7 +19,7 @@ export function generateSumProof(cipher: Cipher, pk: PublicKey, sk: any, uniqueI
   const { a, b } = cipher
 
   // generate random value
-  const x = newBN(random.int(1, pk.q - 1))
+  const x = getSecureRandomValue(pk.q)
 
   // (a1, b1) = (a^x, g^x)
   const a1 = pow(a, x, pk)
@@ -69,7 +69,7 @@ export function verifySumProof(cipher: Cipher, proof: SumProof, pk: any, uniqueI
   return v1 && v2
 }
 
-export function numbersToString(numbers: Array<any>) {
+export function numbersToString(numbers: Array<BN>): string {
   let result = ''
   for (let i = 0; i < numbers.length; i++) {
     result += numbers[i].toJSON()
@@ -77,7 +77,7 @@ export function numbersToString(numbers: Array<any>) {
   return result
 }
 
-export function generateChallenge(q: any, uniqueID: any, a: any, b: any, a1: any, b1: any) {
+export function generateChallenge(q: BN, uniqueID: string, a: BN, b: BN, a1: BN, b1: BN): BN {
   let c = web3.utils.soliditySha3(uniqueID, a, b, a1, b1)
   c = web3.utils.toBN(c)
   c = c.mod(q)
