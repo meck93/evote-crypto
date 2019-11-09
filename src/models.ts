@@ -1,3 +1,5 @@
+import BN = require('bn.js')
+
 export interface Cipher {
   a: any
   b: any
@@ -25,5 +27,10 @@ export interface SumProof {
   a1: any
   b1: any
   f: any
+  d: any
+}
+
+export interface KeyShareProof {
+  c: any
   d: any
 }
