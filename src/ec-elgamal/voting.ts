@@ -37,7 +37,15 @@ export const generateNoVote = (pk: string | curve.base.BasePoint): ECCipher => {
   return encrypt(startingPoint.neg(), publicKey)
 }
 
-export const addVotes = (votes: ECCipher[], publicKey: any): ECCipher => {
+export const addVotes = (votes: ECCipher[], pk: string | curve.base.BasePoint): ECCipher => {
+  let publicKey
+
+  if (typeof pk === 'string' || pk instanceof String) {
+    publicKey = secp256k1.keyFromPublic(pk, 'hex').pub
+  } else {
+    publicKey = pk
+  }
+
   return votes.reduce((previous, current) => homomorphicAdd(previous, current), encrypt(infinityPoint, publicKey))
 }
 
