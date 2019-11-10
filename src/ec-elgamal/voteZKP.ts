@@ -6,7 +6,7 @@ import { ECParams, ECCipher } from './models'
 import BN = require('bn.js')
 import { curve, ec } from 'elliptic'
 
-const printConsole = true
+const printConsole = false
 
 const BNadd = (a: BN, b: BN, params: ECParams) => a.add(b).mod(params.n)
 const BNsub = (a: BN, b: BN, params: ECParams) => a.sub(b).mod(params.n)
