@@ -21,6 +21,10 @@ export function generateYesProof(encryptedVote: ECCipher, params: ECParams, id: 
   const { a, b, r } = encryptedVote
   const { h, g, n } = params
 
+  if (r === undefined || r === null) {
+    throw new Error('value r is undefined')
+  }
+
   // generate fake values for m=0 part
   const c0: BN = ECelGamal.Helper.getSecureRandomValue()
   const f0: BN = ECelGamal.Helper.getSecureRandomValue()
@@ -66,7 +70,7 @@ export function generateNoProof(encryptedVote: ECCipher, params: ECParams, id: s
   const { a, b, r } = encryptedVote
   const { h, g, n } = params
 
-  if (typeof r === undefined || r === null || r.lte(new BN(1))) {
+  if (r === undefined || r === null) {
     throw new Error('value r is undefined')
   }
 
