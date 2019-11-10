@@ -1,8 +1,11 @@
 import { encrypt, homomorphicAdd, decrypt } from './encryption'
-import { ECCipher } from './models'
+import { VoteZKP } from './'
+import { SumZKP } from './'
+import { ECCipher, ECParams, ECParamsTransfer } from './models'
 import { curve } from 'elliptic'
 
 import BN = require('bn.js')
+import { ValidVoteProof, SumProof } from '../models'
 
 const EC = require('elliptic').ec
 const secp256k1 = new EC('secp256k1')
@@ -10,24 +13,26 @@ const secp256k1 = new EC('secp256k1')
 const startingPoint = secp256k1.curve.g
 const infinityPoint = startingPoint.add(startingPoint.neg())
 
-export const generateYesVote = (pk: string): ECCipher => {
-  // This function is called in the fronend and did not work with
-  // passing a curve.base.BasePoint directly before. It failed in
-  // the encrypt function with 'red works only with red numbers'.
+export const generateYesVote = (pk: string | curve.base.BasePoint): ECCipher => {
+  let publicKey
 
-  // Fix: Serialize the key in the fronend and extract the public key from the passed hex-string
-  const publicKey = secp256k1.keyFromPublic(pk, 'hex').pub
+  if (typeof pk === 'string' || pk instanceof String) {
+    publicKey = secp256k1.keyFromPublic(pk, 'hex').pub
+  } else {
+    publicKey = pk
+  }
 
   return encrypt(startingPoint, publicKey)
 }
 
-export const generateNoVote = (pk: string): ECCipher => {
-  // This function is called in the fronend and did not work with
-  // passing a curve.base.BasePoint directly before. It failed in
-  // the encrypt function with 'red works only with red numbers'.
+export const generateNoVote = (pk: string | curve.base.BasePoint): ECCipher => {
+  let publicKey
 
-  // Fix: Serialize the key in the fronend and extract the public key from the passed hex-string
-  const publicKey = secp256k1.keyFromPublic(pk, 'hex').pub
+  if (typeof pk === 'string' || pk instanceof String) {
+    publicKey = secp256k1.keyFromPublic(pk, 'hex').pub
+  } else {
+    publicKey = pk
+  }
 
   return encrypt(startingPoint.neg(), publicKey)
 }
@@ -83,4 +88,44 @@ export const getSummary = (total: number, tallyResult: number) => {
     no = total - yes
   }
   return { total, yes, no }
+}
+
+export function generateYesProof(encryptedVote: ECCipher, params: ECParamsTransfer, id: string): ValidVoteProof {
+  const _params: ECParams = createParams(params)
+
+  return VoteZKP.generateYesProof(encryptedVote, _params, id)
+}
+
+export const generateNoProof = (encryptedVote: ECCipher, params: ECParamsTransfer, id: string): ValidVoteProof => {
+  const _params: ECParams = createParams(params)
+
+  return VoteZKP.generateNoProof(encryptedVote, _params, id)
+}
+
+export const generateSumProof = (encryptedVote: ECCipher, params: ECParamsTransfer, sk: BN, id: string): SumProof => {
+  const _params: ECParams = createParams(params)
+
+  return SumZKP.generateSumProof(encryptedVote, _params, sk, id)
+}
+
+export const verifyZKP = (encryptedVote: ECCipher, proof: ValidVoteProof, params: ECParamsTransfer, id: string): boolean => {
+  const _params: ECParams = createParams(params)
+
+  return VoteZKP.verifyZKP(encryptedVote, proof, _params, id)
+}
+
+export const verifySumProof = (encryptedSum: ECCipher, proof: SumProof, params: ECParamsTransfer, pk: string, id: string): boolean => {
+  const _params: ECParams = createParams(params)
+  const publicKey = secp256k1.keyFromPublic(pk, 'hex').pub
+
+  return SumZKP.verifySumProof(encryptedSum, proof, _params, publicKey, id)
+}
+
+const createParams = (params: ECParamsTransfer): ECParams => {
+  return {
+    p: params.p, // BN
+    n: params.n, // BN
+    g: secp256k1.curve.pointFromJSON(params.g), // string JSON
+    h: secp256k1.keyFromPublic(params.h, 'hex').pub, // string
+  }
 }

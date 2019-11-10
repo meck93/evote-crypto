@@ -13,3 +13,10 @@ export interface ECParams {
   g: curve.base.BasePoint // generator
   h: curve.base.BasePoint
 }
+
+export interface ECParamsTransfer {
+  p: BN
+  n: BN // prime factor: p = 2*n+1
+  g: string // generator
+  h: string
+}
