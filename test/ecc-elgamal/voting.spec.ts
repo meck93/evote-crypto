@@ -10,7 +10,7 @@ describe('Elliptic Curve ElGamal Voting', () => {
     const vote = (_result: number, _votes: number[]) => {
       const keyPair = ec.genKeyPair()
       const privateKey = keyPair.getPrivate()
-      const publicKey = keyPair.getPublic()
+      const publicKey = keyPair.getPublic().encode('hex', false)
 
       const votes: Cipher[] = []
       for (const vote of _votes) {
