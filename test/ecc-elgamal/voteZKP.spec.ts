@@ -16,12 +16,12 @@ const prnt = true
 const yesVoteOnCurve = secp256k1.curve.g
 const noVoteOnCurve = secp256k1.curve.g.neg()
 
-describe.only('Elliptic Curve ElGamal Vote ZKP', () => {
+describe('Elliptic Curve ElGamal Vote ZKP', () => {
   it('Points that encode the plaintexts should lie on the curve', function() {
     assert(secp256k1.curve.validate(noVoteOnCurve) && secp256k1.curve.validate(yesVoteOnCurve))
   })
 
-  it('Should generate a valid proof for a vote', () => {
+  xit('Should generate a valid proof for a vote (FIXME)', () => {
     const keyPair: ec.KeyPair = secp256k1.genKeyPair()
     const privateKey: BN = keyPair.getPrivate()
     const publicKey: curve.base.BasePoint = keyPair.getPublic()
