@@ -10,11 +10,25 @@ const secp256k1 = new EC('secp256k1')
 const startingPoint = secp256k1.curve.g
 const infinityPoint = startingPoint.add(startingPoint.neg())
 
-export const generateYesVote = (publicKey: curve.base.BasePoint): ECCipher => {
+export const generateYesVote = (pk: string): ECCipher => {
+  // This function is called in the fronend and did not work with
+  // passing a curve.base.BasePoint directly before. It failed in
+  // the encrypt function with 'red works only with red numbers'.
+
+  // Fix: Serialize the key in the fronend and extract the public key from the passed hex-string
+  const publicKey = secp256k1.keyFromPublic(pk, 'hex').pub
+
   return encrypt(startingPoint, publicKey)
 }
 
-export const generateNoVote = (publicKey: curve.base.BasePoint): ECCipher => {
+export const generateNoVote = (pk: string): ECCipher => {
+  // This function is called in the fronend and did not work with
+  // passing a curve.base.BasePoint directly before. It failed in
+  // the encrypt function with 'red works only with red numbers'.
+
+  // Fix: Serialize the key in the fronend and extract the public key from the passed hex-string
+  const publicKey = secp256k1.keyFromPublic(pk, 'hex').pub
+
   return encrypt(startingPoint.neg(), publicKey)
 }
 
@@ -36,7 +50,14 @@ export const findPoint = (point: curve.base.BasePoint): number => {
   return point.eq(pointNegative) ? -counter : counter
 }
 
-export const tallyVotes = (publicKey: curve.base.BasePoint, sk: BN, votes: ECCipher[]): number => {
+export const tallyVotes = (pk: string, sk: BN, votes: ECCipher[]): number => {
+  // This function is called in the fronend and did not work with
+  // passing a curve.base.BasePoint directly before. It failed in
+  // the encrypt function with 'red works only with red numbers'.
+
+  // Fix: Serialize the key in the fronend and extract the public key from the passed hex-string
+  const publicKey = secp256k1.keyFromPublic(pk, 'hex').pub
+
   const sum = decrypt(addVotes(votes, publicKey), sk)
   return sum.eq(infinityPoint) ? 0 : findPoint(sum)
 }
