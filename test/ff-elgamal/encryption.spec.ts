@@ -5,6 +5,53 @@ const random = require('random')
 const { expect } = require('chai')
 
 describe('Finite Field ElGamal Encryption', () => {
+  it('should encode a message', () => {
+    const [pk] = FFelGamal.Encryption.generateKeys(11, 3)
+
+    const values = [
+      { decoded: 0, encoded: 1 },
+      { decoded: 1, encoded: 3 },
+      { decoded: 2, encoded: 9 },
+      { decoded: 3, encoded: 5 },
+      { decoded: 4, encoded: 4 },
+      { decoded: 5, encoded: 1 },
+      { decoded: 6, encoded: 3 },
+      { decoded: 7, encoded: 9 },
+      { decoded: 8, encoded: 5 },
+      { decoded: 9, encoded: 4 },
+      { decoded: 10, encoded: 1 },
+      { decoded: 11, encoded: 3 },
+    ]
+
+    for (const value of values) {
+      expect(FFelGamal.Encryption.encodeMessage(value.decoded, pk).toNumber()).to.equal(value.encoded)
+    }
+  })
+
+  it('should decode an encoded message', () => {
+    const [pk] = FFelGamal.Encryption.generateKeys(11, 3)
+
+    const values = [
+      { decoded: 0, encoded: 1 },
+      { decoded: 1, encoded: 3 },
+      { decoded: 2, encoded: 9 },
+      { decoded: 3, encoded: 5 },
+      { decoded: 4, encoded: 4 },
+      // TODO: define constraints for message space
+      /*{ decoded: 5, encoded: 1 },
+      { decoded: 6, encoded: 3 },
+      { decoded: 7, encoded: 9 },
+      { decoded: 8, encoded: 5 },
+      { decoded: 9, encoded: 4 },
+      { decoded: 10, encoded: 1 },
+      { decoded: 11, encoded: 3 },*/
+    ]
+
+    for (const value of values) {
+      expect(FFelGamal.Encryption.decodeMessage(value.encoded, pk).toNumber()).to.equal(value.decoded)
+    }
+  })
+
   it('compare decryption implementations', () => {
     const prnt = false
     const [pk, sk] = FFelGamal.Encryption.generateKeys(11, 3)

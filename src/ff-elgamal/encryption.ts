@@ -56,6 +56,25 @@ export const generateKeysZKP = (_p: number, _g: number): [PublicKey, any] => {
   return [pk, sk]
 }
 
+export const encodeMessage = (m: any, pk: PublicKey) => {
+  m = typeof m === 'number' ? newBN(m) : m
+  return pow(pk.g, m, pk)
+}
+
+// TODO: use baby-step giant-step instead of brute force
+export const decodeMessage = (mh: any, pk: PublicKey) => {
+  mh = typeof mh === 'number' ? newBN(mh) : mh
+
+  let m = newBN(0)
+  while (!encodeMessage(m, pk).eq(mh)) {
+    m = m.add(newBN(1))
+  }
+  return m
+}
+
+// TODO: test encryption and both decryption for the whole message range
+// (to verify the correct implementation and usage of decodeMessage)
+
 // Finite Field ElGamal Encryption
 //
 // given:
@@ -68,7 +87,7 @@ export const generateKeysZKP = (_p: number, _g: number): [PublicKey, any] => {
 // 1. pick random value r: 0 < r < p
 // 2. compute c1 = g^r
 // 3. compute s = h^r
-// 4. compute mh = g^message (to make it "homomorphic")
+// 4. compute mh = g^message (encode it to make it "homomorphic")
 // 5. compute c2 = s*mh
 export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Cipher => {
   const m = typeof message === 'number' ? newBN(message) : message
@@ -76,7 +95,7 @@ export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Ciph
   const r = getSecureRandomValue(pk.q)
   const c1 = pow(pk.g, r, pk)
   const s = pow(pk.h, r, pk)
-  const mh = pow(pk.g, m, pk)
+  const mh = encodeMessage(m, pk)
   const c2 = mul(s, mh, pk)
 
   log && console.log('enc secret   (r)', r)
@@ -101,19 +120,14 @@ export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Ciph
 // 1. compute s = c1^x
 // 2. compute s^-1 = multiplicative inverse of s
 // 3. compute mh = c2 * s^-1
-// 4. compute m using brute force
-// TODO: use baby-step giant-step instead of brute force
+// 4. compute m (decode mh using brute force)
 export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolean = false): any => {
   const { a: c1, b: c2 } = cipherText
 
   const s = pow(c1, sk, pk)
   const sInverse = invm(s, pk)
   const mh = mul(c2, sInverse, pk)
-
-  let m = newBN(0)
-  while (!pow(pk.g, m, pk).eq(mh)) {
-    m = m.add(newBN(1))
-  }
+  const m = decodeMessage(mh, pk)
 
   log && console.log('s\t\t', s)
   log && console.log('s^-1\t\t', sInverse)
@@ -137,19 +151,14 @@ export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolea
 // 2. compute s^-1 = multiplicative inverse of s
 // 3. compute s^(p-2)
 // 4. compute mh = c2 * s^(p-2)
-// 5. compute m using brute force
-// TODO: use baby-step giant-step instead of brute force
+// 5. compute m (decode mh using brute force)
 export const decrypt2 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolean = false): any => {
   const { a: c1, b: c2 } = cipherText
 
   const s = pow(c1, sk, pk)
   const sPowPMinus2 = pow(s, pk.p.sub(newBN(2)), pk)
   const mh = mul(c2, sPowPMinus2, pk)
-
-  let m = newBN(1)
-  while (!pow(pk.g, m, pk).eq(mh)) {
-    m = m.add(newBN(1))
-  }
+  const m = decodeMessage(mh, pk)
 
   log && console.log('s\t\t', s)
   log && console.log('s^(p-2)\t\t', sPowPMinus2)
