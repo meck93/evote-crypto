@@ -18,15 +18,13 @@ describe.only('Finite Field ElGamal Distributed Key Generation', () => {
 
       // generate the public and private key share: H_, SK_
       const share: FFelGamal.KeyShare = FFelGamal.KeyGeneration.generateKeyShares(params)
-      const { h_: h1_, sk_: sk1_, r: r1 } = share
+      const { h_: h1_, sk_: sk1_ } = share
 
-      // TODO: probably remove since generateKeyShares should not return the random value r -> only the combination sk_*r
-      expect(h1_).to.eql(g.pow(sk1_.mul(r1).mod(q)).mod(p))
+      expect(h1_).to.eql(g.pow(sk1_).mod(p))
 
       prnt && console.log('Key Parts')
       prnt && console.log('h_:\t', h1_.toString())
       prnt && console.log('sk_:\t', sk1_.toString())
-      prnt && console.log('r:\t', r1.toString())
       prnt && console.log()
 
       // generate the key share generation proof

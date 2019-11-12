@@ -14,26 +14,23 @@ export const generateKeyShares = (params: FFelGamal.SystemParameters): FFelGamal
   const { p, q, g } = params
 
   // generate first key pair (sk, h)
-  // pick two random values in Zq
-  // compute private key share skr: sk*r mod q
+  // pick a random value in Zq
   const sk: BN = getSecureRandomValue(q)
-  const r: BN = getSecureRandomValue(q)
-  const skr: BN = BNmul(sk, r, q)
 
-  // compute public key share h_: g^skr mod p
-  const h: BN = BNpow(g, skr, p)
+  // compute public key share h_: g^sk mod p
+  const h: BN = BNpow(g, sk, p)
 
   // generate a second key pair (a,b)
   // pick a random value from Zq and generate b: g^a mod p
   const a: BN = getSecureRandomValue(q)
   const b: BN = BNpow(g, a, p)
 
-  return { h_: h, sk_: sk, r: r }
+  return { h_: h, sk_: sk }
 }
 
 export const generateKeyGenerationProof = (params: FFelGamal.SystemParameters, share: FFelGamal.KeyShare, id: string): KeyShareProof => {
   const { p, q, g } = params
-  const { h_, sk_, r } = share
+  const { h_, sk_ } = share
 
   // generate a second key pair (a,b)
   // pick a random value from Zq and generate b: g^a mod p
@@ -43,8 +40,8 @@ export const generateKeyGenerationProof = (params: FFelGamal.SystemParameters, s
   // compute challenge hash(h_, a)
   const c: BN = generateChallenge(q, id, h_, b)
 
-  // compute d = a + c*sk_*r
-  const d: BN = BNadd(a, BNmul(c, BNmul(sk_, r, q), q), q)
+  // compute d = a + c*sk_
+  const d: BN = BNadd(a, BNmul(c, sk_, q), q)
 
   return { c: c, d: d }
 }
