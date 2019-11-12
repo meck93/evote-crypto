@@ -26,6 +26,7 @@ export function generateSumProof(cipher: Cipher, pk: PublicKey, sk: any, uniqueI
   const b1 = pow(pk.g, x, pk)
 
   // generate the challenge
+  // TODO: check paper https://eprint.iacr.org/2016/771.pdf why we should not hash a and b
   const c = generateChallenge(pk.q, uniqueID, a, b, a1, b1)
 
   // compute f = x + c * sk (NOTE: mod q!)

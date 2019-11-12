@@ -40,6 +40,7 @@ export function generateYesProof(cipher: Cipher, pk: PublicKey, uniqueID: string
   const b1 = pow(pk.h, x, pk)
 
   // generate the challenge
+  // TODO: check paper https://eprint.iacr.org/2016/771.pdf why we should not hash a and b
   const c = generateChallenge(pk.q, uniqueID, a, b, a0, b0, a1, b1)
   const c1 = add(pk.q, sub(c, c0, pk), pk)
 
@@ -86,6 +87,7 @@ export function generateNoProof(cipher: Cipher, pk: PublicKey, uniqueID: string)
   const b0 = pow(pk.h, x, pk)
 
   // generate the challenge
+  // TODO: check paper https://eprint.iacr.org/2016/771.pdf why we should not hash a and b
   const c = generateChallenge(pk.q, uniqueID, a, b, a0, b0, a1, b1)
   const c0 = add(pk.q, sub(c, c1, pk), pk)
 
