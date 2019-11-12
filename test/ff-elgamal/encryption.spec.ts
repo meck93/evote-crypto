@@ -1,4 +1,5 @@
-export {}
+export { }
+import BN = require("bn.js")
 import { FFelGamal } from '../../src/index'
 
 const random = require('random')
@@ -56,7 +57,7 @@ describe('Finite Field ElGamal Encryption', () => {
     const prnt = false
     const [pk, sk] = FFelGamal.Encryption.generateKeys(11, 3)
 
-    const message = random.int(1, pk.q - 1)
+    const message = random.int(1, pk.q.sub((new BN(1))))
     for (let i = 0; i < 10; i++) {
       prnt && console.log(i)
       prnt && console.log('prime      (p)\t', pk.p)

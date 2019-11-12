@@ -24,8 +24,8 @@ export function generateYesProof(cipher: Cipher, pk: PublicKey, uniqueID: string
   const { a, b, r } = cipher
 
   // generate fake values for m=0
-  const c0 = newBN(random.int(1, pk.q - 1))
-  const f0 = newBN(random.int(1, pk.q - 1))
+  const c0 = newBN(random.int(1, pk.q.sub(newBN(1))))
+  const f0 = newBN(random.int(1, pk.q.sub(newBN(1))))
 
   // compute fake a0. (a,b) = (a,b)
   const a0 = div(pow(pk.g, f0, pk), pow(a, c0, pk), pk)
@@ -34,7 +34,7 @@ export function generateYesProof(cipher: Cipher, pk: PublicKey, uniqueID: string
   const b0 = div(pow(pk.h, f0, pk), pow(b, c0, pk), pk)
 
   // generate proof for m=1
-  const x = newBN(random.int(1, pk.q - 1))
+  const x = newBN(random.int(1, pk.q.sub(newBN(1))))
 
   const a1 = pow(pk.g, x, pk)
   const b1 = pow(pk.h, x, pk)
@@ -68,8 +68,8 @@ export function generateNoProof(cipher: Cipher, pk: PublicKey, uniqueID: string)
   const { a, b, r } = cipher
 
   // generate fake values for m=1
-  const c1 = newBN(random.int(1, pk.q - 1))
-  const f1 = newBN(random.int(1, pk.q - 1))
+  const c1 = newBN(random.int(1, pk.q.sub(newBN(1))))
+  const f1 = newBN(random.int(1, pk.q.sub(newBN(1))))
 
   // compute fake b
   const b_ = div(b, pk.g, pk)
@@ -81,7 +81,7 @@ export function generateNoProof(cipher: Cipher, pk: PublicKey, uniqueID: string)
   const b1 = div(pow(pk.h, f1, pk), pow(b_, c1, pk), pk)
 
   // generate proof for m=0
-  const x = newBN(random.int(1, pk.q - 1))
+  const x = newBN(random.int(1, pk.q.sub(newBN(1))))
   const a0 = pow(pk.g, x, pk)
   const b0 = pow(pk.h, x, pk)
 
