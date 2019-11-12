@@ -163,4 +163,12 @@ describe('Finite Field ElGamal Helper', () => {
     console.log('p', prime)
     console.log('g candidates', Helper.getGCandidates(prime).toString())
   })
+
+  it('should generate random values', () => {
+    for (let a = 0; a < 100; a++) {
+      const rnd = Helper.getSecureRandomValue(Helper.newBN(5)).toNumber()
+      expect(rnd).to.be.at.least(1)
+      expect(rnd).to.be.at.most(4)
+    }
+  })
 })

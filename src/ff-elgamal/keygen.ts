@@ -1,7 +1,7 @@
 import { FFelGamal } from '..'
-import { KeyShareProof } from '../models'
 import { getSecureRandomValue, newBN, BNpow, BNmul, BNdiv, BNadd } from './helper'
-
+import { decodeMessage } from './encryption'
+import { KeyShareProof, Cipher } from '../models'
 import BN = require('bn.js')
 
 const web3 = require('web3')
@@ -61,6 +61,30 @@ export const verifyKeyGenerationProof = (params: FFelGamal.SystemParameters, pro
   console.log('compC:\t', compC.toString())
 
   return check
+}
+
+export const combinePublicKeys = (params: FFelGamal.SystemParameters, publicKeyShares: BN[]): BN => {
+  return publicKeyShares.reduce((product, share) => BNmul(product, share, params.p))
+}
+
+// NOTE: this should not be used as the distributed secret keys will become "useless"
+// it is only used for testing purpose
+export const combinePrivateKeys = (params: FFelGamal.SystemParameters, privateKeyShares: BN[]): BN => {
+  return privateKeyShares.reduce((sum, share) => BNadd(sum, share, params.q))
+}
+
+export const decryptShare = (params: FFelGamal.SystemParameters, cipher: Cipher, secretKeyShare: BN): BN => {
+  return BNpow(cipher.a, secretKeyShare, params.p)
+}
+
+export const combineDecryptedShares = (params: FFelGamal.SystemParameters, cipher: Cipher, decryptedShares: BN[]): BN => {
+  const mh = BNdiv(cipher.b, decryptedShares.reduce((product, share) => BNmul(product, share, params.p)), params.p)
+
+  // TODO: split PublicKey interface into system parameters (p,g,q) and the actual public key (h)
+  // (h is not needed here)
+  let m = decodeMessage(mh, { p: params.p, g: params.g, q: params.q, h: newBN(1) })
+
+  return m
 }
 
 export const generateChallenge = (q: BN, uniqueID: string, h_: BN, b: BN): BN => {
