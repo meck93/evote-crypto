@@ -20,11 +20,6 @@ export const generateKeyShares = (params: FFelGamal.SystemParameters): FFelGamal
   // compute public key share h_: g^sk mod p
   const h: BN = BNpow(g, sk, p)
 
-  // generate a second key pair (a,b)
-  // pick a random value from Zq and generate b: g^a mod p
-  const a: BN = getSecureRandomValue(q)
-  const b: BN = BNpow(g, a, p)
-
   return { h_: h, sk_: sk }
 }
 
@@ -37,7 +32,7 @@ export const generateKeyGenerationProof = (params: FFelGamal.SystemParameters, s
   const a: BN = getSecureRandomValue(q)
   const b: BN = BNpow(g, a, p)
 
-  // compute challenge hash(h_, a)
+  // compute challenge hash(h_, b)
   const c: BN = generateChallenge(q, id, h_, b)
 
   // compute d = a + c*sk_
@@ -54,13 +49,19 @@ export const verifyKeyGenerationProof = (params: FFelGamal.SystemParameters, pro
   const b: BN = BNdiv(BNpow(g, d, p), BNpow(h_, c, p), p)
 
   // recompute the challenge c = hash(id, h_, b)
-  const compC: BN = generateChallenge(q, id, h_, b)
-  const check: boolean = c.eq(compC)
+  const c_: BN = generateChallenge(q, id, h_, b)
+  const hashCheck: boolean = c.eq(c_)
 
-  console.log('b:\t', b.toString())
-  console.log('compC:\t', compC.toString())
+  // verify that: g^d == b * h_^c
+  const gPowd: BN = BNpow(g, d, p)
+  const bhPowC: BN = BNmul(b, BNpow(h_, c, p), p)
+  const dCheck: boolean = gPowd.eq(bhPowC)
 
-  return check
+  console.log("do the hashes match?\t", hashCheck)
+  console.log('g^d == b * h_^c?\t', dCheck)
+  console.log()
+
+  return hashCheck && dCheck
 }
 
 export const combinePublicKeys = (params: FFelGamal.SystemParameters, publicKeyShares: BN[]): BN => {
