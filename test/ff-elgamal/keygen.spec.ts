@@ -43,14 +43,6 @@ describe('Finite Field ElGamal Distributed Key Generation', () => {
       const verifiedProof: boolean = FFelGamal.KeyGeneration.verifyKeyGenerationProof(params, proof, h1_, uniqueId)
 
       expect(verifiedProof).to.be.true
-
-      // TODO
-      // 1. Generate another a second keySharesPair + Proof + Verify Proof
-      // 2. Sum the private key shares: (sk1 + sk2) mod q => sk
-      // 3. Multiply the public key shares: (h1 + h2) mod p => h
-      // 4. Encrypt a message with the public key: h
-      // 5. Decrypt the message with the private key: sk
-      // 6. Verify that the two plaintexts are equal
     }
   })
 
@@ -101,6 +93,7 @@ describe('Finite Field ElGamal Distributed Key Generation', () => {
     // combined keys
     const publicKey = FFelGamal.KeyGeneration.combinePublicKeys(params, [share1.h_, share2.h_])
     const privateKey = FFelGamal.KeyGeneration.combinePrivateKeys(params, [share1.sk_, share2.sk_])
+
     prnt && console.log('pk', publicKey.toNumber())
     prnt && console.log('sk', privateKey.toNumber())
 
@@ -129,8 +122,8 @@ describe('Finite Field ElGamal Distributed Key Generation', () => {
 
     prnt && console.log('d', decFinal.toNumber())
     prnt && console.log('d2', d2.toNumber())
-    expect(decFinal.toNumber()).to.eql(d2.toNumber())
 
+    expect(decFinal.toNumber()).to.eql(d2.toNumber())
     expect(decFinal.toNumber()).to.eql(plaintext.toNumber())
   })
 })
