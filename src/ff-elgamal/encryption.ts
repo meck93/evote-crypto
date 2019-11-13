@@ -1,24 +1,16 @@
 import { PublicKey } from './models'
 import { Cipher } from '../models'
-import { getQofP, getSecureRandomValue } from './helper'
+import { getQofP, getSecureRandomValue, newBN, BNmul, BNpow, BNinvm } from './helper'
 
-const BN = require('bn.js')
-const random = require('random')
-
-const newBN = (n: number) => new BN(n, 10)
-
-// modulo operations
-const mul = (a: any, b: any, pk: PublicKey) => a.mul(b).mod(pk.p)
-const pow = (a: any, b: any, pk: PublicKey) => a.pow(b).mod(pk.p)
-const invm = (a: any, pk: PublicKey) => a.invm(pk.p)
+import BN = require('bn.js')
 
 export const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
   const p = newBN(_p)
   const q = newBN(getQofP(_p))
   const g = newBN(_g)
 
-  const sk = newBN(random.int(1, q - 1))
-  const h = g.pow(sk).mod(p)
+  const sk = getSecureRandomValue(q)
+  const h = BNpow(g, sk, p)
 
   const pk = { p, g, h, q }
 
@@ -30,19 +22,19 @@ export const generateKeysZKP = (_p: number, _g: number): [PublicKey, any] => {
   const q = newBN(getQofP(_p))
   const g = newBN(_g)
 
-  const sk = newBN(random.int(1, q - 1))
-  const h = g.pow(sk).mod(p)
+  const sk = getSecureRandomValue(q)
+  const h = BNpow(g, sk, p)
 
   const pk = { p, g, h, q }
 
   // verify that g^q mod p == 1 (this means: gcd(q,p) == 1)
-  const test1 = pow(g, q, pk)
+  const test1 = BNpow(g, q, pk.p)
   if (!test1.eq(newBN(1))) {
     throw new Error(`g^q mod p != 1 (== ${test1.toNumber()}. for p: ${_p}, q: ${q.toNumber()} and g: ${_g}`)
   }
 
   // verify that h^q mod p == 1 (this means: gcd(h,p) == 1)
-  const test2 = pow(h, q, pk)
+  const test2 = BNpow(h, q, pk.p)
   if (!test2.eq(newBN(1))) {
     throw new Error(`h^q mod p != 1 (== ${test2.toNumber()}. for p: ${_p}, q: ${q.toNumber()} and g: ${_g}`)
   }
@@ -58,7 +50,7 @@ export const generateKeysZKP = (_p: number, _g: number): [PublicKey, any] => {
 
 export const encodeMessage = (m: any, pk: PublicKey) => {
   m = typeof m === 'number' ? newBN(m) : m
-  return pow(pk.g, m, pk)
+  return BNpow(pk.g, m, pk.p)
 }
 
 // TODO: use baby-step giant-step instead of brute force
@@ -93,10 +85,10 @@ export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Ciph
   const m = typeof message === 'number' ? newBN(message) : message
 
   const r = getSecureRandomValue(pk.q)
-  const c1 = pow(pk.g, r, pk)
-  const s = pow(pk.h, r, pk)
+  const c1 = BNpow(pk.g, r, pk.p)
+  const s = BNpow(pk.h, r, pk.p)
   const mh = encodeMessage(m, pk)
-  const c2 = mul(s, mh, pk)
+  const c2 = BNmul(s, mh, pk.p)
 
   log && console.log('enc secret   (r)', r)
   log && console.log('a\t\t', c1)
@@ -124,9 +116,9 @@ export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Ciph
 export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolean = false): any => {
   const { a: c1, b: c2 } = cipherText
 
-  const s = pow(c1, sk, pk)
-  const sInverse = invm(s, pk)
-  const mh = mul(c2, sInverse, pk)
+  const s = BNpow(c1, sk, pk.p)
+  const sInverse = BNinvm(s, pk.p)
+  const mh = BNmul(c2, sInverse, pk.p)
   const m = decodeMessage(mh, pk)
 
   log && console.log('s\t\t', s)
@@ -155,9 +147,9 @@ export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolea
 export const decrypt2 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolean = false): any => {
   const { a: c1, b: c2 } = cipherText
 
-  const s = pow(c1, sk, pk)
-  const sPowPMinus2 = pow(s, pk.p.sub(newBN(2)), pk)
-  const mh = mul(c2, sPowPMinus2, pk)
+  const s = BNpow(c1, sk, pk.p)
+  const sPowPMinus2 = BNpow(s, pk.p.sub(newBN(2)), pk.p)
+  const mh = BNmul(c2, sPowPMinus2, pk.p)
   const m = decodeMessage(mh, pk)
 
   log && console.log('s\t\t', s)
@@ -171,7 +163,7 @@ export const decrypt2 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolea
 
 export const add = (em1: Cipher, em2: Cipher, pk: PublicKey): Cipher => {
   return {
-    a: mul(em1.a, em2.a, pk),
-    b: mul(em1.b, em2.b, pk),
+    a: BNmul(em1.a, em2.a, pk.p),
+    b: BNmul(em1.b, em2.b, pk.p),
   }
 }

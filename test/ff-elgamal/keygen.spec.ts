@@ -1,4 +1,4 @@
-export {}
+export { }
 import { FFelGamal } from '../../src/index'
 import { KeyShareProof } from '../../src/models'
 import { newBN } from '../../src/ff-elgamal/helper'

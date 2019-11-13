@@ -1,5 +1,6 @@
-export {}
+export { }
 import { FFelGamal } from '../../src/index'
+import { getSecureRandomValue } from '../../src/ff-elgamal/helper'
 
 const random = require('random')
 const { expect } = require('chai')
@@ -23,7 +24,7 @@ describe('ElGamal Finite Field ZKP Sum Proof', () => {
         }
 
         // sum
-        const sum = random.int(1, (p - 1) / 2 - 1)
+        const sum = getSecureRandomValue(pk.q)
         prnt && console.log(`Sum Proof for Message: ${sum}`)
 
         const sumEnc = FFelGamal.Encryption.encrypt(sum, pk, prnt)
@@ -33,7 +34,7 @@ describe('ElGamal Finite Field ZKP Sum Proof', () => {
         expect(verifiedSumProof).to.be.true
 
         const decSum = FFelGamal.Encryption.decrypt1(sumEnc, sk, pk, prnt)
-        expect(decSum.toNumber()).to.equal(sum)
+        expect(decSum.eq(sum)).to.be.true
       }
     }
 
