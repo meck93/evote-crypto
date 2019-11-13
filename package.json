@@ -24,7 +24,7 @@
     "web3": "^1.2.2"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.4",
+    "@types/chai": "^4.2.5",
     "@types/elliptic": "^6.4.10",
     "@types/mocha": "^5.2.7",
     "chai": "^4.2.0",
