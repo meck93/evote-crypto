@@ -1,9 +1,9 @@
-export {}
+export { }
 import { Cipher, ECelGamal } from '../../src/index'
 
 const { assert } = require('chai')
 const EC = require('elliptic').ec
-const ec = new EC('secp256k1')
+const ec = new EC('curve25519-weier')
 
 describe('Elliptic Curve ElGamal Voting', () => {
   it('Voting works correctly in various scenarii', () => {

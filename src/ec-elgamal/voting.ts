@@ -8,16 +8,16 @@ import BN = require('bn.js')
 import { ValidVoteProof, SumProof } from '../models'
 
 const EC = require('elliptic').ec
-const secp256k1 = new EC('secp256k1')
+const curve25519 = new EC('curve25519-weier')
 
-const startingPoint = secp256k1.curve.g
+const startingPoint = curve25519.curve.g
 const infinityPoint = startingPoint.add(startingPoint.neg())
 
 export const generateYesVote = (pk: string | curve.base.BasePoint): ECCipher => {
   let publicKey
 
   if (typeof pk === 'string' || pk instanceof String) {
-    publicKey = secp256k1.keyFromPublic(pk, 'hex').pub
+    publicKey = curve25519.keyFromPublic(pk, 'hex').pub
   } else {
     publicKey = pk
   }
@@ -29,7 +29,7 @@ export const generateNoVote = (pk: string | curve.base.BasePoint): ECCipher => {
   let publicKey
 
   if (typeof pk === 'string' || pk instanceof String) {
-    publicKey = secp256k1.keyFromPublic(pk, 'hex').pub
+    publicKey = curve25519.keyFromPublic(pk, 'hex').pub
   } else {
     publicKey = pk
   }
@@ -41,7 +41,7 @@ export const addVotes = (votes: ECCipher[], pk: string | curve.base.BasePoint): 
   let publicKey
 
   if (typeof pk === 'string' || pk instanceof String) {
-    publicKey = secp256k1.keyFromPublic(pk, 'hex').pub
+    publicKey = curve25519.keyFromPublic(pk, 'hex').pub
   } else {
     publicKey = pk
   }
@@ -69,7 +69,7 @@ export const tallyVotes = (pk: string, sk: BN, votes: ECCipher[]): number => {
   // the encrypt function with 'red works only with red numbers'.
 
   // Fix: Serialize the key in the fronend and extract the public key from the passed hex-string
-  const publicKey = secp256k1.keyFromPublic(pk, 'hex').pub
+  const publicKey = curve25519.keyFromPublic(pk, 'hex').pub
 
   const sum = decrypt(addVotes(votes, publicKey), sk)
   return sum.eq(infinityPoint) ? 0 : findPoint(sum)
@@ -124,7 +124,7 @@ export const verifyZKP = (encryptedVote: ECCipher, proof: ValidVoteProof, params
 
 export const verifySumProof = (encryptedSum: ECCipher, proof: SumProof, params: ECParamsTransfer, pk: string, id: string): boolean => {
   const _params: ECParams = createParams(params)
-  const publicKey = secp256k1.keyFromPublic(pk, 'hex').pub
+  const publicKey = curve25519.keyFromPublic(pk, 'hex').pub
 
   return SumZKP.verifySumProof(encryptedSum, proof, _params, publicKey, id)
 }
@@ -133,7 +133,7 @@ const createParams = (params: ECParamsTransfer): ECParams => {
   return {
     p: params.p, // BN
     n: params.n, // BN
-    g: secp256k1.curve.pointFromJSON(params.g), // string JSON
-    h: secp256k1.keyFromPublic(params.h, 'hex').pub, // string
+    g: curve25519.curve.pointFromJSON(params.g), // string JSON
+    h: curve25519.keyFromPublic(params.h, 'hex').pub, // string
   }
 }

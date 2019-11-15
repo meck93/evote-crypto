@@ -1,26 +1,26 @@
-export {}
+export { }
 import { ECelGamal } from '../../src/index'
 
-const { assert } = require('chai')
+const { expect, assert } = require('chai')
 const EC = require('elliptic').ec
-const ec = new EC('secp256k1')
+const ec = new EC('curve25519-weier')
 
 // Fixed values for testing purposes
-// NO Vote:  mapped to integer 2
-// YES Vote:  mapped to integer 4
-const noVoteInt = 2
-const yesVoteInt = 4
+// NO Vote:  mapped to integer 1
+// YES Vote:  mapped to integer 3
+const noVoteInt = 1
+const yesVoteInt = 3
 
 // Map/encode votes to points on the elliptic curve
 const noVoteOnCurve = ec.curve.pointFromX(noVoteInt)
 const yesVoteOnCurve = ec.curve.pointFromX(yesVoteInt)
 
-describe('Elliptic Curve ElGamal Encryption', function() {
-  it('Points that encode the plaintexts should lie on the curve', function() {
+describe('Elliptic Curve ElGamal Encryption', function () {
+  it('Points that encode the plaintexts should lie on the curve', function () {
     assert(ec.curve.validate(yesVoteOnCurve) && ec.curve.validate(noVoteOnCurve))
   })
 
-  it('Decrypted value is the same as the original message', function() {
+  it('Decrypted value is the same as the original message', function () {
     const keyPair = ec.genKeyPair()
     const privateKey = keyPair.getPrivate()
     const publicKey = keyPair.getPublic()
@@ -32,7 +32,7 @@ describe('Elliptic Curve ElGamal Encryption', function() {
     assert(decryptedCipherText.eq(messageToEncrypt))
   })
 
-  it('Two added ciphertexts should be the same as adding two plain texts', function() {
+  it('Two added ciphertexts should be the same as adding two plain texts', function () {
     const keyPair = ec.genKeyPair()
     const privateKey = keyPair.getPrivate()
     const publicKey = keyPair.getPublic()

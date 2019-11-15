@@ -4,9 +4,9 @@ import { curve } from 'elliptic'
 
 import BN = require('bn.js')
 const EC = require('elliptic').ec
-const secp256k1 = new EC('secp256k1')
+const curve25519 = new EC('curve25519-weier')
 
-const shouldLog = false
+const shouldLog = true
 
 // Elliptic Curve ElGamal Encryption
 //
@@ -23,13 +23,13 @@ const shouldLog = false
 export const encrypt = (message: curve.base.BasePoint, pubK: curve.base.BasePoint): ECCipher => {
   const r = getSecureRandomValue()
 
-  const c1 = secp256k1.g.mul(r)
+  const c1 = curve25519.g.mul(r)
   const s = pubK.mul(r)
   const c2 = s.add(message)
 
-  shouldLog && console.log('Is c1 on the curve?', secp256k1.curve.validate(c1))
-  shouldLog && console.log('Is point s on the curve?', secp256k1.curve.validate(s))
-  shouldLog && console.log('is c2 on curve?', secp256k1.curve.validate(c2))
+  shouldLog && console.log('Is c1 on the curve?\t', curve25519.curve.validate(c1))
+  shouldLog && console.log('Is point s on the curve?', curve25519.curve.validate(s))
+  shouldLog && console.log('Is c2 on curve?\t\t', curve25519.curve.validate(c2))
 
   return { a: c1, b: c2, r: r }
 }
@@ -52,9 +52,9 @@ export const decrypt = (cipherText: ECCipher, privK: BN): any => {
   const sInverse = s.neg()
   const m = c2.add(sInverse)
 
-  shouldLog && console.log('is s on the curve?', secp256k1.curve.validate(s))
-  shouldLog && console.log('is s^-1 on the curve?', secp256k1.curve.validate(sInverse))
-  shouldLog && console.log('is m on curve?', secp256k1.curve.validate(m))
+  shouldLog && console.log('is s on the curve?', curve25519.curve.validate(s))
+  shouldLog && console.log('is s^-1 on the curve?', curve25519.curve.validate(sInverse))
+  shouldLog && console.log('is m on curve?', curve25519.curve.validate(m))
 
   return m
 }

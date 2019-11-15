@@ -2,17 +2,18 @@ import crypto = require('crypto')
 
 import BN = require('bn.js')
 const EC = require('elliptic').ec
-const secp256k1 = new EC('secp256k1')
+const curve25519 = new EC('curve25519-weier')
 
-const RAND_SIZE_BYTES = 32
-const UPPER_BOUND_RANDOM = secp256k1.curve.n.sub(new BN(1, 10))
+export const getSecureRandomValue = (RAND_SIZE_BYTES: number = 32): BN => {
+  const one = new BN(1, 10)
 
-export const getSecureRandomValue = (): BN => {
+  const UPPER_BOUND_RANDOM: BN = curve25519.curve.n.sub(new BN(1, 10))
+
   let randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
   let randomValue = new BN(randomBytes, 'hex')
 
   // ensure that the random value is in range [1,n-1]
-  while (!(randomValue.lte(UPPER_BOUND_RANDOM) && randomValue.gte(new BN(1)))) {
+  while (!(randomValue.lte(UPPER_BOUND_RANDOM) && randomValue.gte(one))) {
     randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
     randomValue = new BN(randomBytes, 'hex')
   }
