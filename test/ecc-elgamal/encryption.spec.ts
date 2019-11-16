@@ -6,10 +6,10 @@ const EC = require('elliptic').ec
 const ec = new EC('curve25519-weier')
 
 // Fixed values for testing purposes
-// NO Vote:  mapped to integer 1
-// YES Vote:  mapped to integer 3
-const noVoteInt = 1
-const yesVoteInt = 3
+// NO Vote:  mapped to integer 3
+// YES Vote:  mapped to integer 6
+const noVoteInt = 3
+const yesVoteInt = 6
 
 // Map/encode votes to points on the elliptic curve
 const noVoteOnCurve = ec.curve.pointFromX(noVoteInt)
