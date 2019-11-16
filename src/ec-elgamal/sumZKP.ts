@@ -2,19 +2,12 @@ import { ECCipher, ECParams } from './models'
 import { ECelGamal } from '../index'
 import { curve } from 'elliptic'
 import { SumProof } from '../models'
+import { ECmul, ECpow, BNmul, BNadd } from './helper'
 
 import BN = require('bn.js')
 import { activeCurve } from './activeCurve'
 
 const log = false
-
-const BNadd = (a: BN, b: BN, params: ECParams) => a.add(b).mod(params.n)
-const BNsub = (a: BN, b: BN, params: ECParams) => a.sub(b).mod(params.n)
-const BNmul = (a: BN, b: BN, params: ECParams) => a.mul(b).mod(params.n)
-
-const ECpow = (a: curve.base.BasePoint, b: BN): curve.base.BasePoint => a.mul(b)
-const ECmul = (a: curve.base.BasePoint, b: curve.base.BasePoint): curve.base.BasePoint => a.add(b)
-const ECdiv = (a: curve.base.BasePoint, b: curve.base.BasePoint): curve.base.BasePoint => a.add(b.neg())
 
 export const generateSumProof = (encryptedVote: ECCipher, params: ECParams, sk: BN, id: string): SumProof => {
   // a = g^r, b = public_key i.e. h^r*g^m

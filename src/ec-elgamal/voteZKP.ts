@@ -2,18 +2,11 @@ import { ECelGamal } from '../index'
 import { ValidVoteProof } from '../models'
 import { ECParams, ECCipher } from './models'
 import BN = require('bn.js')
-import { curve, ec } from 'elliptic'
+import { curve } from 'elliptic'
 import { activeCurve } from './activeCurve'
+import { ECmul, ECdiv, ECpow, BNmul, BNadd, BNsub } from './helper'
 
 const printConsole = false
-
-const BNadd = (a: BN, b: BN, params: ECParams) => a.add(b).mod(params.n)
-const BNsub = (a: BN, b: BN, params: ECParams) => a.sub(b).mod(params.n)
-const BNmul = (a: BN, b: BN, params: ECParams) => a.mul(b).mod(params.n)
-
-const ECpow = (a: curve.base.BasePoint, b: BN): curve.base.BasePoint => a.mul(b)
-const ECmul = (a: curve.base.BasePoint, b: curve.base.BasePoint): curve.base.BasePoint => a.add(b)
-const ECdiv = (a: curve.base.BasePoint, b: curve.base.BasePoint): curve.base.BasePoint => a.add(b.neg())
 
 // Generates a proof for an encrypted yes vote.
 export function generateYesProof(encryptedVote: ECCipher, params: ECParams, id: string): ValidVoteProof {
@@ -157,7 +150,7 @@ export function verifyZKP(encryptedVote: ECCipher, proof: ValidVoteProof, params
   return v1 && v2 && v3 && v4 && v5
 }
 
-export function generateChallenge(n: BN, id: any, c1: any, c2: any, a1: any, a2: any, b1: any, b2: any) {
+export function generateChallenge(n: BN, id: string, c1: curve.base.BasePoint, c2: curve.base.BasePoint, a1: curve.base.BasePoint, a2: curve.base.BasePoint, b1: curve.base.BasePoint, b2: curve.base.BasePoint) {
   const pointsAsString = convertAllECPointsToString([c1, c2, a1, a2, b1, b2])
   const input = id + pointsAsString
 
@@ -179,7 +172,7 @@ export function convertECPointToString(point: any) {
   return Px + Py
 }
 
-export function convertAllECPointsToString(points: any[]) {
+export function convertAllECPointsToString(points: curve.base.BasePoint[]) {
   let asString = ''
   for (const point of points) {
     asString += convertECPointToString(point)
