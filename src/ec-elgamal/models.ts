@@ -20,3 +20,15 @@ export interface ECParamsTransfer {
   g: string // generator
   h: string
 }
+
+export interface KeyShare {
+  h_: curve.base.BasePoint
+  sk_: BN
+  r?: BN
+}
+
+export interface SystemParameters {
+  p: BN
+  n: BN
+  g: curve.base.BasePoint
+}
