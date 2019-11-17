@@ -20,7 +20,7 @@ const shouldLog = false
 // 3. compute s = h^r (ec-multiplication)
 // 4. compute c2 = s*m
 export const encrypt = (message: curve.base.BasePoint, pubK: curve.base.BasePoint): ECCipher => {
-  const r = getSecureRandomValue()
+  const r = getSecureRandomValue(secp256k1.curve.n)
 
   const c1 = activeCurve.g.mul(r)
   const s = pubK.mul(r)

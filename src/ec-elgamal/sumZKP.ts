@@ -1,8 +1,8 @@
 import { ECCipher, ECParams } from './models'
 import { ECelGamal } from '../index'
-import { curve } from 'elliptic'
 import { SumProof } from '../models'
 import { ECmul, ECpow, BNmul, BNadd } from './helper'
+import { curve } from "elliptic"
 
 import BN = require('bn.js')
 import { activeCurve } from './activeCurve'
@@ -15,7 +15,7 @@ export const generateSumProof = (encryptedVote: ECCipher, params: ECParams, sk: 
   const { p, h, g, n } = params
 
   // generate random value
-  const x: BN = ECelGamal.Helper.getSecureRandomValue()
+  const x: BN = ECelGamal.Helper.getSecureRandomValue(n)
 
   // (a1, b1) = (a^x, g^x)
   const a1 = ECpow(a, x)
@@ -25,8 +25,8 @@ export const generateSumProof = (encryptedVote: ECCipher, params: ECParams, sk: 
   const c = generateChallenge(n, id, a, b, a1, b1)
 
   // compute f = x + c * sk (NOTE: mod q!)
-  const cr = BNmul(c, sk, params)
-  const f = BNadd(x, cr, params)
+  const cr = BNmul(c, sk, n)
+  const f = BNadd(x, cr, n)
 
   // comute the decryption factor
   const d = ECpow(a, sk)
