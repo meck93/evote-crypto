@@ -8,6 +8,8 @@ describe('Finite Field ElGamal Voting', () => {
     const vote = (_result: number, _votes: number[]) => {
       const [pk, sk] = FFelGamal.Encryption.generateKeys(137, 51)
 
+      const log = false
+
       const votes: Cipher[] = []
       for (const vote of _votes) {
         vote === 1 && votes.push(FFelGamal.Voting.generateYesVote(pk))
@@ -16,7 +18,7 @@ describe('Finite Field ElGamal Voting', () => {
 
       const result = FFelGamal.Voting.tallyVotes(pk, sk, votes)
       const summary = FFelGamal.Voting.getSummary(votes.length, result)
-      console.log(_result, _votes, result, 'Total:', summary.total, '| Yes:', summary.yes, '| No:', summary.no)
+      log && console.log(_result, _votes, result, 'Total:', summary.total, '| Yes:', summary.yes, '| No:', summary.no)
 
       expect(result).to.equal(_result)
       expect(summary.yes).to.equal(_votes.filter(v => v === 1).length)

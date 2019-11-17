@@ -1,4 +1,4 @@
-export { }
+export {}
 import { ECelGamal } from '../../src/index'
 import { ValidVoteProof } from '../../src/models'
 import { ec, curve } from 'elliptic'
@@ -10,14 +10,14 @@ import { ECParams, ECCipher } from '../../src/ec-elgamal/models'
 const EC = require('elliptic').ec
 const curve25519 = new EC('curve25519-weier')
 
-const prnt = true
+const prnt = false
 
 // fixed constants for values 1 -> generator and 0 -> generator^-1
 const yesVoteOnCurve = curve25519.curve.g
 const noVoteOnCurve = curve25519.curve.g.neg()
 
 describe('Elliptic Curve ElGamal Vote ZKP', () => {
-  it('Points that encode the plaintexts should lie on the curve', function () {
+  it('Points that encode the plaintexts should lie on the curve', function() {
     assert(curve25519.curve.validate(noVoteOnCurve) && curve25519.curve.validate(yesVoteOnCurve))
   })
 

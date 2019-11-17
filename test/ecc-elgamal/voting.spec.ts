@@ -1,4 +1,4 @@
-export { }
+export {}
 import { Cipher, ECelGamal } from '../../src/index'
 
 const { assert } = require('chai')
@@ -8,6 +8,7 @@ const ec = new EC('curve25519-weier')
 describe('Elliptic Curve ElGamal Voting', () => {
   it('Voting works correctly in various scenarii', () => {
     const vote = (_result: number, _votes: number[]) => {
+      const log = false
       const keyPair = ec.genKeyPair()
       const privateKey = keyPair.getPrivate()
       const publicKey = keyPair.getPublic().encode('hex', false)
@@ -20,7 +21,7 @@ describe('Elliptic Curve ElGamal Voting', () => {
 
       const result = ECelGamal.Voting.tallyVotes(publicKey, privateKey, votes)
       const summary = ECelGamal.Voting.getSummary(votes.length, result)
-      console.log(_result, _votes, result, 'Total:', summary.total, '| Yes:', summary.yes, '| No:', summary.no)
+      log && console.log(_result, _votes, result, 'Total:', summary.total, '| Yes:', summary.yes, '| No:', summary.no)
 
       assert(result === _result)
       assert(summary.yes === _votes.filter(v => v === 1).length)

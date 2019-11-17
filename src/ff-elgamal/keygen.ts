@@ -5,6 +5,7 @@ import { KeyShareProof, Cipher } from '../models'
 import BN = require('bn.js')
 
 const web3 = require('web3')
+const log = false
 
 export const generateSystemParameters = (p: number, q: number, g: number): FFelGamal.SystemParameters => {
   return { p: newBN(p), q: newBN(q), g: newBN(g) }
@@ -57,9 +58,9 @@ export const verifyKeyGenerationProof = (params: FFelGamal.SystemParameters, pro
   const bhPowC: BN = BNmul(b, BNpow(h_, c, p), p)
   const dCheck: boolean = gPowd.eq(bhPowC)
 
-  console.log("do the hashes match?\t", hashCheck)
-  console.log('g^d == b * h_^c?\t', dCheck)
-  console.log()
+  log && console.log('do the hashes match?\t', hashCheck)
+  log && console.log('g^d == b * h_^c?\t', dCheck)
+  log && console.log()
 
   return hashCheck && dCheck
 }
@@ -79,7 +80,11 @@ export const decryptShare = (params: FFelGamal.SystemParameters, cipher: Cipher,
 }
 
 export const combineDecryptedShares = (params: FFelGamal.SystemParameters, cipher: Cipher, decryptedShares: BN[]): BN => {
-  const mh = BNdiv(cipher.b, decryptedShares.reduce((product, share) => BNmul(product, share, params.p)), params.p)
+  const mh = BNdiv(
+    cipher.b,
+    decryptedShares.reduce((product, share) => BNmul(product, share, params.p)),
+    params.p
+  )
 
   // TODO: split PublicKey interface into system parameters (p,g,q) and the actual public key (h)
   // (h is not needed here)

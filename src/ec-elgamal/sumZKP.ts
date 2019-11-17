@@ -8,7 +8,7 @@ import BN = require('bn.js')
 const EC = require('elliptic').ec
 const curve25519 = new EC('curve25519-weier')
 
-const log = true
+const log = false
 
 const BNadd = (a: BN, b: BN, params: ECParams) => a.add(b).mod(params.n)
 const BNsub = (a: BN, b: BN, params: ECParams) => a.sub(b).mod(params.n)

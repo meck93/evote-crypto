@@ -1,4 +1,4 @@
-export { }
+export {}
 import { FFelGamal } from '../../src/index'
 import { KeyShareProof } from '../../src/models'
 import { newBN } from '../../src/ff-elgamal/helper'
@@ -9,7 +9,7 @@ const { expect } = require('chai')
 describe('Finite Field ElGamal Distributed Key Generation', () => {
   it('generate and verify (distributed) key share', () => {
     for (let i = 0; i < 10; i++) {
-      const prnt = true
+      const prnt = false
       const p_: number = 11
       const q_: number = (p_ - 1) / 2
       const g_: number = 3

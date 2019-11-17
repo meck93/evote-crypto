@@ -1,4 +1,4 @@
-export { }
+export {}
 import { ECelGamal } from '../../src/index'
 import { SumProof } from '../../src/models'
 import { ECParams, ECCipher } from '../../src/ec-elgamal/models'
@@ -16,11 +16,12 @@ const yesVoteOnCurve = curve25519.curve.g
 const noVoteOnCurve = curve25519.curve.g.neg()
 
 describe('Elliptic Curve ElGamal Sum ZKP', () => {
-  it('Points that encode the plaintexts should lie on the curve', function () {
+  it('Points that encode the plaintexts should lie on the curve', function() {
     assert(curve25519.curve.validate(noVoteOnCurve) && curve25519.curve.validate(yesVoteOnCurve))
   })
 
   it('Should generate a valid sum proof for a number of votes', () => {
+    const log = false
     const keyPair: ec.KeyPair = curve25519.genKeyPair()
     const privateKey: BN = keyPair.getPrivate()
     const publicKey: curve.base.BasePoint = keyPair.getPublic()
@@ -49,7 +50,7 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
       const result = ECelGamal.Voting.checkDecrypedSum(decryptedSum)
 
       const summary = ECelGamal.Voting.getSummary(votes.length, result)
-      console.log(_result, _votes, result, 'Total:', summary.total, '| Yes:', summary.yes, '| No:', summary.no)
+      log && console.log(_result, _votes, result, 'Total:', summary.total, '| Yes:', summary.yes, '| No:', summary.no)
 
       expect(result).to.equal(_result)
       expect(summary.yes).to.equal(_votes.filter(v => v === 1).length)

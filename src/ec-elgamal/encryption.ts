@@ -6,7 +6,7 @@ import BN = require('bn.js')
 const EC = require('elliptic').ec
 const curve25519 = new EC('curve25519-weier')
 
-const shouldLog = true
+const shouldLog = false
 
 // Elliptic Curve ElGamal Encryption
 //

@@ -6,7 +6,7 @@ import { ECParams, ECCipher } from './models'
 import BN = require('bn.js')
 import { curve, ec } from 'elliptic'
 
-const printConsole = true
+const printConsole = false
 
 const BNadd = (a: BN, b: BN, params: ECParams) => a.add(b).mod(params.n)
 const BNsub = (a: BN, b: BN, params: ECParams) => a.sub(b).mod(params.n)
@@ -135,7 +135,7 @@ export function verifyZKP(encryptedVote: ECCipher, proof: ValidVoteProof, params
   // verification h^f0 == b0 * b^c0
   const l3 = ECpow(h, f0)
   const r3 = ECmul(b0, ECpow(b, c0))
-  console.log('r3 == l3?\t\t', l3.eq(r3), '\n')
+  printConsole && console.log('r3 == l3?\t\t', l3.eq(r3), '\n')
   const v3 = l3.eq(r3)
 
   // verification h^f1 == b1 * (b/g)^c1
