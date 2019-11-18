@@ -21,7 +21,7 @@
     "elliptic": "^6.5.1",
     "hash.js": "^1.1.7",
     "random": "^2.1.1",
-    "web3": "^1.2.2"
+    "web3": "^1.2.4"
   },
   "devDependencies": {
     "@types/chai": "^4.2.5",
