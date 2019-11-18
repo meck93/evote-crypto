@@ -4,9 +4,7 @@ import { curve } from 'elliptic'
 import { SumProof } from '../models'
 
 import BN = require('bn.js')
-
-const EC = require('elliptic').ec
-const curve25519 = new EC('curve25519-weier')
+import { activeCurve } from './activeCurve'
 
 const log = false
 
@@ -40,9 +38,9 @@ export const generateSumProof = (encryptedVote: ECCipher, params: ECParams, sk: 
   // comute the decryption factor
   const d = ECpow(a, sk)
 
-  log && console.log('a1 is on the curve?\t', curve25519.curve.validate(a1))
-  log && console.log('b1 is on the curve?\t', curve25519.curve.validate(b1))
-  log && console.log('d is on the curve?\t', curve25519.curve.validate(d))
+  log && console.log('a1 is on the curve?\t', activeCurve.curve.validate(a1))
+  log && console.log('b1 is on the curve?\t', activeCurve.curve.validate(b1))
+  log && console.log('d is on the curve?\t', activeCurve.curve.validate(d))
 
   log && console.log('x\t\t\t', x)
   log && console.log('a1\t\t\t', a1)
@@ -112,7 +110,7 @@ export function generateChallenge(
   const pointsAsString: string = convertAllECPointsToString([a, b, a1, b1])
   const input = id + pointsAsString
 
-  let c = curve25519
+  let c = activeCurve
     .hash()
     .update(input)
     .digest('hex')

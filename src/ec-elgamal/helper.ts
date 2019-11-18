@@ -1,13 +1,12 @@
 import crypto = require('crypto')
 
 import BN = require('bn.js')
-const EC = require('elliptic').ec
-const curve25519 = new EC('curve25519-weier')
+import { activeCurve } from './activeCurve'
 
 export const getSecureRandomValue = (RAND_SIZE_BYTES: number = 32): BN => {
   const one = new BN(1, 10)
 
-  const UPPER_BOUND_RANDOM: BN = curve25519.curve.n.sub(new BN(1, 10))
+  const UPPER_BOUND_RANDOM: BN = activeCurve.curve.n.sub(new BN(1, 10))
 
   let randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
   let randomValue = new BN(randomBytes, 'hex')

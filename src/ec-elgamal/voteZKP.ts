@@ -1,10 +1,9 @@
-const EC = require('elliptic').ec
-const curve25519 = new EC('curve25519-weier')
 import { ECelGamal } from '../index'
 import { ValidVoteProof } from '../models'
 import { ECParams, ECCipher } from './models'
 import BN = require('bn.js')
 import { curve, ec } from 'elliptic'
+import { activeCurve } from './activeCurve'
 
 const printConsole = false
 
@@ -49,10 +48,10 @@ export function generateYesProof(encryptedVote: ECCipher, params: ECParams, id: 
   const c1r = BNmul(c1, r, params)
   const f1 = BNadd(x, c1r, params)
 
-  printConsole && console.log('a0 is on the curve?\t', curve25519.curve.validate(a0))
-  printConsole && console.log('b0 is on the curve?\t', curve25519.curve.validate(b0))
-  printConsole && console.log('a1 is on the curve?\t', curve25519.curve.validate(a1))
-  printConsole && console.log('b1 is on the curve?\t', curve25519.curve.validate(b1))
+  printConsole && console.log('a0 is on the curve?\t', activeCurve.curve.validate(a0))
+  printConsole && console.log('b0 is on the curve?\t', activeCurve.curve.validate(b0))
+  printConsole && console.log('a1 is on the curve?\t', activeCurve.curve.validate(a1))
+  printConsole && console.log('b1 is on the curve?\t', activeCurve.curve.validate(b1))
 
   printConsole && console.log('c0\t\t\t\t', c0.toString('hex'))
   printConsole && console.log('f0\t\t\t\t', f0.toString('hex'))
@@ -101,10 +100,10 @@ export function generateNoProof(encryptedVote: ECCipher, params: ECParams, id: s
   const c0r = BNmul(c0, r, params)
   const f0 = BNadd(x, c0r, params)
 
-  printConsole && console.log('a1 is on the curve?\t', curve25519.curve.validate(a1))
-  printConsole && console.log('b1 is on the curve?\t', curve25519.curve.validate(b1))
-  printConsole && console.log('a0 is on the curve?\t', curve25519.curve.validate(a0))
-  printConsole && console.log('b0 is on the curve?\t', curve25519.curve.validate(b0))
+  printConsole && console.log('a1 is on the curve?\t', activeCurve.curve.validate(a1))
+  printConsole && console.log('b1 is on the curve?\t', activeCurve.curve.validate(b1))
+  printConsole && console.log('a0 is on the curve?\t', activeCurve.curve.validate(a0))
+  printConsole && console.log('b0 is on the curve?\t', activeCurve.curve.validate(b0))
 
   printConsole && console.log('c1\t\t\t\t', c1.toString('hex'))
   printConsole && console.log('f1\t\t\t\t', f1.toString('hex'))
@@ -162,7 +161,7 @@ export function generateChallenge(n: BN, id: any, c1: any, c2: any, a1: any, a2:
   const pointsAsString = convertAllECPointsToString([c1, c2, a1, a2, b1, b2])
   const input = id + pointsAsString
 
-  let c = curve25519
+  let c = activeCurve
     .hash()
     .update(input)
     .digest('hex')
