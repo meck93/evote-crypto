@@ -2,12 +2,10 @@ export { }
 import { ECelGamal } from '../../src/index'
 import { KeyShareProof } from '../../src/models'
 import { ECpow, ECmul, ECdiv } from '../../src/ec-elgamal/helper'
-import { PublicKey } from '../../src/ff-elgamal'
 
 import { expect } from 'chai'
-import { ec, curve } from 'elliptic'
-
-const secp256k1 = new ec("secp256k1")
+import { curve, ec } from 'elliptic'
+import { activeCurve } from '../../src/ec-elgamal/activeCurve'
 
 describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
   it('generate and verify (distributed) key share', () => {
@@ -98,7 +96,7 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
     prnt && console.log('sk', privateKey)
 
     // encrypt a single yes vote -> we use the generator
-    const plaintext = secp256k1.curve.g
+    const plaintext = activeCurve.curve.g
     const cipherText = ECelGamal.Encryption.encrypt(plaintext, publicKey)
 
     prnt && console.log('plaintext', plaintext)

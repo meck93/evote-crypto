@@ -4,11 +4,11 @@ import { KeyShareProof, Cipher } from '../models'
 import BN = require('bn.js')
 import { ec as EC, curve } from "elliptic"
 
-const secp256k1 = new EC('secp256k1')
+import { activeCurve } from './activeCurve'
 const web3 = require('web3')
 
 export const generateSystemParameters = (): ECelGamal.SystemParameters => {
-  return { p: secp256k1.curve.p, n: secp256k1.curve.n, g: secp256k1.curve.g }
+  return { p: activeCurve.curve.p, n: activeCurve.curve.n, g: activeCurve.curve.g }
 }
 
 export const generateKeyShares = (): ECelGamal.KeyShare => {
@@ -21,7 +21,7 @@ export const generateKeyShares = (): ECelGamal.KeyShare => {
 }
 
 export const generateKeyPair = (): EC.KeyPair => {
-  return secp256k1.genKeyPair()
+  return activeCurve.genKeyPair()
 }
 
 export const generateKeyPairs = (n: number): EC.KeyPair[] => {
@@ -37,7 +37,7 @@ export const generateKeyGenerationProof = (params: ECelGamal.SystemParameters, s
   const { h_, sk_ } = share
 
   // generate a second key pair (a,b)
-  const keyPair: EC.KeyPair = secp256k1.genKeyPair()
+  const keyPair: EC.KeyPair = activeCurve.genKeyPair()
   const a: BN = keyPair.getPrivate()
   const b: curve.base.BasePoint = keyPair.getPublic()
 

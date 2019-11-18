@@ -1,15 +1,13 @@
-export {}
+export { }
 import { Cipher, ECelGamal } from '../../src/index'
-
-const { assert } = require('chai')
-const EC = require('elliptic').ec
-const ec = new EC('curve25519-weier')
+import { assert } from "chai"
+import { activeCurve } from '../../src/ec-elgamal/activeCurve'
 
 describe('Elliptic Curve ElGamal Voting', () => {
   it('Voting works correctly in various scenarii', () => {
     const vote = (_result: number, _votes: number[]) => {
       const log = false
-      const keyPair = ec.genKeyPair()
+      const keyPair = activeCurve.genKeyPair()
       const privateKey = keyPair.getPrivate()
       const publicKey = keyPair.getPublic().encode('hex', false)
 
