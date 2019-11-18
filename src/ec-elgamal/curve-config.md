@@ -1,11 +1,23 @@
 # Adding curve25519 (in Weierstrass form) to Elliptic Library
+
 We need to add curve25519 in Weierstrass form manually to the elliptic library since the required pull request has not been merged yet.
 
 To add the curve, do the following:
+
 - copy the configuration code below in to the file: `/node_modules/elliptic/lib/elliptic/curves.js`
 - now, `curve25519-weier` can be instantiated via:
+
 ```javascript
 const curve = new EC('curve25519-weier)
+```
+
+We define the `activeCurve` inside `src/ec-elgamal/activeCurve.ts`.
+
+```javascript
+// activeCurve.ts
+const EC = require('elliptic').ec
+const curve25519 = new EC('curve25519-weier')
+export const activeCurve = curve25519
 ```
 
 ## Curve Configuration
@@ -22,7 +34,7 @@ defineCurve('curve25519-weier', {
   gRed: false,
   g: [
     '2aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad245a',
-    '20ae19a1b8a086b4e01edd2c7748d14c923d4d7e6d7c61b229e9c5a27eced3d9'
-  ]
-});
+    '20ae19a1b8a086b4e01edd2c7748d14c923d4d7e6d7c61b229e9c5a27eced3d9',
+  ],
+})
 ```
