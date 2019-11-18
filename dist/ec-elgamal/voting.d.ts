@@ -1,0 +1,20 @@
+import { ECCipher, ECParamsTransfer } from './models';
+import { curve } from 'elliptic';
+import BN = require('bn.js');
+import { ValidVoteProof, SumProof } from '../models';
+export declare const generateYesVote: (pk: string | curve.base.BasePoint) => ECCipher;
+export declare const generateNoVote: (pk: string | curve.base.BasePoint) => ECCipher;
+export declare const addVotes: (votes: ECCipher[], pk: string | curve.base.BasePoint) => ECCipher;
+export declare const findPoint: (point: curve.base.BasePoint) => number;
+export declare const tallyVotes: (pk: string, sk: BN, votes: ECCipher[]) => number;
+export declare const checkDecrypedSum: (decryptedSum: curve.base.BasePoint) => number;
+export declare const getSummary: (total: number, tallyResult: number) => {
+    total: number;
+    yes: number;
+    no: number;
+};
+export declare function generateYesProof(encryptedVote: ECCipher, params: ECParamsTransfer, id: string): ValidVoteProof;
+export declare const generateNoProof: (encryptedVote: ECCipher, params: ECParamsTransfer, id: string) => ValidVoteProof;
+export declare const generateSumProof: (encryptedVote: ECCipher, params: ECParamsTransfer, sk: BN, id: string) => SumProof;
+export declare const verifyZKP: (encryptedVote: ECCipher, proof: ValidVoteProof, params: ECParamsTransfer, id: string) => boolean;
+export declare const verifySumProof: (encryptedSum: ECCipher, proof: SumProof, params: ECParamsTransfer, pk: string, id: string) => boolean;

@@ -1,0 +1,12 @@
+import { FFelGamal } from '..';
+import { KeyShareProof, Cipher } from '../models';
+import BN = require('bn.js');
+export declare const generateSystemParameters: (p: number, q: number, g: number) => FFelGamal.SystemParameters;
+export declare const generateKeyShares: (params: FFelGamal.SystemParameters) => FFelGamal.KeyShare;
+export declare const generateKeyGenerationProof: (params: FFelGamal.SystemParameters, share: FFelGamal.KeyShare, id: string) => KeyShareProof;
+export declare const verifyKeyGenerationProof: (params: FFelGamal.SystemParameters, proof: KeyShareProof, h_: BN, id: string) => boolean;
+export declare const combinePublicKeys: (params: FFelGamal.SystemParameters, publicKeyShares: BN[]) => BN;
+export declare const combinePrivateKeys: (params: FFelGamal.SystemParameters, privateKeyShares: BN[]) => BN;
+export declare const decryptShare: (params: FFelGamal.SystemParameters, cipher: Cipher, secretKeyShare: BN) => BN;
+export declare const combineDecryptedShares: (params: FFelGamal.SystemParameters, cipher: Cipher, decryptedShares: BN[]) => BN;
+export declare const generateChallenge: (q: BN, uniqueID: string, h_: BN, b: BN) => BN;

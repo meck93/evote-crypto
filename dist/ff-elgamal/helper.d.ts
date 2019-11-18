@@ -1,0 +1,15 @@
+export declare const isPrime: (num: number) => boolean;
+export declare const getPrimitiveRoots: (n: number) => number[];
+export declare const getQofP: (p: any) => number;
+export declare const isQValid: (q: any) => boolean;
+export declare const isGValid: (g: any, p: any) => boolean;
+export declare const getPCandidates: (primes: any) => any;
+export declare const getGCandidates: (p: any) => any;
+import BN = require('bn.js');
+export declare const getSecureRandomValue: (q: BN) => BN;
+export declare const newBN: (num: number, base?: number) => BN;
+export declare const BNadd: (a: BN, b: BN, modulus: BN) => BN;
+export declare const BNmul: (a: BN, b: BN, modulus: BN) => BN;
+export declare const BNpow: (a: BN, b: BN, modulus: BN) => BN;
+export declare const BNinvm: (a: BN, modulus: BN) => BN;
+export declare const BNdiv: (a: BN, b: BN, modulus: BN) => BN;
