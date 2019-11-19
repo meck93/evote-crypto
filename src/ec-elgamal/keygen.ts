@@ -2,7 +2,7 @@ import { ECelGamal } from '..'
 import { ECpow, ECdiv, ECmul, BNmul, BNadd, curvePointsToString } from './helper'
 import { KeyShareProof, Cipher } from '../models'
 import BN = require('bn.js')
-import { ec as EC, curve } from "elliptic"
+import { ec as EC, curve } from 'elliptic'
 
 import { activeCurve } from './activeCurve'
 const web3 = require('web3')
@@ -54,7 +54,8 @@ export const verifyKeyGenerationProof = (
   params: ECelGamal.SystemParameters,
   proof: KeyShareProof,
   h_: curve.base.BasePoint,
-  id: string): boolean => {
+  id: string
+): boolean => {
   const { p, n, g } = params
   const { c, d } = proof
 
@@ -71,7 +72,7 @@ export const verifyKeyGenerationProof = (
   const bhPowC: curve.base.BasePoint = ECmul(b, ECpow(h_, c))
   const dCheck: boolean = gPowd.eq(bhPowC)
 
-  console.log("do the hashes match?\t", hashCheck)
+  console.log('do the hashes match?\t', hashCheck)
   console.log('g^d == b * h_^c?\t', dCheck)
   console.log()
 
@@ -93,7 +94,10 @@ export const decryptShare = (cipher: Cipher, secretKeyShare: BN): curve.base.Bas
 }
 
 export const combineDecryptedShares = (cipher: Cipher, decryptedShares: curve.base.BasePoint[]): curve.base.BasePoint => {
-  const mh = ECdiv(cipher.b, decryptedShares.reduce((product, share) => ECmul(product, share)))
+  const mh = ECdiv(
+    cipher.b,
+    decryptedShares.reduce((product, share) => ECmul(product, share))
+  )
   return mh
 }
 

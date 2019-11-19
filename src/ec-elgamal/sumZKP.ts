@@ -2,7 +2,7 @@ import { ECCipher, ECParams } from './models'
 import { ECelGamal } from '../index'
 import { SumProof } from '../models'
 import { ECmul, ECpow, BNmul, BNadd } from './helper'
-import { curve } from "elliptic"
+import { curve } from 'elliptic'
 
 import BN = require('bn.js')
 import { activeCurve } from './activeCurve'

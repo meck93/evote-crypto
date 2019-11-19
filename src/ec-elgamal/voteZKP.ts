@@ -151,7 +151,16 @@ export function verifyZKP(encryptedVote: ECCipher, proof: ValidVoteProof, params
   return v1 && v2 && v3 && v4 && v5
 }
 
-export function generateChallenge(n: BN, id: string, c1: curve.base.BasePoint, c2: curve.base.BasePoint, a1: curve.base.BasePoint, a2: curve.base.BasePoint, b1: curve.base.BasePoint, b2: curve.base.BasePoint) {
+export function generateChallenge(
+  n: BN,
+  id: string,
+  c1: curve.base.BasePoint,
+  c2: curve.base.BasePoint,
+  a1: curve.base.BasePoint,
+  a2: curve.base.BasePoint,
+  b1: curve.base.BasePoint,
+  b2: curve.base.BasePoint
+) {
   const pointsAsString = curvePointsToString([c1, c2, a1, a2, b1, b2])
   const input = id + pointsAsString
 
