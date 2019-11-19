@@ -65,9 +65,10 @@ export const getGCandidates = (p: any) =>
 import crypto = require('crypto')
 import BN = require('bn.js')
 
-export const getSecureRandomValue = (q: BN, byte_size: number = 1): BN => {
+export const getSecureRandomValue = (q: BN): BN => {
   const one = new BN(1, 10)
   const UPPER_BOUND_RANDOM: BN = q.sub(one)
+  const byte_size = getByteSizeForDecimalNumber(q)
 
   let randomBytes: Buffer = crypto.randomBytes(byte_size)
   let randomValue: BN = new BN(randomBytes)
@@ -78,6 +79,14 @@ export const getSecureRandomValue = (q: BN, byte_size: number = 1): BN => {
     randomValue = new BN(randomBytes)
   }
   return randomValue
+}
+
+// Computes the required number of bytes to store a decimal
+export const getByteSizeForDecimalNumber = (q: BN): number => {
+  const modulus: BN = q.mod(new BN(256, 10))
+  const smallerHalf: boolean = modulus.lt(new BN(128, 10))
+  const result: number = q.divRound(new BN(256, 10)).toNumber()
+  return smallerHalf ? result + 1 : result
 }
 
 export const newBN = (num: number, base: number = 10): BN => new BN(num, base)

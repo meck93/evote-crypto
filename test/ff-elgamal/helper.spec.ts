@@ -2,6 +2,7 @@ export {}
 import { FFelGamal } from '../../src/index'
 
 import { primes as primes2 } from './primes.spec'
+import BN = require('bn.js')
 
 const { expect } = require('chai')
 const Helper = FFelGamal.Helper
@@ -170,5 +171,15 @@ describe('Finite Field ElGamal Helper', () => {
       expect(rnd).to.be.at.least(1)
       expect(rnd).to.be.at.most(4)
     }
+  })
+
+  it('should convert decimals to required byte size', () => {
+    const numbers: number[] = [31, 32, 254, 255, 256, 511, 512]
+    const results: number[] = [1, 1, 1, 1, 2, 2, 3]
+
+    numbers.forEach((nr, ind) => {
+      const convertedNumber = Helper.getByteSizeForDecimalNumber(new BN(nr, 10))
+      expect(convertedNumber).to.equal(results[ind])
+    })
   })
 })
