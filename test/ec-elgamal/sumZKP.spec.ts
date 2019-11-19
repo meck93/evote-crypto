@@ -1,4 +1,4 @@
-export { }
+export {}
 import { ECelGamal } from '../../src/index'
 import { SumProof } from '../../src/models'
 import { ECParams, ECCipher } from '../../src/ec-elgamal/models'
@@ -14,7 +14,7 @@ const yesVoteOnCurve = activeCurve.curve.g
 const noVoteOnCurve = activeCurve.curve.g.neg()
 
 describe('Elliptic Curve ElGamal Sum ZKP', () => {
-  it('Points that encode the plaintexts should lie on the curve', function () {
+  it('Points that encode the plaintexts should lie on the curve', function() {
     assert(activeCurve.curve.validate(noVoteOnCurve) && activeCurve.curve.validate(yesVoteOnCurve))
   })
 

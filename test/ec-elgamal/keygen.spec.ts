@@ -1,4 +1,4 @@
-export { }
+export {}
 import { ECelGamal } from '../../src/index'
 import { KeyShareProof } from '../../src/models'
 import { ECpow, ECmul, ECdiv } from '../../src/ec-elgamal/helper'

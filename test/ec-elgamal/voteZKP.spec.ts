@@ -1,4 +1,4 @@
-export { }
+export {}
 import { ECelGamal } from '../../src/index'
 import { ValidVoteProof } from '../../src/models'
 import { ec, curve } from 'elliptic'
@@ -16,7 +16,7 @@ const yesVoteOnCurve = activeCurve.curve.g
 const noVoteOnCurve = activeCurve.curve.g.neg()
 
 describe('Elliptic Curve ElGamal Vote ZKP', () => {
-  it('Points that encode the plaintexts should lie on the curve', function () {
+  it('Points that encode the plaintexts should lie on the curve', function() {
     assert(activeCurve.curve.validate(noVoteOnCurve) && activeCurve.curve.validate(yesVoteOnCurve))
   })
 

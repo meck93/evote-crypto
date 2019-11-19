@@ -1,6 +1,6 @@
-export { }
+export {}
 import { Cipher, ECelGamal } from '../../src/index'
-import { assert } from "chai"
+import { assert } from 'chai'
 import { activeCurve } from '../../src/ec-elgamal/activeCurve'
 
 describe('Elliptic Curve ElGamal Voting', () => {
