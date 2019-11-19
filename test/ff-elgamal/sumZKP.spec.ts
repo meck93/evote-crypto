@@ -1,4 +1,4 @@
-export { }
+export {}
 import { FFelGamal } from '../../src/index'
 import { getSecureRandomValue } from '../../src/ff-elgamal/helper'
 

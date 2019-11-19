@@ -1,5 +1,5 @@
-export { }
-import BN = require("bn.js")
+export {}
+import BN = require('bn.js')
 import { FFelGamal } from '../../src/index'
 import { getSecureRandomValue } from '../../src/ff-elgamal/helper'
 
