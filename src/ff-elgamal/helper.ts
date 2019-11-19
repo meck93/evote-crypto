@@ -65,20 +65,17 @@ export const getGCandidates = (p: any) =>
 import crypto = require('crypto')
 import BN = require('bn.js')
 
-export const getSecureRandomValue = (q: BN): BN => {
+export const getSecureRandomValue = (q: BN, byte_size: number = 1): BN => {
   const one = new BN(1, 10)
-
-  // TODO: Fix upper limit to q-1
   const UPPER_BOUND_RANDOM: BN = q.sub(one)
-  const RAND_SIZE_BYTES = 1
 
-  let randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
-  let randomValue = new BN(randomBytes)
+  let randomBytes: Buffer = crypto.randomBytes(byte_size)
+  let randomValue: BN = new BN(randomBytes)
 
   // ensure that the random value is in range [1,n-1]
   while (!(randomValue.lte(UPPER_BOUND_RANDOM) && randomValue.gte(one))) {
-    randomBytes = crypto.randomBytes(RAND_SIZE_BYTES)
-    randomValue = new BN(randomBytes, 'hex')
+    randomBytes = crypto.randomBytes(byte_size)
+    randomValue = new BN(randomBytes)
   }
   return randomValue
 }
