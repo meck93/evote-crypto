@@ -35,17 +35,17 @@ describe('ElGamal Finite Field E2E Test', () => {
           const encYesVote = FFelGamal.Voting.generateYesVote(sp, pk)
           votes.push(encYesVote)
 
-          const encYesProof = FFelGamal.VoteZKP.generateYesProof(encYesVote, sp, pk, id)
+          const encYesProof = FFelGamal.MembershipProof.generateYesProof(encYesVote, sp, pk, id)
 
-          const validVote = FFelGamal.VoteZKP.verifyVoteProof(encYesVote, encYesProof, sp, pk, id)
+          const validVote = FFelGamal.MembershipProof.verify(encYesVote, encYesProof, sp, pk, id)
           expect(validVote).to.be.true
         } else {
           const encNoVote = FFelGamal.Voting.generateNoVote(sp, pk)
           votes.push(encNoVote)
 
-          const encNoProof = FFelGamal.VoteZKP.generateNoProof(encNoVote, sp, pk, id)
+          const encNoProof = FFelGamal.MembershipProof.generateNoProof(encNoVote, sp, pk, id)
 
-          const validVote = FFelGamal.VoteZKP.verifyVoteProof(encNoVote, encNoProof, sp, pk, id)
+          const validVote = FFelGamal.MembershipProof.verify(encNoVote, encNoProof, sp, pk, id)
           expect(validVote).to.be.true
         }
       }

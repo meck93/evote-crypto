@@ -129,7 +129,7 @@ export function generateNoProof(
   return { a0, a1, b0, b1, c0, c1, f0, f1 }
 }
 
-export function verifyVoteProof(
+export function verify(
   cipher: Cipher,
   proof: ValidVoteProof,
   sp: SystemParameters,

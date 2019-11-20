@@ -23,9 +23,9 @@ describe('Finite Field ElGamal Vote ZKP', () => {
         prnt && console.log('yes proof')
         const yesVote = 1
         const yesEnc = FFelGamal.Encryption.encrypt(yesVote, sp, pk, prnt)
-        const yesProof = FFelGamal.VoteZKP.generateYesProof(yesEnc, sp, pk, uniqueID)
+        const yesProof = FFelGamal.MembershipProof.generateYesProof(yesEnc, sp, pk, uniqueID)
 
-        const verifiedYesProof = FFelGamal.VoteZKP.verifyVoteProof(
+        const verifiedYesProof = FFelGamal.MembershipProof.verify(
           yesEnc,
           yesProof,
           sp,
@@ -38,9 +38,9 @@ describe('Finite Field ElGamal Vote ZKP', () => {
         prnt && console.log('no proof')
         const noVote = 0
         const noEnc = FFelGamal.Encryption.encrypt(noVote, sp, pk, prnt)
-        const noProof = FFelGamal.VoteZKP.generateNoProof(noEnc, sp, pk, uniqueID)
+        const noProof = FFelGamal.MembershipProof.generateNoProof(noEnc, sp, pk, uniqueID)
 
-        const verifiedNoProof = FFelGamal.VoteZKP.verifyVoteProof(noEnc, noProof, sp, pk, uniqueID)
+        const verifiedNoProof = FFelGamal.MembershipProof.verify(noEnc, noProof, sp, pk, uniqueID)
         expect(verifiedNoProof).to.be.true
       }
     }
