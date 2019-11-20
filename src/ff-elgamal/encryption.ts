@@ -27,13 +27,17 @@ export const generateKeysZKP = (_p: number, _g: number): [PublicKey, BN] => {
   // verify that g^q mod p == 1 (this means: gcd(q,p) == 1)
   const test1 = Helper.BNpow(g, q, pk.p)
   if (!test1.eq(Helper.newBN(1))) {
-    throw new Error(`g^q mod p != 1 (== ${test1.toNumber()}. for p: ${_p}, q: ${q.toNumber()} and g: ${_g}`)
+    throw new Error(
+      `g^q mod p != 1 (== ${test1.toNumber()}. for p: ${_p}, q: ${q.toNumber()} and g: ${_g}`
+    )
   }
 
   // verify that h^q mod p == 1 (this means: gcd(h,p) == 1)
   const test2 = Helper.BNpow(h, q, pk.p)
   if (!test2.eq(Helper.newBN(1))) {
-    throw new Error(`h^q mod p != 1 (== ${test2.toNumber()}. for p: ${_p}, q: ${q.toNumber()} and g: ${_g}`)
+    throw new Error(
+      `h^q mod p != 1 (== ${test2.toNumber()}. for p: ${_p}, q: ${q.toNumber()} and g: ${_g}`
+    )
   }
 
   // verify that the public key h is not 1

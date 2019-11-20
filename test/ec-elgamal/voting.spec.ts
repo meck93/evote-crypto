@@ -19,7 +19,18 @@ describe('Elliptic Curve ElGamal Voting', () => {
 
       const result = ECelGamal.Voting.tallyVotes(publicKey, privateKey, votes)
       const summary = ECelGamal.Voting.getSummary(votes.length, result)
-      log && console.log(_result, _votes, result, 'Total:', summary.total, '| Yes:', summary.yes, '| No:', summary.no)
+      log &&
+        console.log(
+          _result,
+          _votes,
+          result,
+          'Total:',
+          summary.total,
+          '| Yes:',
+          summary.yes,
+          '| No:',
+          summary.no
+        )
 
       assert(result === _result)
       assert(summary.yes === _votes.filter(v => v === 1).length)

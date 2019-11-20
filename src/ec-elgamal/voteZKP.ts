@@ -32,7 +32,11 @@ export function generateChallenge(
 }
 
 // Generates a proof for an encrypted yes vote.
-export function generateYesProof(encryptedVote: Cipher, params: ECParams, id: string): ValidVoteProof {
+export function generateYesProof(
+  encryptedVote: Cipher,
+  params: ECParams,
+  id: string
+): ValidVoteProof {
   const { a, b, r } = encryptedVote
   const { h, g, n } = params
 
@@ -81,7 +85,11 @@ export function generateYesProof(encryptedVote: Cipher, params: ECParams, id: st
 }
 
 // Generates a proof for an encrypted no vote.
-export function generateNoProof(encryptedVote: Cipher, params: ECParams, id: string): ValidVoteProof {
+export function generateNoProof(
+  encryptedVote: Cipher,
+  params: ECParams,
+  id: string
+): ValidVoteProof {
   const { a, b, r } = encryptedVote
   const { h, g, n } = params
 
@@ -132,7 +140,12 @@ export function generateNoProof(encryptedVote: Cipher, params: ECParams, id: str
   return { a0, a1, b0, b1, c0, c1, f0, f1 }
 }
 
-export function verifyZKP(encryptedVote: Cipher, proof: ValidVoteProof, params: ECParams, id: string): boolean {
+export function verifyZKP(
+  encryptedVote: Cipher,
+  proof: ValidVoteProof,
+  params: ECParams,
+  id: string
+): boolean {
   const { a0, a1, b0, b1, c0, c1, f0, f1 } = proof
   const { h, g, n } = params
   const { a, b } = encryptedVote

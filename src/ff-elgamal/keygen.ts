@@ -28,7 +28,11 @@ export const generateChallenge = (q: BN, uniqueID: string, h_: BN, b: BN): BN =>
   return c
 }
 
-export const generateKeyGenerationProof = (params: SystemParameters, share: KeyShare, id: string): KeyShareProof => {
+export const generateKeyGenerationProof = (
+  params: SystemParameters,
+  share: KeyShare,
+  id: string
+): KeyShareProof => {
   const { p, q, g } = params
   const { h_, sk_ } = share
 
@@ -46,7 +50,12 @@ export const generateKeyGenerationProof = (params: SystemParameters, share: KeyS
   return { c: c, d: d }
 }
 
-export const verifyKeyGenerationProof = (params: SystemParameters, proof: KeyShareProof, h_: BN, id: string): boolean => {
+export const verifyKeyGenerationProof = (
+  params: SystemParameters,
+  proof: KeyShareProof,
+  h_: BN,
+  id: string
+): boolean => {
   const { p, q, g } = params
   const { c, d } = proof
 
@@ -83,7 +92,11 @@ export const decryptShare = (params: SystemParameters, cipher: Cipher, secretKey
   return Helper.BNpow(cipher.a, secretKeyShare, params.p)
 }
 
-export const combineDecryptedShares = (params: SystemParameters, cipher: Cipher, decryptedShares: BN[]): BN => {
+export const combineDecryptedShares = (
+  params: SystemParameters,
+  cipher: Cipher,
+  decryptedShares: BN[]
+): BN => {
   const mh = Helper.BNdiv(
     cipher.b,
     decryptedShares.reduce((product, share) => Helper.BNmul(product, share, params.p)),
@@ -92,7 +105,12 @@ export const combineDecryptedShares = (params: SystemParameters, cipher: Cipher,
 
   // TODO: split PublicKey interface into system parameters (p,g,q) and the actual public key (h)
   // (h is not needed here)
-  const m = Encryption.decodeMessage(mh, { p: params.p, g: params.g, q: params.q, h: Helper.newBN(1) })
+  const m = Encryption.decodeMessage(mh, {
+    p: params.p,
+    g: params.g,
+    q: params.q,
+    h: Helper.newBN(1),
+  })
 
   return m
 }

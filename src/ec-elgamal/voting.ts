@@ -44,7 +44,10 @@ export const addVotes = (votes: Cipher[], pk: string | CurvePoint): Cipher => {
     publicKey = pk
   }
 
-  return votes.reduce((previous, current) => homomorphicAdd(previous, current), encrypt(infinityPoint, publicKey))
+  return votes.reduce(
+    (previous, current) => homomorphicAdd(previous, current),
+    encrypt(infinityPoint, publicKey)
+  )
 }
 
 export const findPoint = (point: CurvePoint): number => {
@@ -105,31 +108,55 @@ const createParams = (params: ECParamsTransfer): ECParams => {
   }
 }
 
-export function generateYesProof(encryptedVote: Cipher, params: ECParamsTransfer, id: string): ValidVoteProof {
+export function generateYesProof(
+  encryptedVote: Cipher,
+  params: ECParamsTransfer,
+  id: string
+): ValidVoteProof {
   const _params: ECParams = createParams(params)
 
   return VoteZKP.generateYesProof(encryptedVote, _params, id)
 }
 
-export const generateNoProof = (encryptedVote: Cipher, params: ECParamsTransfer, id: string): ValidVoteProof => {
+export const generateNoProof = (
+  encryptedVote: Cipher,
+  params: ECParamsTransfer,
+  id: string
+): ValidVoteProof => {
   const _params: ECParams = createParams(params)
 
   return VoteZKP.generateNoProof(encryptedVote, _params, id)
 }
 
-export const generateSumProof = (encryptedVote: Cipher, params: ECParamsTransfer, sk: BN, id: string): SumProof => {
+export const generateSumProof = (
+  encryptedVote: Cipher,
+  params: ECParamsTransfer,
+  sk: BN,
+  id: string
+): SumProof => {
   const _params: ECParams = createParams(params)
 
   return SumZKP.generateSumProof(encryptedVote, _params, sk, id)
 }
 
-export const verifyZKP = (encryptedVote: Cipher, proof: ValidVoteProof, params: ECParamsTransfer, id: string): boolean => {
+export const verifyZKP = (
+  encryptedVote: Cipher,
+  proof: ValidVoteProof,
+  params: ECParamsTransfer,
+  id: string
+): boolean => {
   const _params: ECParams = createParams(params)
 
   return VoteZKP.verifyZKP(encryptedVote, proof, _params, id)
 }
 
-export const verifySumProof = (encryptedSum: Cipher, proof: SumProof, params: ECParamsTransfer, pk: string, id: string): boolean => {
+export const verifySumProof = (
+  encryptedSum: Cipher,
+  proof: SumProof,
+  params: ECParamsTransfer,
+  pk: string,
+  id: string
+): boolean => {
   const _params: ECParams = createParams(params)
   const publicKey = activeCurve.keyFromPublic(pk, 'hex').pub
 

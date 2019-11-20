@@ -24,7 +24,9 @@ describe('Finite Field ElGamal Encryption', () => {
     ]
 
     for (const value of values) {
-      expect(FFelGamal.Encryption.encodeMessage(value.decoded, pk).toNumber()).to.equal(value.encoded)
+      expect(FFelGamal.Encryption.encodeMessage(value.decoded, pk).toNumber()).to.equal(
+        value.encoded
+      )
     }
   })
 
@@ -48,7 +50,9 @@ describe('Finite Field ElGamal Encryption', () => {
     ]
 
     for (const value of values) {
-      expect(FFelGamal.Encryption.decodeMessage(value.encoded, pk).toNumber()).to.equal(value.decoded)
+      expect(FFelGamal.Encryption.decodeMessage(value.encoded, pk).toNumber()).to.equal(
+        value.decoded
+      )
     }
   })
 

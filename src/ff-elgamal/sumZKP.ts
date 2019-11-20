@@ -17,7 +17,12 @@ export function generateChallenge(q: BN, uniqueID: string, a: BN, b: BN, a1: BN,
 }
 
 // Generates a proof for the valid sum.
-export function generateSumProof(cipher: Cipher, pk: PublicKey, sk: BN, uniqueID: string): SumProof {
+export function generateSumProof(
+  cipher: Cipher,
+  pk: PublicKey,
+  sk: BN,
+  uniqueID: string
+): SumProof {
   // a = g^r, b = public_key i.e. h^r*g^m
   const { a, b }: Cipher = cipher
 
@@ -49,7 +54,12 @@ export function generateSumProof(cipher: Cipher, pk: PublicKey, sk: BN, uniqueID
   return { a1, b1, f, d } as SumProof
 }
 
-export function verifySumProof(cipher: Cipher, proof: SumProof, pk: PublicKey, uniqueID: string): boolean {
+export function verifySumProof(
+  cipher: Cipher,
+  proof: SumProof,
+  pk: PublicKey,
+  uniqueID: string
+): boolean {
   const { a, b }: Cipher = cipher
   const { a1, b1, f, d }: SumProof = proof
 

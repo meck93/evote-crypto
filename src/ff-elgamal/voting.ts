@@ -5,10 +5,15 @@ import BN = require('bn.js')
 
 export const generateYesVote = (pk: PublicKey): Cipher => Encryption.encrypt(1, pk)
 export const generateNoVote = (pk: PublicKey): Cipher => Encryption.encrypt(0, pk)
-export const generateBaseVote = (): Cipher => ({ a: Helper.newBN(1), b: Helper.newBN(1) }) // encrypt with m=0, r=0
+export const generateBaseVote = (): Cipher => {
+  return { a: Helper.newBN(1), b: Helper.newBN(1) }
+} // encrypt with m=0, r=0
 
 export const addVotes = (votes: Cipher[], pk: PublicKey): Cipher => {
-  return votes.reduce((previous, current) => Encryption.add(previous, current, pk), generateBaseVote())
+  return votes.reduce(
+    (previous, current) => Encryption.add(previous, current, pk),
+    generateBaseVote()
+  )
 }
 
 export const tallyVotes = (pk: PublicKey, sk: BN, votes: Cipher[]): number => {

@@ -40,7 +40,11 @@ export const generateChallenge = (n: BN, uniqueID: string, h_: CurvePoint, b: Cu
   return c
 }
 
-export const generateKeyGenerationProof = (params: ECelGamal.SystemParameters, share: ECelGamal.KeyShare, id: string): KeyShareProof => {
+export const generateKeyGenerationProof = (
+  params: ECelGamal.SystemParameters,
+  share: ECelGamal.KeyShare,
+  id: string
+): KeyShareProof => {
   const { n } = params
   const { h_, sk_ } = share
 
@@ -58,7 +62,12 @@ export const generateKeyGenerationProof = (params: ECelGamal.SystemParameters, s
   return { c: c, d: d }
 }
 
-export const verifyKeyGenerationProof = (params: ECelGamal.SystemParameters, proof: KeyShareProof, h_: CurvePoint, id: string): boolean => {
+export const verifyKeyGenerationProof = (
+  params: ECelGamal.SystemParameters,
+  proof: KeyShareProof,
+  h_: CurvePoint,
+  id: string
+): boolean => {
   const { n, g } = params
   const { c, d } = proof
 
@@ -88,7 +97,10 @@ export const combinePublicKeys = (publicKeyShares: CurvePoint[]): CurvePoint => 
 
 // NOTE: this should not be used as the distributed secret keys will become "useless"
 // it is only used for testing purpose
-export const combinePrivateKeys = (params: ECelGamal.SystemParameters, privateKeyShares: BN[]): BN => {
+export const combinePrivateKeys = (
+  params: ECelGamal.SystemParameters,
+  privateKeyShares: BN[]
+): BN => {
   return privateKeyShares.reduce((sum, share) => BNadd(sum, share, params.n))
 }
 
@@ -96,7 +108,10 @@ export const decryptShare = (cipher: Cipher, secretKeyShare: BN): CurvePoint => 
   return ECpow(cipher.a, secretKeyShare)
 }
 
-export const combineDecryptedShares = (cipher: Cipher, decryptedShares: CurvePoint[]): CurvePoint => {
+export const combineDecryptedShares = (
+  cipher: Cipher,
+  decryptedShares: CurvePoint[]
+): CurvePoint => {
   const mh = ECdiv(
     cipher.b,
     decryptedShares.reduce((product, share) => ECmul(product, share))

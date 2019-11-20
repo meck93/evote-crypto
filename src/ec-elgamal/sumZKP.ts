@@ -23,7 +23,14 @@ export function convertAllECPointsToString(points: CurvePoint[]): string {
   return asString
 }
 
-export function generateChallenge(n: BN, id: string, a: CurvePoint, b: CurvePoint, a1: CurvePoint, b1: CurvePoint): BN {
+export function generateChallenge(
+  n: BN,
+  id: string,
+  a: CurvePoint,
+  b: CurvePoint,
+  a1: CurvePoint,
+  b1: CurvePoint
+): BN {
   const pointsAsString: string = convertAllECPointsToString([a, b, a1, b1])
   const input = id + pointsAsString
 
@@ -38,7 +45,12 @@ export function generateChallenge(n: BN, id: string, a: CurvePoint, b: CurvePoin
   return c
 }
 
-export const generateSumProof = (encryptedVote: Cipher, params: ECParams, sk: BN, id: string): SumProof => {
+export const generateSumProof = (
+  encryptedVote: Cipher,
+  params: ECParams,
+  sk: BN,
+  id: string
+): SumProof => {
   // a = g^r, b = public_key i.e. h^r*g^m
   const { a, b } = encryptedVote
   const { g, n } = params
@@ -74,7 +86,13 @@ export const generateSumProof = (encryptedVote: Cipher, params: ECParams, sk: BN
   return { a1, b1, f, d }
 }
 
-export const verifySumProof = (encryptedSum: Cipher, proof: SumProof, params: ECParams, pk: CurvePoint, id: string): boolean => {
+export const verifySumProof = (
+  encryptedSum: Cipher,
+  proof: SumProof,
+  params: ECParams,
+  pk: CurvePoint,
+  id: string
+): boolean => {
   const { a, b } = encryptedSum
   const { h, g, n } = params
   const { a1, b1, f, d } = proof

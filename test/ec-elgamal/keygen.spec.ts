@@ -29,7 +29,11 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
 
       // generate the key share generation proof
       const uniqueId = 'IamReallyUnique;-)'
-      const proof: KeyShareProof = ECelGamal.KeyGeneration.generateKeyGenerationProof(params, share, uniqueId)
+      const proof: KeyShareProof = ECelGamal.KeyGeneration.generateKeyGenerationProof(
+        params,
+        share,
+        uniqueId
+      )
       const { c: c1, d: d1 } = proof
 
       prnt && console.log('Proof Parts')
@@ -38,7 +42,12 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
       prnt && console.log()
 
       // verify that the key share has been generated truthfully
-      const verifiedProof: boolean = ECelGamal.KeyGeneration.verifyKeyGenerationProof(params, proof, h1_, uniqueId)
+      const verifiedProof: boolean = ECelGamal.KeyGeneration.verifyKeyGenerationProof(
+        params,
+        proof,
+        h1_,
+        uniqueId
+      )
 
       expect(verifiedProof).to.be.true
     }
@@ -59,7 +68,11 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
 
     // generate three shares + combine them
     keyPairs = ECelGamal.KeyGeneration.generateKeyPairs(3)
-    shares = [keyPairs[0].getPublic() as CurvePoint, keyPairs[1].getPublic() as CurvePoint, keyPairs[2].getPublic() as CurvePoint]
+    shares = [
+      keyPairs[0].getPublic() as CurvePoint,
+      keyPairs[1].getPublic() as CurvePoint,
+      keyPairs[2].getPublic() as CurvePoint,
+    ]
     product = ECmul(ECmul(shares[0], shares[1]), shares[2])
     expect(ECelGamal.KeyGeneration.combinePublicKeys(shares)).to.eql(product)
   })
@@ -73,16 +86,34 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
     // generate the public and private key share and the key generation proof
     const share1: ECelGamal.KeyShare = ECelGamal.KeyGeneration.generateKeyShares()
     const uniqueId1 = 'IamReallyUnique;-)'
-    const proof1: KeyShareProof = ECelGamal.KeyGeneration.generateKeyGenerationProof(params, share1, uniqueId1)
-    const verified1: boolean = ECelGamal.KeyGeneration.verifyKeyGenerationProof(params, proof1, share1.h_, uniqueId1)
+    const proof1: KeyShareProof = ECelGamal.KeyGeneration.generateKeyGenerationProof(
+      params,
+      share1,
+      uniqueId1
+    )
+    const verified1: boolean = ECelGamal.KeyGeneration.verifyKeyGenerationProof(
+      params,
+      proof1,
+      share1.h_,
+      uniqueId1
+    )
     expect(verified1).to.be.true
 
     // second authority
     // generate the public and private key share and the key generation proof
     const share2: ECelGamal.KeyShare = ECelGamal.KeyGeneration.generateKeyShares()
     const uniqueId2 = 'IamMuchMoreUnique_o.o'
-    const proof2: KeyShareProof = ECelGamal.KeyGeneration.generateKeyGenerationProof(params, share2, uniqueId2)
-    const verified2: boolean = ECelGamal.KeyGeneration.verifyKeyGenerationProof(params, proof2, share2.h_, uniqueId2)
+    const proof2: KeyShareProof = ECelGamal.KeyGeneration.generateKeyGenerationProof(
+      params,
+      share2,
+      uniqueId2
+    )
+    const verified2: boolean = ECelGamal.KeyGeneration.verifyKeyGenerationProof(
+      params,
+      proof2,
+      share2.h_,
+      uniqueId2
+    )
     expect(verified2).to.be.true
 
     prnt && console.log('1: pk, sk', share1.h_, share1.sk_)
@@ -110,7 +141,10 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
     prnt && console.log('share 2 - decrypted\t', share2Decrypted)
 
     // finish decryption by combining decrypted shares
-    const distributedDecrypted = ECelGamal.KeyGeneration.combineDecryptedShares(cipherText, [share1Decrypted, share2Decrypted])
+    const distributedDecrypted = ECelGamal.KeyGeneration.combineDecryptedShares(cipherText, [
+      share1Decrypted,
+      share2Decrypted,
+    ])
     const result1 = ECelGamal.Voting.checkDecrypedSum(distributedDecrypted)
 
     // decrypt with combined private key

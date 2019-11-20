@@ -23,7 +23,12 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
     const privateKey: BN = keyPair.getPrivate()
     const publicKey: CurvePoint = keyPair.getPublic() as CurvePoint
 
-    const params: ECParams = { p: activeCurve.curve.p, h: publicKey, g: activeCurve.curve.g, n: activeCurve.curve.n }
+    const params: ECParams = {
+      p: activeCurve.curve.p,
+      h: publicKey,
+      g: activeCurve.curve.g,
+      n: activeCurve.curve.n,
+    }
     const uniqueID = '0xAd4E7D8f03904b175a1F8AE0D88154f329ac9329'
 
     const generateAndVerifySum = (_votes: number[], _result: number): void => {
@@ -36,10 +41,21 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
 
       // homomorphically add votes + generate sum proof
       const encryptedSum: Cipher = ECelGamal.Voting.addVotes(votes, publicKey)
-      const sumProof: SumProof = ECelGamal.SumZKP.generateSumProof(encryptedSum, params, privateKey, uniqueID)
+      const sumProof: SumProof = ECelGamal.SumZKP.generateSumProof(
+        encryptedSum,
+        params,
+        privateKey,
+        uniqueID
+      )
 
       // verify proof
-      const verifiedSumProof: boolean = ECelGamal.SumZKP.verifySumProof(encryptedSum, sumProof, params, publicKey, uniqueID)
+      const verifiedSumProof: boolean = ECelGamal.SumZKP.verifySumProof(
+        encryptedSum,
+        sumProof,
+        params,
+        publicKey,
+        uniqueID
+      )
       expect(verifiedSumProof).to.be.true
 
       // decrypt sum
@@ -47,7 +63,18 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
       const result = ECelGamal.Voting.checkDecrypedSum(decryptedSum)
 
       const summary = ECelGamal.Voting.getSummary(votes.length, result)
-      log && console.log(_result, _votes, result, 'Total:', summary.total, '| Yes:', summary.yes, '| No:', summary.no)
+      log &&
+        console.log(
+          _result,
+          _votes,
+          result,
+          'Total:',
+          summary.total,
+          '| Yes:',
+          summary.yes,
+          '| No:',
+          summary.no
+        )
 
       expect(result).to.equal(_result)
       expect(summary.yes).to.equal(_votes.filter(v => v === 1).length)

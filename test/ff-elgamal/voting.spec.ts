@@ -17,7 +17,18 @@ describe('Finite Field ElGamal Voting', () => {
 
       const result = FFelGamal.Voting.tallyVotes(pk, sk, votes)
       const summary = FFelGamal.Voting.getSummary(votes.length, result)
-      log && console.log(_result, _votes, result, 'Total:', summary.total, '| Yes:', summary.yes, '| No:', summary.no)
+      log &&
+        console.log(
+          _result,
+          _votes,
+          result,
+          'Total:',
+          summary.total,
+          '| Yes:',
+          summary.yes,
+          '| No:',
+          summary.no
+        )
 
       expect(result).to.equal(_result)
       expect(summary.yes).to.equal(_votes.filter(v => v === 1).length)

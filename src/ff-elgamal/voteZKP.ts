@@ -11,7 +11,16 @@ const mul = (a: BN, b: BN, pk: PublicKey): BN => Helper.BNmul(a, b, pk.p)
 const div = (a: BN, b: BN, pk: PublicKey): BN => Helper.BNdiv(a, b, pk.p)
 const pow = (a: BN, b: BN, pk: PublicKey): BN => Helper.BNpow(a, b, pk.p)
 
-export function generateChallenge(q: BN, uniqueID: string, a: BN, b: BN, a0: BN, b0: BN, a1: BN, b1: BN): BN {
+export function generateChallenge(
+  q: BN,
+  uniqueID: string,
+  a: BN,
+  b: BN,
+  a0: BN,
+  b0: BN,
+  a1: BN,
+  b1: BN
+): BN {
   let c = web3.utils.soliditySha3(uniqueID, a, b, a0, b0, a1, b1)
   c = web3.utils.toBN(c)
   c = c.mod(q)
@@ -110,7 +119,12 @@ export function generateNoProof(cipher: Cipher, pk: PublicKey, uniqueID: string)
   return { a0, a1, b0, b1, c0, c1, f0, f1 }
 }
 
-export function verifyVoteProof(cipher: Cipher, proof: ValidVoteProof, pk: PublicKey, uniqueID: string): boolean {
+export function verifyVoteProof(
+  cipher: Cipher,
+  proof: ValidVoteProof,
+  pk: PublicKey,
+  uniqueID: string
+): boolean {
   const { a, b } = cipher
   const { a0, a1, b0, b1, c0, c1, f0, f1 } = proof
 
