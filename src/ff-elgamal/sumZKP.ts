@@ -83,11 +83,3 @@ export function verifySumProof(
 
   return v1 && v2
 }
-
-export function numbersToString(numbers: Array<BN>): string {
-  let result = ''
-  for (let i = 0; i < numbers.length; i++) {
-    result += numbers[i].toJSON()
-  }
-  return result
-}
