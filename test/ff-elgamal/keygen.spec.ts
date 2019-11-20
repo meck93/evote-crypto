@@ -1,31 +1,21 @@
 export {}
 import { FFelGamal } from '../../src/index'
-import { KeyShareProof } from '../../src/models'
 import { newBN } from '../../src/ff-elgamal/helper'
-import { PublicKey } from '../../src/ff-elgamal'
 import { expect } from 'chai'
 
 describe('Finite Field ElGamal Distributed Key Generation', () => {
   it('generate and verify (distributed) key share', () => {
     for (let i = 0; i < 10; i++) {
       const prnt = false
-      const p_ = 11
-      const q_: number = (p_ - 1) / 2
-      const g_ = 3
 
       // generate the system parameters: P, Q, G
-      const params: FFelGamal.SystemParameters = FFelGamal.KeyGeneration.generateSystemParameters(
-        p_,
-        q_,
-        g_
-      )
-      const { p, g } = params
+      const sp: FFelGamal.SystemParameters = FFelGamal.Encryption.generateSystemParameters(11, 3)
 
       // generate the public and private key share: H_, SK_
-      const share: FFelGamal.KeyShare = FFelGamal.KeyGeneration.generateKeyShares(params)
+      const share: FFelGamal.KeyShare = FFelGamal.KeyGeneration.generateKeyShares(sp)
       const { h_: h1_, sk_: sk1_ } = share
 
-      expect(h1_).to.eql(g.pow(sk1_).mod(p))
+      expect(h1_).to.eql(sp.g.pow(sk1_).mod(sp.p))
 
       prnt && console.log('Key Parts')
       prnt && console.log('h_:\t', h1_.toString())
@@ -34,8 +24,8 @@ describe('Finite Field ElGamal Distributed Key Generation', () => {
 
       // generate the key share generation proof
       const uniqueId = 'IamReallyUnique;-)'
-      const proof: KeyShareProof = FFelGamal.KeyGeneration.generateKeyGenerationProof(
-        params,
+      const proof: FFelGamal.KeyShareProof = FFelGamal.KeyGeneration.generateKeyGenerationProof(
+        sp,
         share,
         uniqueId
       )
@@ -48,7 +38,7 @@ describe('Finite Field ElGamal Distributed Key Generation', () => {
 
       // verify that the key share has been generated truthfully
       const verifiedProof: boolean = FFelGamal.KeyGeneration.verifyKeyGenerationProof(
-        params,
+        sp,
         proof,
         h1_,
         uniqueId
@@ -59,103 +49,85 @@ describe('Finite Field ElGamal Distributed Key Generation', () => {
   })
 
   it('combine public keys', () => {
-    const p_ = 11
-    const q_: number = (p_ - 1) / 2
-    const g_ = 3
-    const params: FFelGamal.SystemParameters = FFelGamal.KeyGeneration.generateSystemParameters(
-      p_,
-      q_,
-      g_
-    )
+    const sp: FFelGamal.SystemParameters = FFelGamal.Encryption.generateSystemParameters(11, 3)
 
     let shares = [newBN(1)]
     let product = 1
-    expect(FFelGamal.KeyGeneration.combinePublicKeys(params, shares).toNumber()).to.eql(product)
+    expect(FFelGamal.KeyGeneration.combinePublicKeys(sp, shares).toNumber()).to.eql(product)
 
     shares = [newBN(4), newBN(2)]
     product = 8
-    expect(FFelGamal.KeyGeneration.combinePublicKeys(params, shares).toNumber()).to.eql(product)
+    expect(FFelGamal.KeyGeneration.combinePublicKeys(sp, shares).toNumber()).to.eql(product)
 
     shares = [newBN(2), newBN(3), newBN(4)]
     product = 2
-    expect(FFelGamal.KeyGeneration.combinePublicKeys(params, shares).toNumber()).to.eql(product)
+    expect(FFelGamal.KeyGeneration.combinePublicKeys(sp, shares).toNumber()).to.eql(product)
   })
 
   it('perform distributed key generation', () => {
     const prnt = false
-    const p_ = 11
-    const q_: number = (p_ - 1) / 2
-    const g_ = 3
 
-    const params: FFelGamal.SystemParameters = FFelGamal.KeyGeneration.generateSystemParameters(
-      p_,
-      q_,
-      g_
-    )
+    const sp: FFelGamal.SystemParameters = FFelGamal.Encryption.generateSystemParameters(11, 3)
 
     // first authority
     // generate the public and private key share and the key generation proof
-    const share1: FFelGamal.KeyShare = FFelGamal.KeyGeneration.generateKeyShares(params)
+    const share1: FFelGamal.KeyShare = FFelGamal.KeyGeneration.generateKeyShares(sp)
     const uniqueId1 = 'IamReallyUnique;-)'
-    const proof1: KeyShareProof = FFelGamal.KeyGeneration.generateKeyGenerationProof(
-      params,
+    const proof1: FFelGamal.KeyShareProof = FFelGamal.KeyGeneration.generateKeyGenerationProof(
+      sp,
       share1,
       uniqueId1
     )
-    expect(FFelGamal.KeyGeneration.verifyKeyGenerationProof(params, proof1, share1.h_, uniqueId1))
-      .to.be.true
+    expect(FFelGamal.KeyGeneration.verifyKeyGenerationProof(sp, proof1, share1.h_, uniqueId1)).to.be
+      .true
 
     // second authority
     // generate the public and private key share and the key generation proof
-    const share2: FFelGamal.KeyShare = FFelGamal.KeyGeneration.generateKeyShares(params)
+    const share2: FFelGamal.KeyShare = FFelGamal.KeyGeneration.generateKeyShares(sp)
     const uniqueId2 = 'IamMuchMoreUnique_o.o'
-    const proof2: KeyShareProof = FFelGamal.KeyGeneration.generateKeyGenerationProof(
-      params,
+    const proof2: FFelGamal.KeyShareProof = FFelGamal.KeyGeneration.generateKeyGenerationProof(
+      sp,
       share2,
       uniqueId2
     )
-    expect(FFelGamal.KeyGeneration.verifyKeyGenerationProof(params, proof2, share2.h_, uniqueId2))
-      .to.be.true
+    expect(FFelGamal.KeyGeneration.verifyKeyGenerationProof(sp, proof2, share2.h_, uniqueId2)).to.be
+      .true
 
     prnt && console.log('1: pk, sk', share1.h_.toNumber(), share1.sk_.toNumber())
     prnt && console.log('2: pk, sk', share2.h_.toNumber(), share2.sk_.toNumber())
 
     // combined keys
-    const publicKey = FFelGamal.KeyGeneration.combinePublicKeys(params, [share1.h_, share2.h_])
-    const privateKey = FFelGamal.KeyGeneration.combinePrivateKeys(params, [share1.sk_, share2.sk_])
+    const publicKey = FFelGamal.KeyGeneration.combinePublicKeys(sp, [share1.h_, share2.h_])
+    const privateKey = FFelGamal.KeyGeneration.combinePrivateKeys(sp, [share1.sk_, share2.sk_])
 
     prnt && console.log('pk', publicKey.toNumber())
     prnt && console.log('sk', privateKey.toNumber())
 
-    // TODO: adjust encryption implementation (PublicKey Interface)
-    const encPubKey: PublicKey = { p: params.p, q: params.q, g: params.g, h: publicKey }
-
     // encrypt some message
     const plaintext = newBN(3)
-    const cipherText = FFelGamal.Encryption.encrypt(plaintext, encPubKey)
+    const cipherText = FFelGamal.Encryption.encrypt(plaintext, sp, publicKey)
 
     prnt && console.log('plaintext', plaintext.toNumber())
     prnt && console.log('cipherText (a,b)', cipherText.a.toNumber(), cipherText.b.toNumber())
 
     // decrypt shares
-    const decShare1 = FFelGamal.KeyGeneration.decryptShare(params, cipherText, share1.sk_)
-    const decShare2 = FFelGamal.KeyGeneration.decryptShare(params, cipherText, share2.sk_)
+    const decShare1 = FFelGamal.KeyGeneration.decryptShare(sp, cipherText, share1.sk_)
+    const decShare2 = FFelGamal.KeyGeneration.decryptShare(sp, cipherText, share2.sk_)
 
     prnt && console.log('ds1', decShare1.toNumber())
     prnt && console.log('ds2', decShare2.toNumber())
 
     // create proofs
-    const pk1: PublicKey = { p: params.p, q: params.q, g: params.g, h: share1.h_ }
     const decryptionProof1 = FFelGamal.SumZKP.generateSumProof(
       cipherText,
-      pk1,
+      sp,
       share1.sk_,
       uniqueId1
     )
-    const pk2: PublicKey = { p: params.p, q: params.q, g: params.g, h: share2.h_ }
+
     const decryptionProof2 = FFelGamal.SumZKP.generateSumProof(
       cipherText,
-      pk1,
+      sp,
       share2.sk_,
       uniqueId2
     )
@@ -164,26 +136,28 @@ describe('Finite Field ElGamal Distributed Key Generation', () => {
     const verifiedProof1 = FFelGamal.SumZKP.verifySumProof(
       cipherText,
       decryptionProof1,
-      pk1,
+      sp,
+      share1.h_,
       uniqueId1
     )
     const verifiedProof2 = FFelGamal.SumZKP.verifySumProof(
       cipherText,
       decryptionProof2,
-      pk2,
+      sp,
+      share2.h_,
       uniqueId2
     )
     expect(verifiedProof1).to.be.true
     expect(verifiedProof2).to.be.true
 
     // finish decryption by combining decrypted shares
-    const decFinal = FFelGamal.KeyGeneration.combineDecryptedShares(params, cipherText, [
+    const decFinal = FFelGamal.KeyGeneration.combineDecryptedShares(sp, cipherText, [
       decShare1,
       decShare2,
     ])
 
     // decrypt with combined private key
-    const d2 = FFelGamal.Encryption.decrypt2(cipherText, privateKey, encPubKey)
+    const d2 = FFelGamal.Encryption.decrypt2(cipherText, privateKey, sp)
 
     prnt && console.log('d', decFinal.toNumber())
     prnt && console.log('d2', d2.toNumber())

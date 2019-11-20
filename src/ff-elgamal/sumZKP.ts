@@ -1,13 +1,13 @@
-import { Cipher, Helper, PublicKey, SumProof } from './index'
+import { Cipher, Helper, SumProof, SystemParameters } from './index'
 import BN = require('bn.js')
 
 const web3 = require('web3')
 const printConsole = false
 
 // modulo operations
-const add = (a: BN, b: BN, pk: PublicKey): BN => Helper.BNadd(a, b, pk.q)
-const mul = (a: BN, b: BN, pk: PublicKey): BN => Helper.BNmul(a, b, pk.p)
-const pow = (a: BN, b: BN, pk: PublicKey): BN => Helper.BNpow(a, b, pk.p)
+const add = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNadd(a, b, sp.q)
+const mul = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNmul(a, b, sp.p)
+const pow = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNpow(a, b, sp.p)
 
 export function generateChallenge(q: BN, uniqueID: string, a: BN, b: BN, a1: BN, b1: BN): BN {
   let c = web3.utils.soliditySha3(uniqueID, a, b, a1, b1)
@@ -19,7 +19,7 @@ export function generateChallenge(q: BN, uniqueID: string, a: BN, b: BN, a1: BN,
 // Generates a proof for the valid sum.
 export function generateSumProof(
   cipher: Cipher,
-  pk: PublicKey,
+  sp: SystemParameters,
   sk: BN,
   uniqueID: string
 ): SumProof {
@@ -27,22 +27,22 @@ export function generateSumProof(
   const { a, b }: Cipher = cipher
 
   // generate random value
-  const x: BN = Helper.getSecureRandomValue(pk.q)
+  const x: BN = Helper.getSecureRandomValue(sp.q)
 
   // (a1, b1) = (a^x, g^x)
-  const a1: BN = pow(a, x, pk)
-  const b1: BN = pow(pk.g, x, pk)
+  const a1: BN = pow(a, x, sp)
+  const b1: BN = pow(sp.g, x, sp)
 
   // generate the challenge
   // TODO: check paper https://eprint.iacr.org/2016/771.pdf why we should not hash a and b
-  const c: BN = generateChallenge(pk.q, uniqueID, a, b, a1, b1)
+  const c: BN = generateChallenge(sp.q, uniqueID, a, b, a1, b1)
 
   // compute f = x + c * sk (NOTE: mod q!)
-  const cr: BN = c.mul(sk).mod(pk.q)
-  const f: BN = add(x, cr, pk)
+  const cr: BN = c.mul(sk).mod(sp.q)
+  const f: BN = add(x, cr, sp)
 
   // compute the decryption factor
-  const d: BN = pow(a, sk, pk)
+  const d: BN = pow(a, sk, sp)
 
   printConsole && console.log('x\t\t\t', x.toNumber())
   printConsole && console.log('a1\t\t\t', a1.toNumber())
@@ -57,23 +57,24 @@ export function generateSumProof(
 export function verifySumProof(
   cipher: Cipher,
   proof: SumProof,
-  pk: PublicKey,
+  sp: SystemParameters,
+  pk: BN,
   uniqueID: string
 ): boolean {
   const { a, b }: Cipher = cipher
   const { a1, b1, f, d }: SumProof = proof
 
   // recompute the challenge
-  const c: BN = generateChallenge(pk.q, uniqueID, a, b, a1, b1)
+  const c: BN = generateChallenge(sp.q, uniqueID, a, b, a1, b1)
 
   // verification a^f == a1 * d^c
-  const l1: BN = pow(a, f, pk)
-  const r1: BN = mul(a1, pow(d, c, pk), pk)
+  const l1: BN = pow(a, f, sp)
+  const r1: BN = mul(a1, pow(d, c, sp), sp)
   const v1: boolean = l1.eq(r1)
 
   // verification g^f == b1 * h^c
-  const l2: BN = pow(pk.g, f, pk)
-  const r2: BN = mul(b1, pow(pk.h, c, pk), pk)
+  const l2: BN = pow(sp.g, f, sp)
+  const r2: BN = mul(b1, pow(pk, c, sp), sp)
   const v2: boolean = l2.eq(r2)
 
   printConsole && console.log('a^f == a1*d^c:\t\t', v1, l1.toNumber(), r1.toNumber())

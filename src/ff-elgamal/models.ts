@@ -1,16 +1,20 @@
 import BN = require('bn.js')
 
+export interface SystemParameters {
+  p: BN // prime
+  q: BN // prime factor: p = 2*q+1
+  g: BN // generator
+}
+
+export interface KeyPair {
+  h: BN
+  sk: BN
+}
+
 export interface Cipher {
   a: BN
   b: BN
   r?: BN
-}
-
-export interface PublicKey {
-  p: BN // prime
-  q: BN // prime factor: p = 2*q+1
-  g: BN // generator
-  h: BN
 }
 
 export interface KeyShare {
@@ -40,10 +44,4 @@ export interface SumProof {
   b1: BN
   f: BN
   d: BN
-}
-
-export interface SystemParameters {
-  p: BN
-  q: BN
-  g: BN
 }

@@ -11,9 +11,9 @@ describe('Finite Field ElGamal Vote ZKP', () => {
       for (let i = 0; i < 10; i++) {
         const prnt = false
         prnt && console.log('p:', p, ', g:', g)
-        let pk
+        let sp, pk
         try {
-          pk = FFelGamal.Encryption.generateKeysZKP(p, g)[0]
+          ;[sp, { h: pk }] = FFelGamal.Encryption.generateSystemParametersAndKeys(p, g)
         } catch (error) {
           console.error(error)
           break
@@ -22,19 +22,25 @@ describe('Finite Field ElGamal Vote ZKP', () => {
         // yes vote
         prnt && console.log('yes proof')
         const yesVote = 1
-        const yesEnc = FFelGamal.Encryption.encrypt(yesVote, pk, prnt)
-        const yesProof = FFelGamal.VoteZKP.generateYesProof(yesEnc, pk, uniqueID)
+        const yesEnc = FFelGamal.Encryption.encrypt(yesVote, sp, pk, prnt)
+        const yesProof = FFelGamal.VoteZKP.generateYesProof(yesEnc, sp, pk, uniqueID)
 
-        const verifiedYesProof = FFelGamal.VoteZKP.verifyVoteProof(yesEnc, yesProof, pk, uniqueID)
+        const verifiedYesProof = FFelGamal.VoteZKP.verifyVoteProof(
+          yesEnc,
+          yesProof,
+          sp,
+          pk,
+          uniqueID
+        )
         expect(verifiedYesProof).to.be.true
 
         // no vote
         prnt && console.log('no proof')
         const noVote = 0
-        const noEnc = FFelGamal.Encryption.encrypt(noVote, pk, prnt)
-        const noProof = FFelGamal.VoteZKP.generateNoProof(noEnc, pk, uniqueID)
+        const noEnc = FFelGamal.Encryption.encrypt(noVote, sp, pk, prnt)
+        const noProof = FFelGamal.VoteZKP.generateNoProof(noEnc, sp, pk, uniqueID)
 
-        const verifiedNoProof = FFelGamal.VoteZKP.verifyVoteProof(noEnc, noProof, pk, uniqueID)
+        const verifiedNoProof = FFelGamal.VoteZKP.verifyVoteProof(noEnc, noProof, sp, pk, uniqueID)
         expect(verifiedNoProof).to.be.true
       }
     }

@@ -4,10 +4,6 @@ import BN = require('bn.js')
 const web3 = require('web3')
 const log = false
 
-export const generateSystemParameters = (p: number, q: number, g: number): SystemParameters => {
-  return { p: Helper.newBN(p), q: Helper.newBN(q), g: Helper.newBN(g) }
-}
-
 export const generateKeyShares = (params: SystemParameters): KeyShare => {
   const { p, q, g } = params
 
@@ -103,14 +99,5 @@ export const combineDecryptedShares = (
     params.p
   )
 
-  // TODO: split PublicKey interface into system parameters (p,g,q) and the actual public key (h)
-  // (h is not needed here)
-  const m = Encryption.decodeMessage(mh, {
-    p: params.p,
-    g: params.g,
-    q: params.q,
-    h: Helper.newBN(1),
-  })
-
-  return m
+  return Encryption.decodeMessage(mh, params)
 }

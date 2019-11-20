@@ -1,12 +1,10 @@
 export {}
-import BN = require('bn.js')
 import { FFelGamal } from '../../src/index'
-import { getSecureRandomValue } from '../../src/ff-elgamal/helper'
 import { expect } from 'chai'
 
 describe('Finite Field ElGamal Encryption', () => {
   it('should encode a message', () => {
-    const [pk] = FFelGamal.Encryption.generateKeys(11, 3)
+    const sp = FFelGamal.Encryption.generateSystemParameters(11, 3)
 
     const values = [
       { decoded: 0, encoded: 1 },
@@ -24,14 +22,14 @@ describe('Finite Field ElGamal Encryption', () => {
     ]
 
     for (const value of values) {
-      expect(FFelGamal.Encryption.encodeMessage(value.decoded, pk).toNumber()).to.equal(
+      expect(FFelGamal.Encryption.encodeMessage(value.decoded, sp).toNumber()).to.equal(
         value.encoded
       )
     }
   })
 
   it('should decode an encoded message', () => {
-    const [pk] = FFelGamal.Encryption.generateKeys(11, 3)
+    const sp = FFelGamal.Encryption.generateSystemParameters(11, 3)
 
     const values = [
       { decoded: 0, encoded: 1 },
@@ -50,7 +48,7 @@ describe('Finite Field ElGamal Encryption', () => {
     ]
 
     for (const value of values) {
-      expect(FFelGamal.Encryption.decodeMessage(value.encoded, pk).toNumber()).to.equal(
+      expect(FFelGamal.Encryption.decodeMessage(value.encoded, sp).toNumber()).to.equal(
         value.decoded
       )
     }
@@ -58,21 +56,21 @@ describe('Finite Field ElGamal Encryption', () => {
 
   it('compare decryption implementations', () => {
     const prnt = false
-    const [pk, sk] = FFelGamal.Encryption.generateKeys(11, 3)
+    const [sp, { h: pk, sk }] = FFelGamal.Encryption.generateSystemParametersAndKeys(11, 3)
 
-    const message = getSecureRandomValue(pk.q)
+    const message = FFelGamal.Helper.getSecureRandomValue(sp.q)
     for (let i = 0; i < 10; i++) {
       prnt && console.log(i)
-      prnt && console.log('prime      (p)\t', pk.p)
-      prnt && console.log('generator  (g)\t', pk.g)
+      prnt && console.log('prime      (p)\t', sp.p)
+      prnt && console.log('generator  (g)\t', sp.g)
       prnt && console.log('dec secret (x)\t', sk)
-      prnt && console.log('           (h)\t', pk.h)
+      prnt && console.log('           (h)\t', pk)
       prnt && console.log('plaintext    (m)', message)
       prnt && console.log('------------------------')
 
-      const mEnc = FFelGamal.Encryption.encrypt(message, pk, prnt)
-      const mD1 = FFelGamal.Encryption.decrypt1(mEnc, sk, pk, prnt)
-      const mD2 = FFelGamal.Encryption.decrypt2(mEnc, sk, pk, prnt)
+      const mEnc = FFelGamal.Encryption.encrypt(message, sp, pk, prnt)
+      const mD1 = FFelGamal.Encryption.decrypt1(mEnc, sk, sp, prnt)
+      const mD2 = FFelGamal.Encryption.decrypt2(mEnc, sk, sp, prnt)
 
       expect(mD1.eq(message)).to.be.true
       expect(mD2.eq(message)).to.be.true
@@ -81,21 +79,18 @@ describe('Finite Field ElGamal Encryption', () => {
   })
 
   it('homomorphic addition', () => {
-    const _p = 137
-    const _g = 51
-
     for (let i = 0; i < 10; i++) {
-      const [pk, sk] = FFelGamal.Encryption.generateKeys(_p, _g)
+      const [sp, { h: pk, sk }] = FFelGamal.Encryption.generateSystemParametersAndKeys(137, 51)
 
-      // generate random messages of max size (p - 1)/2
+      // generate random messages of max size q = (p - 1)/2
       // so that the sum is max p-1
-      const m1 = getSecureRandomValue(new BN((_p - 1) / 2))
-      const m2 = getSecureRandomValue(new BN((_p - 1) / 2))
+      const m1 = FFelGamal.Helper.getSecureRandomValue(sp.q)
+      const m2 = FFelGamal.Helper.getSecureRandomValue(sp.q)
 
-      const eM1 = FFelGamal.Encryption.encrypt(m1, pk)
-      const eM2 = FFelGamal.Encryption.encrypt(m2, pk)
+      const eM1 = FFelGamal.Encryption.encrypt(m1, sp, pk)
+      const eM2 = FFelGamal.Encryption.encrypt(m2, sp, pk)
 
-      const dSum = FFelGamal.Encryption.decrypt1(FFelGamal.Encryption.add(eM1, eM2, pk), sk, pk)
+      const dSum = FFelGamal.Encryption.decrypt1(FFelGamal.Encryption.add(eM1, eM2, sp), sk, sp)
 
       expect(dSum.eq(m1.add(m2))).to.be.true
     }

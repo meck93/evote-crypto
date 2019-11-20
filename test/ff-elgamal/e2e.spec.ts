@@ -1,6 +1,8 @@
 export {}
 import { FFelGamal } from '../../src/index'
 import { expect } from 'chai'
+import { SystemParameters } from '../../src/ff-elgamal'
+import BN = require('bn.js')
 
 const random = require('random')
 const web3 = require('web3')
@@ -10,14 +12,15 @@ describe('ElGamal Finite Field E2E Test', () => {
     const vote = (p: number, g: number, _result: number, _votes: number[]): void => {
       const govID = 'GOV_ID_SUPER_SECURE_:-)'
 
-      const prnt = false
-      prnt && console.log('p:', p, 'q:', (p - 1) / 2, 'g:', g)
+      const prnt = true
 
-      let pk
-      let sk
+      let sp: SystemParameters;
+      let pk: BN
+      let sk: BN
 
       try {
-        ;[pk, sk] = FFelGamal.Encryption.generateKeys(p, g)
+        [sp, { h: pk, sk }] = FFelGamal.Encryption.generateSystemParametersAndKeys(p, g)
+        prnt && console.log('p:', sp.p, 'q:', sp.q, 'g:', sp.g, 'pk:', pk, 'sk:', sk)
       } catch (error) {
         console.error(error)
       }
@@ -29,34 +32,34 @@ describe('ElGamal Finite Field E2E Test', () => {
         const id = web3.utils.soliditySha3(random.int(1, Math.pow(2, 16)))
 
         if (vote === 1) {
-          const encYesVote = FFelGamal.Voting.generateYesVote(pk)
+          const encYesVote = FFelGamal.Voting.generateYesVote(sp, pk)
           votes.push(encYesVote)
 
-          const encYesProof = FFelGamal.VoteZKP.generateYesProof(encYesVote, pk, id)
+          const encYesProof = FFelGamal.VoteZKP.generateYesProof(encYesVote, sp, pk, id)
 
-          const validVote = FFelGamal.VoteZKP.verifyVoteProof(encYesVote, encYesProof, pk, id)
+          const validVote = FFelGamal.VoteZKP.verifyVoteProof(encYesVote, encYesProof, sp, pk, id)
           expect(validVote).to.be.true
         } else {
-          const encNoVote = FFelGamal.Voting.generateNoVote(pk)
+          const encNoVote = FFelGamal.Voting.generateNoVote(sp, pk)
           votes.push(encNoVote)
 
-          const encNoProof = FFelGamal.VoteZKP.generateNoProof(encNoVote, pk, id)
+          const encNoProof = FFelGamal.VoteZKP.generateNoProof(encNoVote, sp, pk, id)
 
-          const validVote = FFelGamal.VoteZKP.verifyVoteProof(encNoVote, encNoProof, pk, id)
+          const validVote = FFelGamal.VoteZKP.verifyVoteProof(encNoVote, encNoProof, sp, pk, id)
           expect(validVote).to.be.true
         }
       }
 
       // homomorphically add all votes and create sum proof
-      const encryptedSum = FFelGamal.Voting.addVotes(votes, pk)
-      const sumProof = FFelGamal.SumZKP.generateSumProof(encryptedSum, pk, sk, govID)
+      const encryptedSum = FFelGamal.Voting.addVotes(votes, sp)
+      const sumProof = FFelGamal.SumZKP.generateSumProof(encryptedSum, sp, sk, govID)
 
       // verifiy the sum proof
-      const validSum = FFelGamal.SumZKP.verifySumProof(encryptedSum, sumProof, pk, govID)
+      const validSum = FFelGamal.SumZKP.verifySumProof(encryptedSum, sumProof, sp, pk, govID)
       expect(validSum).to.be.true
 
       // decrypt the sum
-      const decryptedSum = FFelGamal.Encryption.decrypt1(encryptedSum, sk, pk)
+      const decryptedSum = FFelGamal.Encryption.decrypt1(encryptedSum, sk, sp)
       const summary = FFelGamal.Voting.getSummary(votes.length, decryptedSum.toNumber())
       prnt &&
         console.log(

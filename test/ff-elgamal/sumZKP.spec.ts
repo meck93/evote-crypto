@@ -11,27 +11,26 @@ describe('ElGamal Finite Field ZKP Sum Proof', () => {
     const test = (p: number, g: number): void => {
       for (let i = 0; i < 10; i++) {
         const prnt = false
-        prnt && console.log('p:', p, 'q:', (p - 1) / 2, 'g:', g)
-        let pk
-        let sk
+        let sp, pk, sk
         try {
-          ;[pk, sk] = FFelGamal.Encryption.generateKeys(p, g)
+          ;[sp, { h: pk, sk }] = FFelGamal.Encryption.generateSystemParametersAndKeys(p, g)
+          prnt && console.log('p:', sp.p, 'q:', sp.q, 'g:', sp.g)
         } catch (error) {
           console.error(error)
           break
         }
 
         // sum
-        const sum = getSecureRandomValue(pk.q)
+        const sum = getSecureRandomValue(sp.q)
         prnt && console.log(`Sum Proof for Message: ${sum}`)
 
-        const sumEnc = FFelGamal.Encryption.encrypt(sum, pk, prnt)
-        const proof = FFelGamal.SumZKP.generateSumProof(sumEnc, pk, sk, uniqueID)
+        const sumEnc = FFelGamal.Encryption.encrypt(sum, sp, pk, prnt)
+        const proof = FFelGamal.SumZKP.generateSumProof(sumEnc, sp, sk, uniqueID)
 
-        const verifiedSumProof = FFelGamal.SumZKP.verifySumProof(sumEnc, proof, pk, uniqueID)
+        const verifiedSumProof = FFelGamal.SumZKP.verifySumProof(sumEnc, proof, sp, pk, uniqueID)
         expect(verifiedSumProof).to.be.true
 
-        const decSum = FFelGamal.Encryption.decrypt1(sumEnc, sk, pk, prnt)
+        const decSum = FFelGamal.Encryption.decrypt1(sumEnc, sk, sp, prnt)
         expect(decSum.eq(sum)).to.be.true
       }
     }

@@ -9,10 +9,10 @@ export { Encryption, Voting, VoteZKP, SumZKP, Helper, KeyGeneration }
 import {
   Cipher,
   SumProof,
-  PublicKey,
   SystemParameters,
+  KeyPair,
   KeyShare,
   KeyShareProof,
   ValidVoteProof,
 } from './models'
-export { Cipher, SumProof, PublicKey, SystemParameters, KeyShare, KeyShareProof, ValidVoteProof }
+export { Cipher, SumProof, SystemParameters, KeyPair, KeyShare, KeyShareProof, ValidVoteProof }

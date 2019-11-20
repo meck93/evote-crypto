@@ -5,17 +5,17 @@ import { expect } from 'chai'
 describe('Finite Field ElGamal Voting', () => {
   it('vote', () => {
     const vote = (_result: number, _votes: number[]): void => {
-      const [pk, sk] = FFelGamal.Encryption.generateKeys(137, 51)
+      const [sp, { h: pk, sk }] = FFelGamal.Encryption.generateSystemParametersAndKeys(137, 51)
 
       const log = false
 
       const votes: FFelGamal.Cipher[] = []
       for (const vote of _votes) {
-        vote === 1 && votes.push(FFelGamal.Voting.generateYesVote(pk))
-        vote === 0 && votes.push(FFelGamal.Voting.generateNoVote(pk))
+        vote === 1 && votes.push(FFelGamal.Voting.generateYesVote(sp, pk))
+        vote === 0 && votes.push(FFelGamal.Voting.generateNoVote(sp, pk))
       }
 
-      const result = FFelGamal.Voting.tallyVotes(pk, sk, votes)
+      const result = FFelGamal.Voting.tallyVotes(sp, sk, votes)
       const summary = FFelGamal.Voting.getSummary(votes.length, result)
       log &&
         console.log(
