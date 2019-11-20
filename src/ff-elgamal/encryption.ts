@@ -1,16 +1,17 @@
 import { Cipher, Helper, SystemParameters, KeyPair } from './index'
 import BN = require('bn.js')
 
-export const generateSystemParameters = (_p: number, _g: number): SystemParameters => {
-  const p = Helper.newBN(_p)
-  const q = Helper.newBN(Helper.getQofP(_p))
-  const g = Helper.newBN(_g)
-  return { p, q, g }
+export const generateSystemParameters = (p: number, g: number): SystemParameters => {
+  return {
+    p: Helper.newBN(p),
+    q: Helper.newBN(Helper.getQofP(p)),
+    g: Helper.newBN(g),
+  }
 }
 
 export const generateKeyPair = (sp: SystemParameters): KeyPair => {
-  const sk = Helper.getSecureRandomValue(sp.q)
-  const h = Helper.BNpow(sp.g, sk, sp.p)
+  const sk = Helper.getSecureRandomValue(sp.q) // pick a random value in Z_q
+  const h = Helper.BNpow(sp.g, sk, sp.p) // compute public key h: g^sk mod p
   return { h, sk }
 }
 

@@ -17,12 +17,6 @@ export interface Cipher {
   r?: BN
 }
 
-export interface KeyShare {
-  h_: BN
-  sk_: BN
-  r?: BN
-}
-
 export interface ValidVoteProof {
   a0: BN
   a1: BN

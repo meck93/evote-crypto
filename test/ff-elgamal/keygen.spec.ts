@@ -12,14 +12,13 @@ describe('Finite Field ElGamal Distributed Key Generation', () => {
       const sp: FFelGamal.SystemParameters = FFelGamal.Encryption.generateSystemParameters(11, 3)
 
       // generate the public and private key share: H_, SK_
-      const share: FFelGamal.KeyShare = FFelGamal.KeyGeneration.generateKeyShares(sp)
-      const { h_: h1_, sk_: sk1_ } = share
+      const share: FFelGamal.KeyPair = FFelGamal.Encryption.generateKeyPair(sp)
 
-      expect(h1_).to.eql(sp.g.pow(sk1_).mod(sp.p))
+      expect(share.h).to.eql(sp.g.pow(share.sk).mod(sp.p))
 
       prnt && console.log('Key Parts')
-      prnt && console.log('h_:\t', h1_.toString())
-      prnt && console.log('sk_:\t', sk1_.toString())
+      prnt && console.log('h:\t', share.h.toString())
+      prnt && console.log('sk:\t', share.sk.toString())
       prnt && console.log()
 
       // generate the key share generation proof
@@ -40,7 +39,7 @@ describe('Finite Field ElGamal Distributed Key Generation', () => {
       const verifiedProof: boolean = FFelGamal.KeyGeneration.verifyKeyGenerationProof(
         sp,
         proof,
-        h1_,
+        share.h,
         uniqueId
       )
 
@@ -71,34 +70,34 @@ describe('Finite Field ElGamal Distributed Key Generation', () => {
 
     // first authority
     // generate the public and private key share and the key generation proof
-    const share1: FFelGamal.KeyShare = FFelGamal.KeyGeneration.generateKeyShares(sp)
+    const share1: FFelGamal.KeyPair = FFelGamal.Encryption.generateKeyPair(sp)
     const uniqueId1 = 'IamReallyUnique;-)'
     const proof1: FFelGamal.KeyShareProof = FFelGamal.KeyGeneration.generateKeyGenerationProof(
       sp,
       share1,
       uniqueId1
     )
-    expect(FFelGamal.KeyGeneration.verifyKeyGenerationProof(sp, proof1, share1.h_, uniqueId1)).to.be
+    expect(FFelGamal.KeyGeneration.verifyKeyGenerationProof(sp, proof1, share1.h, uniqueId1)).to.be
       .true
 
     // second authority
     // generate the public and private key share and the key generation proof
-    const share2: FFelGamal.KeyShare = FFelGamal.KeyGeneration.generateKeyShares(sp)
+    const share2: FFelGamal.KeyPair = FFelGamal.Encryption.generateKeyPair(sp)
     const uniqueId2 = 'IamMuchMoreUnique_o.o'
     const proof2: FFelGamal.KeyShareProof = FFelGamal.KeyGeneration.generateKeyGenerationProof(
       sp,
       share2,
       uniqueId2
     )
-    expect(FFelGamal.KeyGeneration.verifyKeyGenerationProof(sp, proof2, share2.h_, uniqueId2)).to.be
+    expect(FFelGamal.KeyGeneration.verifyKeyGenerationProof(sp, proof2, share2.h, uniqueId2)).to.be
       .true
 
-    prnt && console.log('1: pk, sk', share1.h_.toNumber(), share1.sk_.toNumber())
-    prnt && console.log('2: pk, sk', share2.h_.toNumber(), share2.sk_.toNumber())
+    prnt && console.log('1: pk, sk', share1.h.toNumber(), share1.sk.toNumber())
+    prnt && console.log('2: pk, sk', share2.h.toNumber(), share2.sk.toNumber())
 
     // combined keys
-    const publicKey = FFelGamal.KeyGeneration.combinePublicKeys(sp, [share1.h_, share2.h_])
-    const privateKey = FFelGamal.KeyGeneration.combinePrivateKeys(sp, [share1.sk_, share2.sk_])
+    const publicKey = FFelGamal.KeyGeneration.combinePublicKeys(sp, [share1.h, share2.h])
+    const privateKey = FFelGamal.KeyGeneration.combinePrivateKeys(sp, [share1.sk, share2.sk])
 
     prnt && console.log('pk', publicKey.toNumber())
     prnt && console.log('sk', privateKey.toNumber())
@@ -111,8 +110,8 @@ describe('Finite Field ElGamal Distributed Key Generation', () => {
     prnt && console.log('cipherText (a,b)', cipherText.a.toNumber(), cipherText.b.toNumber())
 
     // decrypt shares
-    const decShare1 = FFelGamal.KeyGeneration.decryptShare(sp, cipherText, share1.sk_)
-    const decShare2 = FFelGamal.KeyGeneration.decryptShare(sp, cipherText, share2.sk_)
+    const decShare1 = FFelGamal.KeyGeneration.decryptShare(sp, cipherText, share1.sk)
+    const decShare2 = FFelGamal.KeyGeneration.decryptShare(sp, cipherText, share2.sk)
 
     prnt && console.log('ds1', decShare1.toNumber())
     prnt && console.log('ds2', decShare2.toNumber())
@@ -121,14 +120,14 @@ describe('Finite Field ElGamal Distributed Key Generation', () => {
     const decryptionProof1 = FFelGamal.SumZKP.generateSumProof(
       cipherText,
       sp,
-      share1.sk_,
+      share1.sk,
       uniqueId1
     )
 
     const decryptionProof2 = FFelGamal.SumZKP.generateSumProof(
       cipherText,
       sp,
-      share2.sk_,
+      share2.sk,
       uniqueId2
     )
 
@@ -137,14 +136,14 @@ describe('Finite Field ElGamal Distributed Key Generation', () => {
       cipherText,
       decryptionProof1,
       sp,
-      share1.h_,
+      share1.h,
       uniqueId1
     )
     const verifiedProof2 = FFelGamal.SumZKP.verifySumProof(
       cipherText,
       decryptionProof2,
       sp,
-      share2.h_,
+      share2.h,
       uniqueId2
     )
     expect(verifiedProof1).to.be.true

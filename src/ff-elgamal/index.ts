@@ -11,8 +11,7 @@ import {
   SumProof,
   SystemParameters,
   KeyPair,
-  KeyShare,
   KeyShareProof,
   ValidVoteProof,
 } from './models'
-export { Cipher, SumProof, SystemParameters, KeyPair, KeyShare, KeyShareProof, ValidVoteProof }
+export { Cipher, SumProof, SystemParameters, KeyPair, KeyShareProof, ValidVoteProof }

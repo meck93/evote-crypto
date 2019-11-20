@@ -1,21 +1,8 @@
-import { Cipher, Encryption, Helper, KeyShare, KeyShareProof, SystemParameters } from './index'
+import { Cipher, Encryption, Helper, KeyShareProof, SystemParameters, KeyPair } from './index'
 import BN = require('bn.js')
 
 const web3 = require('web3')
 const log = false
-
-export const generateKeyShares = (params: SystemParameters): KeyShare => {
-  const { p, q, g } = params
-
-  // generate first key pair (sk, h)
-  // pick a random value in Zq
-  const sk: BN = Helper.getSecureRandomValue(q)
-
-  // compute public key share h_: g^sk mod p
-  const h: BN = Helper.BNpow(g, sk, p)
-
-  return { h_: h, sk_: sk }
-}
 
 export const generateChallenge = (q: BN, uniqueID: string, h_: BN, b: BN): BN => {
   let c = web3.utils.soliditySha3(uniqueID, h_, b)
@@ -26,11 +13,11 @@ export const generateChallenge = (q: BN, uniqueID: string, h_: BN, b: BN): BN =>
 
 export const generateKeyGenerationProof = (
   params: SystemParameters,
-  share: KeyShare,
+  keyPair: KeyPair, // share
   id: string
 ): KeyShareProof => {
   const { p, q, g } = params
-  const { h_, sk_ } = share
+  const { h, sk } = keyPair
 
   // generate a second key pair (a,b)
   // pick a random value from Zq and generate b: g^a mod p
@@ -38,10 +25,10 @@ export const generateKeyGenerationProof = (
   const b: BN = Helper.BNpow(g, a, p)
 
   // compute challenge hash(h_, b)
-  const c: BN = generateChallenge(q, id, h_, b)
+  const c: BN = generateChallenge(q, id, h, b)
 
   // compute d = a + c*sk_
-  const d: BN = Helper.BNadd(a, Helper.BNmul(c, sk_, q), q)
+  const d: BN = Helper.BNadd(a, Helper.BNmul(c, sk, q), q)
 
   return { c: c, d: d }
 }
