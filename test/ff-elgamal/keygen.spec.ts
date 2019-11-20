@@ -117,14 +117,14 @@ describe('Finite Field ElGamal Distributed Key Generation', () => {
     prnt && console.log('ds2', decShare2.toNumber())
 
     // create proofs
-    const decryptionProof1 = FFelGamal.SumZKP.generateSumProof(
+    const decryptionProof1 = FFelGamal.DecryptionProof.generate(
       cipherText,
       sp,
       share1.sk,
       uniqueId1
     )
 
-    const decryptionProof2 = FFelGamal.SumZKP.generateSumProof(
+    const decryptionProof2 = FFelGamal.DecryptionProof.generate(
       cipherText,
       sp,
       share2.sk,
@@ -132,14 +132,14 @@ describe('Finite Field ElGamal Distributed Key Generation', () => {
     )
 
     // verify proofs
-    const verifiedProof1 = FFelGamal.SumZKP.verifySumProof(
+    const verifiedProof1 = FFelGamal.DecryptionProof.verify(
       cipherText,
       decryptionProof1,
       sp,
       share1.h,
       uniqueId1
     )
-    const verifiedProof2 = FFelGamal.SumZKP.verifySumProof(
+    const verifiedProof2 = FFelGamal.DecryptionProof.verify(
       cipherText,
       decryptionProof2,
       sp,

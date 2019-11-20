@@ -25,9 +25,9 @@ describe('ElGamal Finite Field ZKP Sum Proof', () => {
         prnt && console.log(`Sum Proof for Message: ${sum}`)
 
         const sumEnc = FFelGamal.Encryption.encrypt(sum, sp, pk, prnt)
-        const proof = FFelGamal.SumZKP.generateSumProof(sumEnc, sp, sk, uniqueID)
+        const proof = FFelGamal.DecryptionProof.generate(sumEnc, sp, sk, uniqueID)
 
-        const verifiedSumProof = FFelGamal.SumZKP.verifySumProof(sumEnc, proof, sp, pk, uniqueID)
+        const verifiedSumProof = FFelGamal.DecryptionProof.verify(sumEnc, proof, sp, pk, uniqueID)
         expect(verifiedSumProof).to.be.true
 
         const decSum = FFelGamal.Encryption.decrypt1(sumEnc, sk, sp, prnt)

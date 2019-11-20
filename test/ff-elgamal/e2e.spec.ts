@@ -52,10 +52,10 @@ describe('ElGamal Finite Field E2E Test', () => {
 
       // homomorphically add all votes and create sum proof
       const encryptedSum = FFelGamal.Voting.addVotes(votes, sp)
-      const sumProof = FFelGamal.SumZKP.generateSumProof(encryptedSum, sp, sk, govID)
+      const sumProof = FFelGamal.DecryptionProof.generate(encryptedSum, sp, sk, govID)
 
       // verifiy the sum proof
-      const validSum = FFelGamal.SumZKP.verifySumProof(encryptedSum, sumProof, sp, pk, govID)
+      const validSum = FFelGamal.DecryptionProof.verify(encryptedSum, sumProof, sp, pk, govID)
       expect(validSum).to.be.true
 
       // decrypt the sum

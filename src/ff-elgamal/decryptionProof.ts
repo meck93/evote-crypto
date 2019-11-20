@@ -17,7 +17,7 @@ export function generateChallenge(q: BN, uniqueID: string, a: BN, b: BN, a1: BN,
 }
 
 // Generates a proof for the valid sum.
-export function generateSumProof(
+export function generate(
   cipher: Cipher,
   sp: SystemParameters,
   sk: BN,
@@ -54,7 +54,7 @@ export function generateSumProof(
   return { a1, b1, f, d } as SumProof
 }
 
-export function verifySumProof(
+export function verify(
   cipher: Cipher,
   proof: SumProof,
   sp: SystemParameters,
