@@ -1,23 +1,15 @@
-const BN = require('bn.js')
-const hash = require('hash.js')
-const random = require('random')
+import { Cipher, ValidVoteProof } from '../index'
+import { Helper, PublicKey } from './index'
+
 const web3 = require('web3')
-
-import { ValidVoteProof, Cipher } from '../models'
-import { PublicKey } from './models'
-import { getSecureRandomValue } from './helper'
-
 const printConsole = false
 
-export const newBN = (n: number) => new BN(n, 10)
-
 // modulo operations
-const add = (a: any, b: any, pk: PublicKey) => a.add(b).mod(pk.q)
-const sub = (a: any, b: any, pk: PublicKey) => a.sub(b).mod(pk.q)
-const mul = (a: any, b: any, pk: PublicKey) => a.mul(b).mod(pk.p)
-const div = (a: any, b: any, pk: PublicKey) => mul(a, invm(b, pk), pk).mod(pk.p)
-const pow = (a: any, b: any, pk: PublicKey) => a.pow(b).mod(pk.p)
-const invm = (a: any, pk: PublicKey) => a.invm(pk.p)
+const add = (a: any, b: any, pk: PublicKey) => Helper.BNadd(a, b, pk.q)
+const sub = (a: any, b: any, pk: PublicKey) => Helper.BNsub(a, b, pk.q)
+const mul = (a: any, b: any, pk: PublicKey) => Helper.BNmul(a, b, pk.p)
+const div = (a: any, b: any, pk: PublicKey) => Helper.BNdiv(a, b, pk.p)
+const pow = (a: any, b: any, pk: PublicKey) => Helper.BNpow(a, b, pk.p)
 
 // Generates a proof for an encrypted yes vote.
 export function generateYesProof(cipher: Cipher, pk: PublicKey, uniqueID: string): ValidVoteProof {
@@ -25,8 +17,8 @@ export function generateYesProof(cipher: Cipher, pk: PublicKey, uniqueID: string
   const { a, b, r } = cipher
 
   // generate fake values for m=0
-  const c0 = getSecureRandomValue(pk.q)
-  const f0 = getSecureRandomValue(pk.q)
+  const c0 = Helper.getSecureRandomValue(pk.q)
+  const f0 = Helper.getSecureRandomValue(pk.q)
 
   // compute fake a0. (a,b) = (a,b)
   const a0 = div(pow(pk.g, f0, pk), pow(a, c0, pk), pk)
@@ -35,7 +27,7 @@ export function generateYesProof(cipher: Cipher, pk: PublicKey, uniqueID: string
   const b0 = div(pow(pk.h, f0, pk), pow(b, c0, pk), pk)
 
   // generate proof for m=1
-  const x = getSecureRandomValue(pk.q)
+  const x = Helper.getSecureRandomValue(pk.q)
 
   const a1 = pow(pk.g, x, pk)
   const b1 = pow(pk.h, x, pk)
@@ -70,8 +62,8 @@ export function generateNoProof(cipher: Cipher, pk: PublicKey, uniqueID: string)
   const { a, b, r } = cipher
 
   // generate fake values for m=1
-  const c1 = getSecureRandomValue(pk.q)
-  const f1 = getSecureRandomValue(pk.q)
+  const c1 = Helper.getSecureRandomValue(pk.q)
+  const f1 = Helper.getSecureRandomValue(pk.q)
 
   // compute fake b
   const b_ = div(b, pk.g, pk)
@@ -83,7 +75,7 @@ export function generateNoProof(cipher: Cipher, pk: PublicKey, uniqueID: string)
   const b1 = div(pow(pk.h, f1, pk), pow(b_, c1, pk), pk)
 
   // generate proof for m=0
-  const x = getSecureRandomValue(pk.q)
+  const x = Helper.getSecureRandomValue(pk.q)
   const a0 = pow(pk.g, x, pk)
   const b0 = pow(pk.h, x, pk)
 

@@ -91,6 +91,7 @@ export const getByteSizeForDecimalNumber = (q: BN): number => {
 
 export const newBN = (num: number, base: number = 10): BN => new BN(num, base)
 export const BNadd = (a: BN, b: BN, modulus: BN) => a.add(b).mod(modulus)
+export const BNsub = (a: BN, b: BN, modulus: BN) => a.sub(b).mod(modulus)
 export const BNmul = (a: BN, b: BN, modulus: BN) => a.mul(b).mod(modulus)
 export const BNpow = (a: BN, b: BN, modulus: BN) => a.pow(b).mod(modulus)
 export const BNinvm = (a: BN, modulus: BN) => a.invm(modulus)

@@ -1,16 +1,14 @@
-import { PublicKey } from './models'
-import { Cipher } from '../models'
-import { getQofP, getSecureRandomValue, newBN, BNmul, BNpow, BNinvm } from './helper'
-
+import { Cipher } from '../index'
+import { Helper, PublicKey } from './index'
 import BN = require('bn.js')
 
 export const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
-  const p = newBN(_p)
-  const q = newBN(getQofP(_p))
-  const g = newBN(_g)
+  const p = Helper.newBN(_p)
+  const q = Helper.newBN(Helper.getQofP(_p))
+  const g = Helper.newBN(_g)
 
-  const sk = getSecureRandomValue(q)
-  const h = BNpow(g, sk, p)
+  const sk = Helper.getSecureRandomValue(q)
+  const h = Helper.BNpow(g, sk, p)
 
   const pk = { p, g, h, q }
 
@@ -18,48 +16,48 @@ export const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
 }
 
 export const generateKeysZKP = (_p: number, _g: number): [PublicKey, any] => {
-  const p = newBN(_p)
-  const q = newBN(getQofP(_p))
-  const g = newBN(_g)
+  const p = Helper.newBN(_p)
+  const q = Helper.newBN(Helper.getQofP(_p))
+  const g = Helper.newBN(_g)
 
-  const sk = getSecureRandomValue(q)
-  const h = BNpow(g, sk, p)
+  const sk = Helper.getSecureRandomValue(q)
+  const h = Helper.BNpow(g, sk, p)
 
   const pk = { p, g, h, q }
 
   // verify that g^q mod p == 1 (this means: gcd(q,p) == 1)
-  const test1 = BNpow(g, q, pk.p)
-  if (!test1.eq(newBN(1))) {
+  const test1 = Helper.BNpow(g, q, pk.p)
+  if (!test1.eq(Helper.newBN(1))) {
     throw new Error(`g^q mod p != 1 (== ${test1.toNumber()}. for p: ${_p}, q: ${q.toNumber()} and g: ${_g}`)
   }
 
   // verify that h^q mod p == 1 (this means: gcd(h,p) == 1)
-  const test2 = BNpow(h, q, pk.p)
-  if (!test2.eq(newBN(1))) {
+  const test2 = Helper.BNpow(h, q, pk.p)
+  if (!test2.eq(Helper.newBN(1))) {
     throw new Error(`h^q mod p != 1 (== ${test2.toNumber()}. for p: ${_p}, q: ${q.toNumber()} and g: ${_g}`)
   }
 
   // verify that the public key h is not 1
   const test3 = h.mod(pk.p)
-  if (test3.eq(newBN(1))) {
+  if (test3.eq(Helper.newBN(1))) {
     throw new Error(`h mod p == 1. for p: ${_p}, q: ${q.toNumber()} and g: ${_g}`)
   }
 
   return [pk, sk]
 }
 
-export const encodeMessage = (m: any, pk: PublicKey) => {
-  m = typeof m === 'number' ? newBN(m) : m
-  return BNpow(pk.g, m, pk.p)
+export const encodeMessage = (m: any, pk: PublicKey): BN => {
+  m = typeof m === 'number' ? Helper.newBN(m) : m
+  return Helper.BNpow(pk.g, m, pk.p)
 }
 
 // TODO: use baby-step giant-step instead of brute force
-export const decodeMessage = (mh: any, pk: PublicKey) => {
-  mh = typeof mh === 'number' ? newBN(mh) : mh
+export const decodeMessage = (mh: any, pk: PublicKey): BN => {
+  mh = typeof mh === 'number' ? Helper.newBN(mh) : mh
 
-  let m = newBN(0)
+  let m = Helper.newBN(0)
   while (!encodeMessage(m, pk).eq(mh)) {
-    m = m.add(newBN(1))
+    m = m.add(Helper.newBN(1))
   }
   return m
 }
@@ -82,13 +80,13 @@ export const decodeMessage = (mh: any, pk: PublicKey) => {
 // 4. compute mh = g^message (encode it to make it "homomorphic")
 // 5. compute c2 = s*mh
 export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Cipher => {
-  const m = typeof message === 'number' ? newBN(message) : message
+  const m = typeof message === 'number' ? Helper.newBN(message) : message
 
-  const r = getSecureRandomValue(pk.q)
-  const c1 = BNpow(pk.g, r, pk.p)
-  const s = BNpow(pk.h, r, pk.p)
+  const r = Helper.getSecureRandomValue(pk.q)
+  const c1 = Helper.BNpow(pk.g, r, pk.p)
+  const s = Helper.BNpow(pk.h, r, pk.p)
   const mh = encodeMessage(m, pk)
-  const c2 = BNmul(s, mh, pk.p)
+  const c2 = Helper.BNmul(s, mh, pk.p)
 
   log && console.log('enc secret   (r)', r)
   log && console.log('a\t\t', c1)
@@ -116,9 +114,9 @@ export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Ciph
 export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolean = false): any => {
   const { a: c1, b: c2 } = cipherText
 
-  const s = BNpow(c1, sk, pk.p)
-  const sInverse = BNinvm(s, pk.p)
-  const mh = BNmul(c2, sInverse, pk.p)
+  const s = Helper.BNpow(c1, sk, pk.p)
+  const sInverse = Helper.BNinvm(s, pk.p)
+  const mh = Helper.BNmul(c2, sInverse, pk.p)
   const m = decodeMessage(mh, pk)
 
   log && console.log('s\t\t', s)
@@ -147,9 +145,9 @@ export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolea
 export const decrypt2 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolean = false): any => {
   const { a: c1, b: c2 } = cipherText
 
-  const s = BNpow(c1, sk, pk.p)
-  const sPowPMinus2 = BNpow(s, pk.p.sub(newBN(2)), pk.p)
-  const mh = BNmul(c2, sPowPMinus2, pk.p)
+  const s = Helper.BNpow(c1, sk, pk.p)
+  const sPowPMinus2 = Helper.BNpow(s, pk.p.sub(Helper.newBN(2)), pk.p)
+  const mh = Helper.BNmul(c2, sPowPMinus2, pk.p)
   const m = decodeMessage(mh, pk)
 
   log && console.log('s\t\t', s)
@@ -163,7 +161,7 @@ export const decrypt2 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolea
 
 export const add = (em1: Cipher, em2: Cipher, pk: PublicKey): Cipher => {
   return {
-    a: BNmul(em1.a, em2.a, pk.p),
-    b: BNmul(em1.b, em2.b, pk.p),
+    a: Helper.BNmul(em1.a, em2.a, pk.p),
+    b: Helper.BNmul(em1.b, em2.b, pk.p),
   }
 }

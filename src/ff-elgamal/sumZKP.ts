@@ -1,17 +1,14 @@
-import { Cipher, SumProof } from '../models'
-import { PublicKey } from './models'
-import { getSecureRandomValue } from './helper'
-
+import { Cipher, SumProof } from '../index'
+import { Helper, PublicKey } from './index'
 import BN = require('bn.js')
+
 const web3 = require('web3')
 const printConsole = false
 
-export const newBN = (n: number) => new BN(n, 10)
-
 // modulo operations
-const add = (a: any, b: any, pk: PublicKey) => a.add(b).mod(pk.q)
-const mul = (a: any, b: any, pk: PublicKey) => a.mul(b).mod(pk.p)
-const pow = (a: any, b: any, pk: PublicKey) => a.pow(b).mod(pk.p)
+const add = (a: any, b: any, pk: PublicKey) => Helper.BNadd(a, b, pk.q)
+const mul = (a: any, b: any, pk: PublicKey) => Helper.BNmul(a, b, pk.p)
+const pow = (a: any, b: any, pk: PublicKey) => Helper.BNpow(a, b, pk.p)
 
 // Generates a proof for the valid sum.
 export function generateSumProof(cipher: Cipher, pk: PublicKey, sk: any, uniqueID: string): SumProof {
@@ -19,7 +16,7 @@ export function generateSumProof(cipher: Cipher, pk: PublicKey, sk: any, uniqueI
   const { a, b } = cipher
 
   // generate random value
-  const x = getSecureRandomValue(pk.q)
+  const x = Helper.getSecureRandomValue(pk.q)
 
   // (a1, b1) = (a^x, g^x)
   const a1 = pow(a, x, pk)
