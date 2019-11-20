@@ -114,6 +114,18 @@ describe('Finite Field ElGamal Distributed Key Generation', () => {
     prnt && console.log('ds1', decShare1.toNumber())
     prnt && console.log('ds2', decShare2.toNumber())
 
+    // create proofs
+    const pk1: PublicKey = { p: params.p, q: params.q, g: params.g, h: share1.h_ }
+    const decryptionProof1 = FFelGamal.SumZKP.generateSumProof(cipherText, pk1, share1.sk_, uniqueId1)
+    const pk2: PublicKey = { p: params.p, q: params.q, g: params.g, h: share2.h_ }
+    const decryptionProof2 = FFelGamal.SumZKP.generateSumProof(cipherText, pk1, share2.sk_, uniqueId2)
+
+    // verify proofs
+    const verifiedProof1 = FFelGamal.SumZKP.verifySumProof(cipherText, decryptionProof1, pk1, uniqueId1)
+    const verifiedProof2 = FFelGamal.SumZKP.verifySumProof(cipherText, decryptionProof2, pk2, uniqueId2)
+    expect(verifiedProof1).to.be.true
+    expect(verifiedProof2).to.be.true
+
     // finish decryption by combining decrypted shares
     const decFinal = FFelGamal.KeyGeneration.combineDecryptedShares(params, cipherText, [decShare1, decShare2])
 
