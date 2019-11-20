@@ -1,15 +1,23 @@
-import { Cipher, ValidVoteProof } from '../index'
-import { Helper, PublicKey } from './index'
+import { Cipher, Helper, PublicKey, ValidVoteProof } from './index'
+import BN = require('bn.js')
 
 const web3 = require('web3')
 const printConsole = false
 
 // modulo operations
-const add = (a: any, b: any, pk: PublicKey) => Helper.BNadd(a, b, pk.q)
-const sub = (a: any, b: any, pk: PublicKey) => Helper.BNsub(a, b, pk.q)
-const mul = (a: any, b: any, pk: PublicKey) => Helper.BNmul(a, b, pk.p)
-const div = (a: any, b: any, pk: PublicKey) => Helper.BNdiv(a, b, pk.p)
-const pow = (a: any, b: any, pk: PublicKey) => Helper.BNpow(a, b, pk.p)
+const add = (a: BN, b: BN, pk: PublicKey): BN => Helper.BNadd(a, b, pk.q)
+const sub = (a: BN, b: BN, pk: PublicKey): BN => Helper.BNsub(a, b, pk.q)
+const mul = (a: BN, b: BN, pk: PublicKey): BN => Helper.BNmul(a, b, pk.p)
+const div = (a: BN, b: BN, pk: PublicKey): BN => Helper.BNdiv(a, b, pk.p)
+const pow = (a: BN, b: BN, pk: PublicKey): BN => Helper.BNpow(a, b, pk.p)
+
+export function generateChallenge(q: BN, uniqueID: string, a: BN, b: BN, a0: BN, b0: BN, a1: BN, b1: BN): BN {
+  let c = web3.utils.soliditySha3(uniqueID, a, b, a0, b0, a1, b1)
+  c = web3.utils.toBN(c)
+  c = c.mod(q)
+
+  return c
+}
 
 // Generates a proof for an encrypted yes vote.
 export function generateYesProof(cipher: Cipher, pk: PublicKey, uniqueID: string): ValidVoteProof {
@@ -38,7 +46,7 @@ export function generateYesProof(cipher: Cipher, pk: PublicKey, uniqueID: string
   const c1 = add(pk.q, sub(c, c0, pk), pk)
 
   // compute f1 = x + c1 * r (NOTE: mod q!)
-  const c1r = c1.mul(r).mod(pk.q)
+  const c1r = c1.mul(r as BN).mod(pk.q)
   const f1 = add(x, c1r, pk)
 
   printConsole && console.log('c0\t\t\t', c0.toNumber())
@@ -85,7 +93,7 @@ export function generateNoProof(cipher: Cipher, pk: PublicKey, uniqueID: string)
   const c0 = add(pk.q, sub(c, c1, pk), pk)
 
   // compute f0 = x + c0 * r (NOTE: mod q!)
-  const f0 = add(x, c0.mul(r).mod(pk.q), pk)
+  const f0 = add(x, c0.mul(r as BN).mod(pk.q), pk)
 
   printConsole && console.log('c0\t\t\t', c0.toNumber())
   printConsole && console.log('f0\t\t\t', f0.toNumber())
@@ -102,7 +110,7 @@ export function generateNoProof(cipher: Cipher, pk: PublicKey, uniqueID: string)
   return { a0, a1, b0, b1, c0, c1, f0, f1 }
 }
 
-export function verifyVoteProof(cipher: Cipher, proof: ValidVoteProof, pk: any, uniqueID: string): boolean {
+export function verifyVoteProof(cipher: Cipher, proof: ValidVoteProof, pk: PublicKey, uniqueID: string): boolean {
   const { a, b } = cipher
   const { a0, a1, b0, b1, c0, c1, f0, f1 } = proof
 
@@ -140,20 +148,4 @@ export function verifyVoteProof(cipher: Cipher, proof: ValidVoteProof, pk: any, 
   printConsole && console.log()
 
   return v1 && v2 && v3 && v4 && v5
-}
-
-export function numbersToString(numbers: Array<any>) {
-  let result = ''
-  for (let i = 0; i < numbers.length; i++) {
-    result += numbers[i].toJSON()
-  }
-  return result
-}
-
-export function generateChallenge(q: any, uniqueID: any, a: any, b: any, a0: any, b0: any, a1: any, b1: any) {
-  let c = web3.utils.soliditySha3(uniqueID, a, b, a0, b0, a1, b1)
-  c = web3.utils.toBN(c)
-  c = c.mod(q)
-
-  return c
 }

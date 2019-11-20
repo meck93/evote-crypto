@@ -1,10 +1,10 @@
 export {}
 import { FFelGamal } from '../../src/index'
+import { expect } from 'chai'
 
-import { primes as primes2 } from './primes.spec'
+//import { primes as primes2 } from './primes.spec'
 import BN = require('bn.js')
 
-const { expect } = require('chai')
 const Helper = FFelGamal.Helper
 
 // all prime numbers up to 100

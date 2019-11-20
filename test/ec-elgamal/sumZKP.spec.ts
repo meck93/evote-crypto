@@ -1,8 +1,7 @@
 export {}
 import { ECelGamal } from '../../src/index'
-import { SumProof } from '../../src/models'
-import { ECParams, ECCipher } from '../../src/ec-elgamal/models'
-import { ec, curve } from 'elliptic'
+import { ECParams, CurvePoint, Cipher, SumProof } from '../../src/ec-elgamal/models'
+import { ec } from 'elliptic'
 
 import BN = require('bn.js')
 
@@ -22,13 +21,13 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
     const log = false
     const keyPair: ec.KeyPair = activeCurve.genKeyPair()
     const privateKey: BN = keyPair.getPrivate()
-    const publicKey: curve.base.BasePoint = keyPair.getPublic()
+    const publicKey: CurvePoint = keyPair.getPublic() as CurvePoint
 
     const params: ECParams = { p: activeCurve.curve.p, h: publicKey, g: activeCurve.curve.g, n: activeCurve.curve.n }
     const uniqueID = '0xAd4E7D8f03904b175a1F8AE0D88154f329ac9329'
 
-    const generateAndVerifySum = (_votes: number[], _result: number) => {
-      const votes: ECCipher[] = []
+    const generateAndVerifySum = (_votes: number[], _result: number): void => {
+      const votes: Cipher[] = []
 
       for (const vote of _votes) {
         vote === 1 && votes.push(ECelGamal.Encryption.encrypt(yesVoteOnCurve, publicKey))
@@ -36,7 +35,7 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
       }
 
       // homomorphically add votes + generate sum proof
-      const encryptedSum: ECCipher = ECelGamal.Voting.addVotes(votes, publicKey)
+      const encryptedSum: Cipher = ECelGamal.Voting.addVotes(votes, publicKey)
       const sumProof: SumProof = ECelGamal.SumZKP.generateSumProof(encryptedSum, params, privateKey, uniqueID)
 
       // verify proof
@@ -44,7 +43,7 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
       expect(verifiedSumProof).to.be.true
 
       // decrypt sum
-      const decryptedSum: curve.base.BasePoint = ECelGamal.Encryption.decrypt(encryptedSum, privateKey)
+      const decryptedSum: CurvePoint = ECelGamal.Encryption.decrypt(encryptedSum, privateKey)
       const result = ECelGamal.Voting.checkDecrypedSum(decryptedSum)
 
       const summary = ECelGamal.Voting.getSummary(votes.length, result)

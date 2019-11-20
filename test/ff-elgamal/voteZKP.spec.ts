@@ -1,14 +1,13 @@
 export {}
 import { FFelGamal } from '../../src/index'
-
-const { expect } = require('chai')
+import { expect } from 'chai'
 
 describe('Finite Field ElGamal Vote ZKP', () => {
   it('create and verify proof', () => {
     const uniqueID = '0xAd4E7D8f03904b175a1F8AE0D88154f329ac9329'
 
     // generate and verify 10 proofs (with different random variables)
-    const test = (p: number, g: number) => {
+    const test = (p: number, g: number): void => {
       for (let i = 0; i < 10; i++) {
         const prnt = false
         prnt && console.log('p:', p, ', g:', g)

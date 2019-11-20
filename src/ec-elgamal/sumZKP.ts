@@ -1,18 +1,47 @@
-import { ECCipher, ECParams } from './models'
+import { ECParams, CurvePoint, Cipher, SumProof } from './models'
 import { ECelGamal } from '../index'
-import { SumProof } from '../models'
 import { ECmul, ECpow, BNmul, BNadd } from './helper'
-import { curve } from 'elliptic'
 
 import BN = require('bn.js')
 import { activeCurve } from './activeCurve'
 
 const log = false
 
-export const generateSumProof = (encryptedVote: ECCipher, params: ECParams, sk: BN, id: string): SumProof => {
+// fix type of point to be CurvePoint => requires all other to be ShortPoint
+export function convertECPointToString(point: CurvePoint): string {
+  const pointAsJSON = point.toJSON()
+  const Px = (pointAsJSON[0] as BN).toString('hex')
+  const Py = (pointAsJSON[1] as BN).toString('hex')
+  return Px + Py
+}
+
+export function convertAllECPointsToString(points: CurvePoint[]): string {
+  let asString = ''
+  for (const point of points) {
+    asString += convertECPointToString(point)
+  }
+  return asString
+}
+
+export function generateChallenge(n: BN, id: string, a: CurvePoint, b: CurvePoint, a1: CurvePoint, b1: CurvePoint): BN {
+  const pointsAsString: string = convertAllECPointsToString([a, b, a1, b1])
+  const input = id + pointsAsString
+
+  let c = activeCurve
+    .hash()
+    .update(input)
+    .digest('hex')
+
+  c = new BN(c, 'hex')
+  c = c.mod(n)
+
+  return c
+}
+
+export const generateSumProof = (encryptedVote: Cipher, params: ECParams, sk: BN, id: string): SumProof => {
   // a = g^r, b = public_key i.e. h^r*g^m
   const { a, b } = encryptedVote
-  const { p, h, g, n } = params
+  const { g, n } = params
 
   // generate random value
   const x: BN = ECelGamal.Helper.getSecureRandomValue(n)
@@ -45,15 +74,9 @@ export const generateSumProof = (encryptedVote: ECCipher, params: ECParams, sk: 
   return { a1, b1, f, d }
 }
 
-export const verifySumProof = (
-  encryptedSum: ECCipher,
-  proof: SumProof,
-  params: ECParams,
-  pk: curve.base.BasePoint,
-  id: string
-): boolean => {
+export const verifySumProof = (encryptedSum: Cipher, proof: SumProof, params: ECParams, pk: CurvePoint, id: string): boolean => {
   const { a, b } = encryptedSum
-  const { p, h, g, n } = params
+  const { h, g, n } = params
   const { a1, b1, f, d } = proof
 
   // recompute the challenge
@@ -74,42 +97,4 @@ export const verifySumProof = (
   log && console.log()
 
   return v1 && v2
-}
-
-// fix type of point to be curve.short.ShortPoint => requires all other to be ShortPoint
-export function convertECPointToString(point: any): string {
-  const pointAsJSON = point.toJSON()
-  const Px = pointAsJSON[0].toString('hex')
-  const Py = pointAsJSON[1].toString('hex')
-  return Px + Py
-}
-
-export function convertAllECPointsToString(points: curve.base.BasePoint[]): string {
-  let asString = ''
-  for (const point of points) {
-    asString += convertECPointToString(point)
-  }
-  return asString
-}
-
-export function generateChallenge(
-  n: BN,
-  id: string,
-  a: curve.base.BasePoint,
-  b: curve.base.BasePoint,
-  a1: curve.base.BasePoint,
-  b1: curve.base.BasePoint
-): BN {
-  const pointsAsString: string = convertAllECPointsToString([a, b, a1, b1])
-  const input = id + pointsAsString
-
-  let c = activeCurve
-    .hash()
-    .update(input)
-    .digest('hex')
-
-  c = new BN(c, 'hex')
-  c = c.mod(n)
-
-  return c
 }

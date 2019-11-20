@@ -12,6 +12,8 @@
     "test:watch": "ts-mocha ./**/*.spec.ts -w --watch-extensions ts ",
     "test:report": "nyc --reporter=lcov ts-mocha ./**/*.spec.ts",
     "format": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|css|md)\"",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
     "ts-mocha": "./node_modules/.bin/ts-mocha",
     "ts-node": "./node_modules/.bin/ts-node",
     "tsc": "./node_modules/.bin/tsc"
@@ -28,7 +30,17 @@
     "@types/chai": "^4.2.5",
     "@types/elliptic": "^6.4.10",
     "@types/mocha": "^5.2.7",
+    "@typescript-eslint/eslint-plugin": "^2.8.0",
+    "@typescript-eslint/parser": "^2.8.0",
     "chai": "^4.2.0",
+    "eslint": "^6.6.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-import-resolver-typescript": "^2.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-json": "^2.0.1",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-prettier": "^3.1.1",
     "lint-staged": "^9.4.3",
     "mocha": "^6.2.2",
     "nyc": "^14.1.1",
@@ -43,19 +55,11 @@
     "webpack-cli": "^3.3.10"
   },
   "lint-staged": {
-    "*.js": [
-      "prettier --write",
+    "*.+(ts)": [
+      "eslint --fix",
       "git add"
     ],
-    "*.ts": [
-      "prettier --write",
-      "git add"
-    ],
-    "*.tsx": [
-      "prettier --write",
-      "git add"
-    ],
-    "*.json": [
+    "*.+(js|ts|json)": [
       "prettier --write",
       "git add"
     ]

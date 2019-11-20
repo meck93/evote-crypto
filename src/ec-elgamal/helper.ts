@@ -1,40 +1,40 @@
 import crypto = require('crypto')
-import { curve } from 'elliptic'
 import BN = require('bn.js')
+import { CurvePoint } from './models'
 
-export const getSecureRandomValue = (n: BN, byte_size: number = 32): BN => {
+export const getSecureRandomValue = (n: BN, byteSize = 32): BN => {
   const one = new BN(1, 10)
   const UPPER_BOUND_RANDOM: BN = n.sub(one)
 
-  let randomBytes: Buffer = crypto.randomBytes(byte_size)
+  let randomBytes: Buffer = crypto.randomBytes(byteSize)
   let randomValue: BN = new BN(randomBytes)
 
   // ensure that the random value is in range [1,n-1]
   while (!(randomValue.lte(UPPER_BOUND_RANDOM) && randomValue.gte(one))) {
-    randomBytes = crypto.randomBytes(byte_size)
+    randomBytes = crypto.randomBytes(byteSize)
     randomValue = new BN(randomBytes)
   }
   return randomValue
 }
 
-export const newBN = (n: number, base: number = 10) => new BN(n, base)
+export const newBN = (n: number, base = 10): BN => new BN(n, base)
 
-export const BNadd = (a: BN, b: BN, mod: BN) => a.add(b).mod(mod)
-export const BNsub = (a: BN, b: BN, mod: BN) => a.sub(b).mod(mod)
-export const BNmul = (a: BN, b: BN, mod: BN) => a.mul(b).mod(mod)
+export const BNadd = (a: BN, b: BN, mod: BN): BN => a.add(b).mod(mod)
+export const BNsub = (a: BN, b: BN, mod: BN): BN => a.sub(b).mod(mod)
+export const BNmul = (a: BN, b: BN, mod: BN): BN => a.mul(b).mod(mod)
 
-export const ECpow = (a: curve.base.BasePoint, b: BN): curve.base.BasePoint => a.mul(b)
-export const ECmul = (a: curve.base.BasePoint, b: curve.base.BasePoint): curve.base.BasePoint => a.add(b)
-export const ECdiv = (a: curve.base.BasePoint, b: curve.base.BasePoint): curve.base.BasePoint => a.add(b.neg())
+export const ECpow = (a: CurvePoint, b: BN): CurvePoint => a.mul(b) as CurvePoint
+export const ECmul = (a: CurvePoint, b: CurvePoint): CurvePoint => a.add(b) as CurvePoint
+export const ECdiv = (a: CurvePoint, b: CurvePoint): CurvePoint => a.add(b.neg()) as CurvePoint
 
-export function curvePointToString(point: any) {
+export function curvePointToString(point: CurvePoint): string {
   const pointAsJSON = point.toJSON()
-  const Px = pointAsJSON[0].toString('hex')
-  const Py = pointAsJSON[1].toString('hex')
+  const Px = (pointAsJSON[0] as BN).toString('hex')
+  const Py = (pointAsJSON[1] as BN).toString('hex')
   return Px + Py
 }
 
-export function curvePointsToString(points: curve.base.BasePoint[]) {
+export function curvePointsToString(points: CurvePoint[]): string {
   let asString = ''
   for (const point of points) {
     asString += curvePointToString(point)

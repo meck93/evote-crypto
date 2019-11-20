@@ -1,14 +1,13 @@
 export {}
-import { Cipher, FFelGamal, ValidVoteProof } from '../../src/index'
+import { FFelGamal } from '../../src/index'
+import { expect } from 'chai'
 
 const random = require('random')
-const { expect } = require('chai')
 const web3 = require('web3')
 
 describe('ElGamal Finite Field E2E Test', () => {
   it('complete vote', () => {
-    const vote = (p: number, g: number, _result: number, _votes: number[]) => {
-      const baseID = '0xAd4E7D8f03904b175a1F8AE0D88154f329ac9329'
+    const vote = (p: number, g: number, _result: number, _votes: number[]): void => {
       const govID = 'GOV_ID_SUPER_SECURE_:-)'
 
       const prnt = false
@@ -23,7 +22,7 @@ describe('ElGamal Finite Field E2E Test', () => {
         console.error(error)
       }
 
-      const votes: Cipher[] = []
+      const votes: FFelGamal.Cipher[] = []
 
       // generate votes and proofs with random IDs
       for (const vote of _votes) {
@@ -58,7 +57,7 @@ describe('ElGamal Finite Field E2E Test', () => {
 
       // decrypt the sum
       const decryptedSum = FFelGamal.Encryption.decrypt1(encryptedSum, sk, pk)
-      const summary = FFelGamal.Voting.getSummary(votes.length, decryptedSum)
+      const summary = FFelGamal.Voting.getSummary(votes.length, decryptedSum.toNumber())
       prnt && console.log(_result, _votes, 'Total:', summary.total, '| Yes:', summary.yes, '| No:', summary.no)
 
       expect(decryptedSum.toNumber()).to.equal(_result)

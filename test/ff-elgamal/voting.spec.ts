@@ -1,16 +1,15 @@
 export {}
-import { Cipher, FFelGamal } from '../../src/index'
-
-const { expect } = require('chai')
+import { FFelGamal } from '../../src/index'
+import { expect } from 'chai'
 
 describe('Finite Field ElGamal Voting', () => {
   it('vote', () => {
-    const vote = (_result: number, _votes: number[]) => {
+    const vote = (_result: number, _votes: number[]): void => {
       const [pk, sk] = FFelGamal.Encryption.generateKeys(137, 51)
 
       const log = false
 
-      const votes: Cipher[] = []
+      const votes: FFelGamal.Cipher[] = []
       for (const vote of _votes) {
         vote === 1 && votes.push(FFelGamal.Voting.generateYesVote(pk))
         vote === 0 && votes.push(FFelGamal.Voting.generateNoVote(pk))

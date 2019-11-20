@@ -2,9 +2,7 @@ export {}
 import BN = require('bn.js')
 import { FFelGamal } from '../../src/index'
 import { getSecureRandomValue } from '../../src/ff-elgamal/helper'
-
-const random = require('random')
-const { expect } = require('chai')
+import { expect } from 'chai'
 
 describe('Finite Field ElGamal Encryption', () => {
   it('should encode a message', () => {
@@ -68,13 +66,13 @@ describe('Finite Field ElGamal Encryption', () => {
       prnt && console.log('plaintext    (m)', message)
       prnt && console.log('------------------------')
 
-      const m_enc = FFelGamal.Encryption.encrypt(message, pk, prnt)
-      const m_d1 = FFelGamal.Encryption.decrypt1(m_enc, sk, pk, prnt)
-      const m_d2 = FFelGamal.Encryption.decrypt2(m_enc, sk, pk, prnt)
+      const mEnc = FFelGamal.Encryption.encrypt(message, pk, prnt)
+      const mD1 = FFelGamal.Encryption.decrypt1(mEnc, sk, pk, prnt)
+      const mD2 = FFelGamal.Encryption.decrypt2(mEnc, sk, pk, prnt)
 
-      expect(m_d1.eq(message)).to.be.true
-      expect(m_d2.eq(message)).to.be.true
-      expect(m_d1.eq(m_d2)).to.be.true
+      expect(mD1.eq(message)).to.be.true
+      expect(mD2.eq(message)).to.be.true
+      expect(mD1.eq(mD2)).to.be.true
     }
   })
 
@@ -90,12 +88,12 @@ describe('Finite Field ElGamal Encryption', () => {
       const m1 = getSecureRandomValue(new BN((_p - 1) / 2))
       const m2 = getSecureRandomValue(new BN((_p - 1) / 2))
 
-      const e_m1 = FFelGamal.Encryption.encrypt(m1, pk)
-      const e_m2 = FFelGamal.Encryption.encrypt(m2, pk)
+      const eM1 = FFelGamal.Encryption.encrypt(m1, pk)
+      const eM2 = FFelGamal.Encryption.encrypt(m2, pk)
 
-      const d_sum = FFelGamal.Encryption.decrypt1(FFelGamal.Encryption.add(e_m1, e_m2, pk), sk, pk)
+      const dSum = FFelGamal.Encryption.decrypt1(FFelGamal.Encryption.add(eM1, eM2, pk), sk, pk)
 
-      expect(d_sum.eq(m1.add(m2))).to.be.true
+      expect(dSum.eq(m1.add(m2))).to.be.true
     }
   })
 })

@@ -1,5 +1,4 @@
-import { Cipher, KeyShareProof } from '../index'
-import { Encryption, Helper, KeyShare, SystemParameters } from './index'
+import { Cipher, Encryption, Helper, KeyShare, KeyShareProof, SystemParameters } from './index'
 import BN = require('bn.js')
 
 const web3 = require('web3')
@@ -20,6 +19,13 @@ export const generateKeyShares = (params: SystemParameters): KeyShare => {
   const h: BN = Helper.BNpow(g, sk, p)
 
   return { h_: h, sk_: sk }
+}
+
+export const generateChallenge = (q: BN, uniqueID: string, h_: BN, b: BN): BN => {
+  let c = web3.utils.soliditySha3(uniqueID, h_, b)
+  c = web3.utils.toBN(c)
+  c = c.mod(q)
+  return c
 }
 
 export const generateKeyGenerationProof = (params: SystemParameters, share: KeyShare, id: string): KeyShareProof => {
@@ -86,14 +92,7 @@ export const combineDecryptedShares = (params: SystemParameters, cipher: Cipher,
 
   // TODO: split PublicKey interface into system parameters (p,g,q) and the actual public key (h)
   // (h is not needed here)
-  let m = Encryption.decodeMessage(mh, { p: params.p, g: params.g, q: params.q, h: Helper.newBN(1) })
+  const m = Encryption.decodeMessage(mh, { p: params.p, g: params.g, q: params.q, h: Helper.newBN(1) })
 
   return m
-}
-
-export const generateChallenge = (q: BN, uniqueID: string, h_: BN, b: BN): BN => {
-  let c = web3.utils.soliditySha3(uniqueID, h_, b)
-  c = web3.utils.toBN(c)
-  c = c.mod(q)
-  return c
 }

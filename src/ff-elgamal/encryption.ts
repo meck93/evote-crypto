@@ -1,8 +1,7 @@
-import { Cipher } from '../index'
-import { Helper, PublicKey } from './index'
+import { Cipher, Helper, PublicKey } from './index'
 import BN = require('bn.js')
 
-export const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
+export const generateKeys = (_p: number, _g: number): [PublicKey, BN] => {
   const p = Helper.newBN(_p)
   const q = Helper.newBN(Helper.getQofP(_p))
   const g = Helper.newBN(_g)
@@ -15,7 +14,7 @@ export const generateKeys = (_p: number, _g: number): [PublicKey, any] => {
   return [pk, sk]
 }
 
-export const generateKeysZKP = (_p: number, _g: number): [PublicKey, any] => {
+export const generateKeysZKP = (_p: number, _g: number): [PublicKey, BN] => {
   const p = Helper.newBN(_p)
   const q = Helper.newBN(Helper.getQofP(_p))
   const g = Helper.newBN(_g)
@@ -46,13 +45,13 @@ export const generateKeysZKP = (_p: number, _g: number): [PublicKey, any] => {
   return [pk, sk]
 }
 
-export const encodeMessage = (m: any, pk: PublicKey): BN => {
+export const encodeMessage = (m: number | BN, pk: PublicKey): BN => {
   m = typeof m === 'number' ? Helper.newBN(m) : m
   return Helper.BNpow(pk.g, m, pk.p)
 }
 
 // TODO: use baby-step giant-step instead of brute force
-export const decodeMessage = (mh: any, pk: PublicKey): BN => {
+export const decodeMessage = (mh: number | BN, pk: PublicKey): BN => {
   mh = typeof mh === 'number' ? Helper.newBN(mh) : mh
 
   let m = Helper.newBN(0)
@@ -79,7 +78,7 @@ export const decodeMessage = (mh: any, pk: PublicKey): BN => {
 // 3. compute s = h^r
 // 4. compute mh = g^message (encode it to make it "homomorphic")
 // 5. compute c2 = s*mh
-export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Cipher => {
+export const encrypt = (message: number | BN, pk: PublicKey, log = false): Cipher => {
   const m = typeof message === 'number' ? Helper.newBN(message) : message
 
   const r = Helper.getSecureRandomValue(pk.q)
@@ -111,7 +110,7 @@ export const encrypt = (message: any, pk: PublicKey, log: boolean = false): Ciph
 // 2. compute s^-1 = multiplicative inverse of s
 // 3. compute mh = c2 * s^-1
 // 4. compute m (decode mh using brute force)
-export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolean = false): any => {
+export const decrypt1 = (cipherText: Cipher, sk: BN, pk: PublicKey, log = false): BN => {
   const { a: c1, b: c2 } = cipherText
 
   const s = Helper.BNpow(c1, sk, pk.p)
@@ -142,7 +141,7 @@ export const decrypt1 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolea
 // 3. compute s^(p-2)
 // 4. compute mh = c2 * s^(p-2)
 // 5. compute m (decode mh using brute force)
-export const decrypt2 = (cipherText: Cipher, sk: any, pk: PublicKey, log: boolean = false): any => {
+export const decrypt2 = (cipherText: Cipher, sk: BN, pk: PublicKey, log = false): BN => {
   const { a: c1, b: c2 } = cipherText
 
   const s = Helper.BNpow(c1, sk, pk.p)

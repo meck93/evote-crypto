@@ -1,11 +1,11 @@
 export {}
 import { ECelGamal } from '../../src/index'
-import { KeyShareProof } from '../../src/models'
-import { ECpow, ECmul, ECdiv } from '../../src/ec-elgamal/helper'
+import { ECpow, ECmul } from '../../src/ec-elgamal/helper'
 
 import { expect } from 'chai'
-import { curve, ec } from 'elliptic'
+import { ec } from 'elliptic'
 import { activeCurve } from '../../src/ec-elgamal/activeCurve'
+import { CurvePoint, KeyShareProof } from '../../src/ec-elgamal/models'
 
 describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
   it('generate and verify (distributed) key share', () => {
@@ -47,19 +47,19 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
   it('combine public keys', () => {
     // generate one share
     let keyPairs: ec.KeyPair[] = ECelGamal.KeyGeneration.generateKeyPairs(1)
-    let shares: curve.base.BasePoint[] = [keyPairs[0].getPublic()]
-    let product: curve.base.BasePoint = shares[0]
+    let shares: CurvePoint[] = [keyPairs[0].getPublic() as CurvePoint]
+    let product: CurvePoint = shares[0]
     expect(ECelGamal.KeyGeneration.combinePublicKeys(shares)).to.eql(product)
 
     // generate two shares + combine them
     keyPairs = ECelGamal.KeyGeneration.generateKeyPairs(2)
-    shares = [keyPairs[0].getPublic(), keyPairs[1].getPublic()]
+    shares = [keyPairs[0].getPublic() as CurvePoint, keyPairs[1].getPublic() as CurvePoint]
     product = ECmul(shares[0], shares[1])
     expect(ECelGamal.KeyGeneration.combinePublicKeys(shares)).to.eql(product)
 
     // generate three shares + combine them
     keyPairs = ECelGamal.KeyGeneration.generateKeyPairs(3)
-    shares = [keyPairs[0].getPublic(), keyPairs[1].getPublic(), keyPairs[2].getPublic()]
+    shares = [keyPairs[0].getPublic() as CurvePoint, keyPairs[1].getPublic() as CurvePoint, keyPairs[2].getPublic() as CurvePoint]
     product = ECmul(ECmul(shares[0], shares[1]), shares[2])
     expect(ECelGamal.KeyGeneration.combinePublicKeys(shares)).to.eql(product)
   })

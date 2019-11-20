@@ -1,6 +1,6 @@
 // general models
-import { Cipher, KeyShareProof, Summary, SumProof, ValidVoteProof } from './models'
-export { Cipher, KeyShareProof, Summary, SumProof, ValidVoteProof }
+import { Summary } from './models'
+export { Summary }
 
 // finite field elgamal
 import * as FFelGamal from './ff-elgamal'

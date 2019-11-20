@@ -1,16 +1,38 @@
 import { ECelGamal } from '../index'
-import { ValidVoteProof } from '../models'
-import { ECParams, ECCipher } from './models'
+import { ECParams, Cipher, CurvePoint, ValidVoteProof } from './models'
 import { ECmul, ECdiv, ECpow, BNmul, BNadd, BNsub, curvePointsToString } from './helper'
 
 import BN = require('bn.js')
-import { curve } from 'elliptic'
 import { activeCurve } from './activeCurve'
 
 const printConsole = false
 
+export function generateChallenge(
+  n: BN,
+  id: string,
+  c1: CurvePoint,
+  c2: CurvePoint,
+  a1: CurvePoint,
+  a2: CurvePoint,
+  b1: CurvePoint,
+  b2: CurvePoint
+): BN {
+  const pointsAsString = curvePointsToString([c1, c2, a1, a2, b1, b2])
+  const input = id + pointsAsString
+
+  let c = activeCurve
+    .hash()
+    .update(input)
+    .digest('hex')
+
+  c = new BN(c, 'hex')
+  c = c.mod(n)
+
+  return c
+}
+
 // Generates a proof for an encrypted yes vote.
-export function generateYesProof(encryptedVote: ECCipher, params: ECParams, id: string): ValidVoteProof {
+export function generateYesProof(encryptedVote: Cipher, params: ECParams, id: string): ValidVoteProof {
   const { a, b, r } = encryptedVote
   const { h, g, n } = params
 
@@ -59,7 +81,7 @@ export function generateYesProof(encryptedVote: ECCipher, params: ECParams, id: 
 }
 
 // Generates a proof for an encrypted no vote.
-export function generateNoProof(encryptedVote: ECCipher, params: ECParams, id: string): ValidVoteProof {
+export function generateNoProof(encryptedVote: Cipher, params: ECParams, id: string): ValidVoteProof {
   const { a, b, r } = encryptedVote
   const { h, g, n } = params
 
@@ -110,7 +132,7 @@ export function generateNoProof(encryptedVote: ECCipher, params: ECParams, id: s
   return { a0, a1, b0, b1, c0, c1, f0, f1 }
 }
 
-export function verifyZKP(encryptedVote: ECCipher, proof: ValidVoteProof, params: ECParams, id: string): boolean {
+export function verifyZKP(encryptedVote: Cipher, proof: ValidVoteProof, params: ECParams, id: string): boolean {
   const { a0, a1, b0, b1, c0, c1, f0, f1 } = proof
   const { h, g, n } = params
   const { a, b } = encryptedVote
@@ -149,28 +171,4 @@ export function verifyZKP(encryptedVote: ECCipher, proof: ValidVoteProof, params
   printConsole && console.log()
 
   return v1 && v2 && v3 && v4 && v5
-}
-
-export function generateChallenge(
-  n: BN,
-  id: string,
-  c1: curve.base.BasePoint,
-  c2: curve.base.BasePoint,
-  a1: curve.base.BasePoint,
-  a2: curve.base.BasePoint,
-  b1: curve.base.BasePoint,
-  b2: curve.base.BasePoint
-) {
-  const pointsAsString = curvePointsToString([c1, c2, a1, a2, b1, b2])
-  const input = id + pointsAsString
-
-  let c = activeCurve
-    .hash()
-    .update(input)
-    .digest('hex')
-
-  c = new BN(c, 'hex')
-  c = c.mod(n)
-
-  return c
 }
