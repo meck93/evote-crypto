@@ -55,22 +55,22 @@ describe('Finite Field ElGamal Encryption', () => {
   })
 
   it('compare decryption implementations', () => {
-    const prnt = false
+    const log = false
     const [sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(11, 3)
 
     const message = FFelGamal.Helper.getSecureRandomValue(sp.q)
     for (let i = 0; i < 10; i++) {
-      prnt && console.log(i)
-      prnt && console.log('prime      (p)\t', sp.p)
-      prnt && console.log('generator  (g)\t', sp.g)
-      prnt && console.log('dec secret (x)\t', sk)
-      prnt && console.log('           (h)\t', pk)
-      prnt && console.log('plaintext    (m)', message)
-      prnt && console.log('------------------------')
+      log && console.log(i)
+      log && console.log('prime      (p)\t', sp.p)
+      log && console.log('generator  (g)\t', sp.g)
+      log && console.log('dec secret (x)\t', sk)
+      log && console.log('           (h)\t', pk)
+      log && console.log('plaintext    (m)', message)
+      log && console.log('------------------------')
 
-      const mEnc = FFelGamal.Encryption.encrypt(message, sp, pk, prnt)
-      const mD1 = FFelGamal.Encryption.decrypt1(mEnc, sk, sp, prnt)
-      const mD2 = FFelGamal.Encryption.decrypt2(mEnc, sk, sp, prnt)
+      const mEnc = FFelGamal.Encryption.encrypt(message, sp, pk, log)
+      const mD1 = FFelGamal.Encryption.decrypt1(mEnc, sk, sp, log)
+      const mD2 = FFelGamal.Encryption.decrypt2(mEnc, sk, sp, log)
 
       expect(mD1.eq(message)).to.be.true
       expect(mD2.eq(message)).to.be.true

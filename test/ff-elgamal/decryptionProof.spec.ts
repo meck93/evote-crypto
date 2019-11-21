@@ -9,11 +9,11 @@ describe('ElGamal Finite Field NIZKP for Decryption', () => {
     // generate and verify 10 proofs (with different random variables and different random messages)
     const test = (p: number, g: number): void => {
       for (let i = 0; i < 10; i++) {
-        const prnt = false
+        const log = false
         let sp, pk, sk
         try {
           ;[sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(p, g)
-          prnt && console.log('p:', sp.p, 'q:', sp.q, 'g:', sp.g)
+          log && console.log('p:', sp.p, 'q:', sp.q, 'g:', sp.g)
         } catch (error) {
           console.error(error)
           break
@@ -21,15 +21,15 @@ describe('ElGamal Finite Field NIZKP for Decryption', () => {
 
         // sum
         const sum = FFelGamal.Helper.getSecureRandomValue(sp.q)
-        prnt && console.log(`Sum Proof for Message: ${sum}`)
+        log && console.log(`Sum Proof for Message: ${sum}`)
 
-        const sumEnc = FFelGamal.Encryption.encrypt(sum, sp, pk, prnt)
+        const sumEnc = FFelGamal.Encryption.encrypt(sum, sp, pk, log)
         const proof = FFelGamal.DecryptionProof.generate(sumEnc, sp, sk, uniqueID)
 
         const verifiedSumProof = FFelGamal.DecryptionProof.verify(sumEnc, proof, sp, pk, uniqueID)
         expect(verifiedSumProof).to.be.true
 
-        const decSum = FFelGamal.Encryption.decrypt1(sumEnc, sk, sp, prnt)
+        const decSum = FFelGamal.Encryption.decrypt1(sumEnc, sk, sp, log)
         expect(decSum.eq(sum)).to.be.true
       }
     }

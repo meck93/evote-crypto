@@ -10,7 +10,7 @@ import { CurvePoint, KeyShareProof } from '../../src/ec-elgamal/models'
 describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
   it('generate and verify (distributed) key share', () => {
     for (let i = 0; i < 10; i++) {
-      const prnt = true
+      const log = false
 
       // generate the system parameters: P, Q, G
       const params: ECelGamal.SystemParameters = ECelGamal.KeyGeneration.generateSystemParameters()
@@ -22,10 +22,10 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
 
       expect(h1_).to.eql(ECpow(g, sk1_))
 
-      prnt && console.log('Key Parts')
-      prnt && console.log('h_:\t', h1_.toString())
-      prnt && console.log('sk_:\t', sk1_.toString())
-      prnt && console.log()
+      log && console.log('Key Parts')
+      log && console.log('h_:\t', h1_.toString())
+      log && console.log('sk_:\t', sk1_.toString())
+      log && console.log()
 
       // generate the key share generation proof
       const uniqueId = 'IamReallyUnique;-)'
@@ -36,10 +36,10 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
       )
       const { c: c1, d: d1 } = proof
 
-      prnt && console.log('Proof Parts')
-      prnt && console.log('c:\t', c1.toString())
-      prnt && console.log('d1:\t', d1.toString())
-      prnt && console.log()
+      log && console.log('Proof Parts')
+      log && console.log('c:\t', c1.toString())
+      log && console.log('d1:\t', d1.toString())
+      log && console.log()
 
       // verify that the key share has been generated truthfully
       const verifiedProof: boolean = ECelGamal.KeyGeneration.verifyKeyGenerationProof(
@@ -78,7 +78,7 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
   })
 
   it('perform distributed key generation', () => {
-    const prnt = false
+    const log = false
 
     const params: ECelGamal.SystemParameters = ECelGamal.KeyGeneration.generateSystemParameters()
 
@@ -116,29 +116,29 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
     )
     expect(verified2).to.be.true
 
-    prnt && console.log('1: pk, sk', share1.h_, share1.sk_)
-    prnt && console.log('2: pk, sk', share2.h_, share2.sk_)
+    log && console.log('1: pk, sk', share1.h_, share1.sk_)
+    log && console.log('2: pk, sk', share2.h_, share2.sk_)
 
     // combined keys
     const publicKey = ECelGamal.KeyGeneration.combinePublicKeys([share1.h_, share2.h_])
     const privateKey = ECelGamal.KeyGeneration.combinePrivateKeys(params, [share1.sk_, share2.sk_])
 
-    prnt && console.log('pk', publicKey)
-    prnt && console.log('sk', privateKey)
+    log && console.log('pk', publicKey)
+    log && console.log('sk', privateKey)
 
     // encrypt a single yes vote -> we use the generator
     const plaintext = activeCurve.curve.g
     const cipherText = ECelGamal.Encryption.encrypt(plaintext, publicKey)
 
-    prnt && console.log('plaintext', plaintext)
-    prnt && console.log('cipherText (a,b)', cipherText.a, cipherText.b)
+    log && console.log('plaintext', plaintext)
+    log && console.log('cipherText (a,b)', cipherText.a, cipherText.b)
 
     // decrypt shares
     const share1Decrypted = ECelGamal.KeyGeneration.decryptShare(cipherText, share1.sk_)
     const share2Decrypted = ECelGamal.KeyGeneration.decryptShare(cipherText, share2.sk_)
 
-    prnt && console.log('share 1 - decrypted\t', share1Decrypted)
-    prnt && console.log('share 2 - decrypted\t', share2Decrypted)
+    log && console.log('share 1 - decrypted\t', share1Decrypted)
+    log && console.log('share 2 - decrypted\t', share2Decrypted)
 
     // finish decryption by combining decrypted shares
     const distributedDecrypted = ECelGamal.KeyGeneration.combineDecryptedShares(cipherText, [
@@ -151,8 +151,8 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
     const combinedDecryption = ECelGamal.Encryption.decrypt(cipherText, privateKey)
     const result2 = ECelGamal.Voting.checkDecrypedSum(combinedDecryption)
 
-    prnt && console.log('distributed decryption\t', distributedDecrypted.toString())
-    prnt && console.log('combined decryption\t', combinedDecryption.toString())
+    log && console.log('distributed decryption\t', distributedDecrypted.toString())
+    log && console.log('combined decryption\t', combinedDecryption.toString())
 
     // check that decrypting both ways results in the same result
     expect(distributedDecrypted).to.eql(combinedDecryption)

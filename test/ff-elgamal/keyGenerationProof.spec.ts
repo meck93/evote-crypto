@@ -5,7 +5,7 @@ import { FFelGamal } from '../../src/index'
 describe('ElGamal Finite Field NIZKP for Key Generation', () => {
   it('generate and verify (distributed) key share', () => {
     for (let i = 0; i < 10; i++) {
-      const prnt = false
+      const log = false
 
       // generate the system parameters: P, Q, G
       const sp: FFelGamal.SystemParameters = FFelGamal.SystemSetup.generateSystemParameters(11, 3)
@@ -15,10 +15,10 @@ describe('ElGamal Finite Field NIZKP for Key Generation', () => {
 
       expect(share.h).to.eql(sp.g.pow(share.sk).mod(sp.p))
 
-      prnt && console.log('Key Parts')
-      prnt && console.log('h:\t', share.h.toString())
-      prnt && console.log('sk:\t', share.sk.toString())
-      prnt && console.log()
+      log && console.log('Key Parts')
+      log && console.log('h:\t', share.h.toString())
+      log && console.log('sk:\t', share.sk.toString())
+      log && console.log()
 
       // generate the key share generation proof
       const uniqueId = 'IamReallyUnique;-)'
@@ -29,10 +29,10 @@ describe('ElGamal Finite Field NIZKP for Key Generation', () => {
       )
       const { c: c1, d: d1 } = proof
 
-      prnt && console.log('Proof Parts')
-      prnt && console.log('c:\t', c1.toString())
-      prnt && console.log('d1:\t', d1.toString())
-      prnt && console.log()
+      log && console.log('Proof Parts')
+      log && console.log('c:\t', c1.toString())
+      log && console.log('d1:\t', d1.toString())
+      log && console.log()
 
       // verify that the key share has been generated truthfully
       const verifiedProof: boolean = FFelGamal.KeyGenerationProof.verify(
@@ -47,7 +47,7 @@ describe('ElGamal Finite Field NIZKP for Key Generation', () => {
   })
 
   it('perform distributed key generation', () => {
-    const prnt = false
+    const log = false
 
     const sp: FFelGamal.SystemParameters = FFelGamal.SystemSetup.generateSystemParameters(11, 3)
 
@@ -73,29 +73,29 @@ describe('ElGamal Finite Field NIZKP for Key Generation', () => {
     )
     expect(FFelGamal.KeyGenerationProof.verify(sp, proof2, share2.h, uniqueId2)).to.be.true
 
-    prnt && console.log('1: pk, sk', share1.h.toNumber(), share1.sk.toNumber())
-    prnt && console.log('2: pk, sk', share2.h.toNumber(), share2.sk.toNumber())
+    log && console.log('1: pk, sk', share1.h.toNumber(), share1.sk.toNumber())
+    log && console.log('2: pk, sk', share2.h.toNumber(), share2.sk.toNumber())
 
     // combined keys
     const publicKey = FFelGamal.SystemSetup.combinePublicKeys(sp, [share1.h, share2.h])
     const privateKey = FFelGamal.SystemSetup.combinePrivateKeys(sp, [share1.sk, share2.sk])
 
-    prnt && console.log('pk', publicKey.toNumber())
-    prnt && console.log('sk', privateKey.toNumber())
+    log && console.log('pk', publicKey.toNumber())
+    log && console.log('sk', privateKey.toNumber())
 
     // encrypt some message
     const plaintext = FFelGamal.Helper.newBN(3)
     const cipherText = FFelGamal.Encryption.encrypt(plaintext, sp, publicKey)
 
-    prnt && console.log('plaintext', plaintext.toNumber())
-    prnt && console.log('cipherText (a,b)', cipherText.a.toNumber(), cipherText.b.toNumber())
+    log && console.log('plaintext', plaintext.toNumber())
+    log && console.log('cipherText (a,b)', cipherText.a.toNumber(), cipherText.b.toNumber())
 
     // decrypt shares
     const decShare1 = FFelGamal.Encryption.decryptShare(sp, cipherText, share1.sk)
     const decShare2 = FFelGamal.Encryption.decryptShare(sp, cipherText, share2.sk)
 
-    prnt && console.log('ds1', decShare1.toNumber())
-    prnt && console.log('ds2', decShare2.toNumber())
+    log && console.log('ds1', decShare1.toNumber())
+    log && console.log('ds2', decShare2.toNumber())
 
     // create proofs
     const decryptionProof1 = FFelGamal.DecryptionProof.generate(
@@ -139,8 +139,8 @@ describe('ElGamal Finite Field NIZKP for Key Generation', () => {
     // decrypt with combined private key
     const d2 = FFelGamal.Encryption.decrypt2(cipherText, privateKey, sp)
 
-    prnt && console.log('d', decFinal.toNumber())
-    prnt && console.log('d2', d2.toNumber())
+    log && console.log('d', decFinal.toNumber())
+    log && console.log('d2', d2.toNumber())
 
     expect(decFinal.toNumber()).to.eql(d2.toNumber())
     expect(decFinal.toNumber()).to.eql(plaintext.toNumber())

@@ -11,7 +11,7 @@ describe('ElGamal Finite Field E2E Test', () => {
     const vote = (p: number, g: number, _result: number, _votes: number[]): void => {
       const govID = 'GOV_ID_SUPER_SECURE_:-)'
 
-      const prnt = true
+      const log = false
 
       let sp: FFelGamal.SystemParameters
       let pk: BN
@@ -19,7 +19,7 @@ describe('ElGamal Finite Field E2E Test', () => {
 
       try {
         ;[sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(p, g)
-        prnt && console.log('p:', sp.p, 'q:', sp.q, 'g:', sp.g, 'pk:', pk, 'sk:', sk)
+        log && console.log('p:', sp.p, 'q:', sp.q, 'g:', sp.g, 'pk:', pk, 'sk:', sk)
       } catch (error) {
         console.error(error)
       }
@@ -60,7 +60,7 @@ describe('ElGamal Finite Field E2E Test', () => {
       // decrypt the sum
       const decryptedSum = FFelGamal.Encryption.decrypt1(encryptedSum, sk, sp)
       const summary = FFelGamal.Voting.getSummary(votes.length, decryptedSum.toNumber())
-      prnt &&
+      log &&
         console.log(
           _result,
           _votes,

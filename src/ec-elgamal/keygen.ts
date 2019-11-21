@@ -68,6 +68,7 @@ export const verifyKeyGenerationProof = (
   h_: CurvePoint,
   id: string
 ): boolean => {
+  const log = false
   const { n, g } = params
   const { c, d } = proof
 
@@ -84,9 +85,9 @@ export const verifyKeyGenerationProof = (
   const bhPowC: CurvePoint = ECmul(b, ECpow(h_, c))
   const dCheck: boolean = gPowd.eq(bhPowC)
 
-  console.log('do the hashes match?\t', hashCheck)
-  console.log('g^d == b * h_^c?\t', dCheck)
-  console.log()
+  log && console.log('do the hashes match?\t', hashCheck)
+  log && console.log('g^d == b * h_^c?\t', dCheck)
+  log && console.log()
 
   return hashCheck && dCheck
 }

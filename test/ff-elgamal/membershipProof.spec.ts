@@ -9,8 +9,8 @@ describe('ElGamal Finite Field NIZKP for Plaintext Membership', () => {
     // generate and verify 10 proofs (with different random variables)
     const test = (p: number, g: number): void => {
       for (let i = 0; i < 10; i++) {
-        const prnt = false
-        prnt && console.log('p:', p, ', g:', g)
+        const log = false
+        log && console.log('p:', p, ', g:', g)
         let sp, pk
         try {
           ;[sp, { h: pk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(p, g)
@@ -20,9 +20,9 @@ describe('ElGamal Finite Field NIZKP for Plaintext Membership', () => {
         }
 
         // yes vote
-        prnt && console.log('yes proof')
+        log && console.log('yes proof')
         const yesVote = 1
-        const yesEnc = FFelGamal.Encryption.encrypt(yesVote, sp, pk, prnt)
+        const yesEnc = FFelGamal.Encryption.encrypt(yesVote, sp, pk, log)
         const yesProof = FFelGamal.MembershipProof.generateYesProof(yesEnc, sp, pk, uniqueID)
 
         const verifiedYesProof = FFelGamal.MembershipProof.verify(
@@ -35,9 +35,9 @@ describe('ElGamal Finite Field NIZKP for Plaintext Membership', () => {
         expect(verifiedYesProof).to.be.true
 
         // no vote
-        prnt && console.log('no proof')
+        log && console.log('no proof')
         const noVote = 0
-        const noEnc = FFelGamal.Encryption.encrypt(noVote, sp, pk, prnt)
+        const noEnc = FFelGamal.Encryption.encrypt(noVote, sp, pk, log)
         const noProof = FFelGamal.MembershipProof.generateNoProof(noEnc, sp, pk, uniqueID)
 
         const verifiedNoProof = FFelGamal.MembershipProof.verify(noEnc, noProof, sp, pk, uniqueID)
