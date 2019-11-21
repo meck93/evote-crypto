@@ -2,7 +2,7 @@ export {}
 import { FFelGamal } from '../../src/index'
 import { expect } from 'chai'
 
-describe('Finite Field ElGamal Vote ZKP', () => {
+describe('ElGamal Finite Field NIZKP for Plaintext Membership', () => {
   it('create and verify proof', () => {
     const uniqueID = '0xAd4E7D8f03904b175a1F8AE0D88154f329ac9329'
 
