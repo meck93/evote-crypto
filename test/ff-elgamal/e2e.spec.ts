@@ -34,27 +34,27 @@ describe('ElGamal Finite Field E2E Test', () => {
           const encYesVote = FFelGamal.Voting.generateYesVote(sp, pk)
           votes.push(encYesVote)
 
-          const encYesProof = FFelGamal.MembershipProof.generateYesProof(encYesVote, sp, pk, id)
+          const encYesProof = FFelGamal.Proof.Membership.generateYesProof(encYesVote, sp, pk, id)
 
-          const validVote = FFelGamal.MembershipProof.verify(encYesVote, encYesProof, sp, pk, id)
+          const validVote = FFelGamal.Proof.Membership.verify(encYesVote, encYesProof, sp, pk, id)
           expect(validVote).to.be.true
         } else {
           const encNoVote = FFelGamal.Voting.generateNoVote(sp, pk)
           votes.push(encNoVote)
 
-          const encNoProof = FFelGamal.MembershipProof.generateNoProof(encNoVote, sp, pk, id)
+          const encNoProof = FFelGamal.Proof.Membership.generateNoProof(encNoVote, sp, pk, id)
 
-          const validVote = FFelGamal.MembershipProof.verify(encNoVote, encNoProof, sp, pk, id)
+          const validVote = FFelGamal.Proof.Membership.verify(encNoVote, encNoProof, sp, pk, id)
           expect(validVote).to.be.true
         }
       }
 
       // homomorphically add all votes and create sum proof
       const encryptedSum = FFelGamal.Voting.addVotes(votes, sp)
-      const sumProof = FFelGamal.DecryptionProof.generate(encryptedSum, sp, sk, govID)
+      const sumProof = FFelGamal.Proof.Decryption.generate(encryptedSum, sp, sk, govID)
 
       // verifiy the sum proof
-      const validSum = FFelGamal.DecryptionProof.verify(encryptedSum, sumProof, sp, pk, govID)
+      const validSum = FFelGamal.Proof.Decryption.verify(encryptedSum, sumProof, sp, pk, govID)
       expect(validSum).to.be.true
 
       // decrypt the sum

@@ -10,7 +10,8 @@
  */
 
 import BN = require('bn.js')
-import { Cipher, Helper, ValidVoteProof, SystemParameters } from './index'
+import { Cipher, Helper, SystemParameters } from '../index'
+import { MembershipProof } from './models'
 
 const web3 = require('web3')
 const printConsole = false
@@ -58,7 +59,7 @@ export function generateYesProof(
   sp: SystemParameters,
   pk: BN,
   uniqueID: string
-): ValidVoteProof {
+): MembershipProof {
   const { a, b, r } = cipher
 
   const c0 = Helper.getSecureRandomValue(sp.q)
@@ -111,7 +112,7 @@ export function generateNoProof(
   sp: SystemParameters,
   pk: BN,
   uniqueID: string
-): ValidVoteProof {
+): MembershipProof {
   const { a, b, r } = cipher
 
   const c1 = Helper.getSecureRandomValue(sp.q)
@@ -153,7 +154,7 @@ export function generateNoProof(
 // recompute the hash and verify
 export function verify(
   cipher: Cipher,
-  proof: ValidVoteProof,
+  proof: MembershipProof,
   sp: SystemParameters,
   pk: BN,
   uniqueID: string

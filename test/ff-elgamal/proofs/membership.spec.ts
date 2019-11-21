@@ -1,6 +1,6 @@
 export {}
 import { expect } from 'chai'
-import { FFelGamal } from '../../src/index'
+import { FFelGamal } from '../../../src/index'
 
 describe('ElGamal Finite Field NIZKP for Plaintext Membership', () => {
   it('create and verify proof', () => {
@@ -23,9 +23,9 @@ describe('ElGamal Finite Field NIZKP for Plaintext Membership', () => {
         log && console.log('yes proof')
         const yesVote = 1
         const yesEnc = FFelGamal.Encryption.encrypt(yesVote, sp, pk, log)
-        const yesProof = FFelGamal.MembershipProof.generateYesProof(yesEnc, sp, pk, uniqueID)
+        const yesProof = FFelGamal.Proof.Membership.generateYesProof(yesEnc, sp, pk, uniqueID)
 
-        const verifiedYesProof = FFelGamal.MembershipProof.verify(
+        const verifiedYesProof = FFelGamal.Proof.Membership.verify(
           yesEnc,
           yesProof,
           sp,
@@ -38,9 +38,9 @@ describe('ElGamal Finite Field NIZKP for Plaintext Membership', () => {
         log && console.log('no proof')
         const noVote = 0
         const noEnc = FFelGamal.Encryption.encrypt(noVote, sp, pk, log)
-        const noProof = FFelGamal.MembershipProof.generateNoProof(noEnc, sp, pk, uniqueID)
+        const noProof = FFelGamal.Proof.Membership.generateNoProof(noEnc, sp, pk, uniqueID)
 
-        const verifiedNoProof = FFelGamal.MembershipProof.verify(noEnc, noProof, sp, pk, uniqueID)
+        const verifiedNoProof = FFelGamal.Proof.Membership.verify(noEnc, noProof, sp, pk, uniqueID)
         expect(verifiedNoProof).to.be.true
       }
     }

@@ -11,7 +11,8 @@
  */
 
 import BN = require('bn.js')
-import { Cipher, Helper, SumProof, SystemParameters } from './index'
+import { Cipher, Helper, SystemParameters } from '../index'
+import { DecryptionProof } from './models'
 
 const web3 = require('web3')
 const printConsole = false
@@ -38,7 +39,7 @@ function generateChallenge(q: BN, uniqueID: string, a: BN, b: BN, a1: BN, b1: BN
 // 3. generate the challenge
 // 3. compute f = x + c * sk (NOTE: mod q!)
 // 4. compute the decryption factor d = a^r
-export function generate(cipher: Cipher, sp: SystemParameters, sk: BN, uniqueID: string): SumProof {
+export function generate(cipher: Cipher, sp: SystemParameters, sk: BN, uniqueID: string): DecryptionProof {
   const { a, b }: Cipher = cipher
 
   const x: BN = Helper.getSecureRandomValue(sp.q)
@@ -57,7 +58,7 @@ export function generate(cipher: Cipher, sp: SystemParameters, sk: BN, uniqueID:
   printConsole && console.log('f = x + c*r\t\t', f.toNumber())
   printConsole && console.log()
 
-  return { a1, b1, f, d } as SumProof
+  return { a1, b1, f, d } as DecryptionProof
 }
 
 // verify a proof for the decryption
@@ -66,13 +67,13 @@ export function generate(cipher: Cipher, sp: SystemParameters, sk: BN, uniqueID:
 // 3. verification g^f == b1 * h^c
 export function verify(
   cipher: Cipher,
-  proof: SumProof,
+  proof: DecryptionProof,
   sp: SystemParameters,
   pk: BN,
   uniqueID: string
 ): boolean {
   const { a, b }: Cipher = cipher
-  const { a1, b1, f, d }: SumProof = proof
+  const { a1, b1, f, d }: DecryptionProof = proof
 
   const c: BN = generateChallenge(sp.q, uniqueID, a, b, a1, b1)
 

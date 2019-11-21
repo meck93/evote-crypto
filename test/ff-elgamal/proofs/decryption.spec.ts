@@ -1,6 +1,6 @@
 export {}
 import { expect } from 'chai'
-import { FFelGamal } from '../../src/index'
+import { FFelGamal } from '../../../src/index'
 
 describe('ElGamal Finite Field NIZKP for Decryption', () => {
   it('create and verify sum proof', () => {
@@ -24,9 +24,9 @@ describe('ElGamal Finite Field NIZKP for Decryption', () => {
         log && console.log(`Sum Proof for Message: ${sum}`)
 
         const sumEnc = FFelGamal.Encryption.encrypt(sum, sp, pk, log)
-        const proof = FFelGamal.DecryptionProof.generate(sumEnc, sp, sk, uniqueID)
+        const proof = FFelGamal.Proof.Decryption.generate(sumEnc, sp, sk, uniqueID)
 
-        const verifiedSumProof = FFelGamal.DecryptionProof.verify(sumEnc, proof, sp, pk, uniqueID)
+        const verifiedSumProof = FFelGamal.Proof.Decryption.verify(sumEnc, proof, sp, pk, uniqueID)
         expect(verifiedSumProof).to.be.true
 
         const decSum = FFelGamal.Encryption.decrypt1(sumEnc, sk, sp, log)

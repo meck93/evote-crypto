@@ -11,7 +11,8 @@
  */
 
 import BN = require('bn.js')
-import { Helper, KeyShareProof, SystemParameters, KeyPair } from './index'
+import { Helper, SystemParameters, KeyPair } from '../index'
+import { KeyGenerationProof } from './models'
 
 const web3 = require('web3')
 const log = false
@@ -30,7 +31,7 @@ export const generate = (
   params: SystemParameters,
   keyPair: KeyPair, // share
   id: string
-): KeyShareProof => {
+): KeyGenerationProof => {
   const { p, q, g } = params
   const { h, sk } = keyPair
 
@@ -49,7 +50,7 @@ export const generate = (
 // 4. verify that: g^d == b * h^c
 export const verify = (
   params: SystemParameters,
-  proof: KeyShareProof,
+  proof: KeyGenerationProof,
   h: BN,
   id: string
 ): boolean => {
