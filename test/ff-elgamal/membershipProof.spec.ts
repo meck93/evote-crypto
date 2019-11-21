@@ -13,7 +13,7 @@ describe('ElGamal Finite Field NIZKP for Plaintext Membership', () => {
         prnt && console.log('p:', p, ', g:', g)
         let sp, pk
         try {
-          ;[sp, { h: pk }] = FFelGamal.Encryption.generateSystemParametersAndKeys(p, g)
+          ;[sp, { h: pk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(p, g)
         } catch (error) {
           console.error(error)
           break

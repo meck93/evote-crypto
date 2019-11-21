@@ -5,7 +5,7 @@ import { expect } from 'chai'
 describe('Finite Field ElGamal Voting', () => {
   it('vote', () => {
     const vote = (_result: number, _votes: number[]): void => {
-      const [sp, { h: pk, sk }] = FFelGamal.Encryption.generateSystemParametersAndKeys(137, 51)
+      const [sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(137, 51)
 
       const log = false
 

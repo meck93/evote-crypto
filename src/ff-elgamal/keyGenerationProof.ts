@@ -1,4 +1,4 @@
-import { Cipher, Encryption, Helper, KeyShareProof, SystemParameters, KeyPair } from './index'
+import { Helper, KeyShareProof, SystemParameters, KeyPair } from './index'
 import BN = require('bn.js')
 
 const web3 = require('web3')
@@ -59,32 +59,4 @@ export const verify = (
   log && console.log()
 
   return hashCheck && dCheck
-}
-
-export const combinePublicKeys = (params: SystemParameters, publicKeyShares: BN[]): BN => {
-  return publicKeyShares.reduce((product, share) => Helper.BNmul(product, share, params.p))
-}
-
-// NOTE: this should not be used as the distributed secret keys will become "useless"
-// it is only used for testing purpose
-export const combinePrivateKeys = (params: SystemParameters, privateKeyShares: BN[]): BN => {
-  return privateKeyShares.reduce((sum, share) => Helper.BNadd(sum, share, params.q))
-}
-
-export const decryptShare = (params: SystemParameters, cipher: Cipher, secretKeyShare: BN): BN => {
-  return Helper.BNpow(cipher.a, secretKeyShare, params.p)
-}
-
-export const combineDecryptedShares = (
-  params: SystemParameters,
-  cipher: Cipher,
-  decryptedShares: BN[]
-): BN => {
-  const mh = Helper.BNdiv(
-    cipher.b,
-    decryptedShares.reduce((product, share) => Helper.BNmul(product, share, params.p)),
-    params.p
-  )
-
-  return Encryption.decodeMessage(mh, params)
 }

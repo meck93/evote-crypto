@@ -1,10 +1,19 @@
-import * as Encryption from './encryption'
-import * as Voting from './voting'
-import * as MembershipProof from './membershipProof'
 import * as DecryptionProof from './decryptionProof'
+import * as Encryption from './encryption'
 import * as Helper from './helper'
 import * as KeyGenerationProof from './keyGenerationProof'
-export { Encryption, Voting, MembershipProof, DecryptionProof, Helper, KeyGenerationProof }
+import * as MembershipProof from './membershipProof'
+import * as SystemSetup from './systemSetup'
+import * as Voting from './voting'
+export {
+  DecryptionProof,
+  Encryption,
+  Helper,
+  KeyGenerationProof,
+  MembershipProof,
+  SystemSetup,
+  Voting,
+}
 
 import {
   Cipher,

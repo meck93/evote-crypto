@@ -1,10 +1,11 @@
 export {}
 import { FFelGamal } from '../../src/index'
+import { newBN } from '../../src/ff-elgamal/helper'
 import { expect } from 'chai'
 
 describe('Finite Field ElGamal Encryption', () => {
   it('should encode a message', () => {
-    const sp = FFelGamal.Encryption.generateSystemParameters(11, 3)
+    const sp = FFelGamal.SystemSetup.generateSystemParameters(11, 3)
 
     const values = [
       { decoded: 0, encoded: 1 },
@@ -29,7 +30,7 @@ describe('Finite Field ElGamal Encryption', () => {
   })
 
   it('should decode an encoded message', () => {
-    const sp = FFelGamal.Encryption.generateSystemParameters(11, 3)
+    const sp = FFelGamal.SystemSetup.generateSystemParameters(11, 3)
 
     const values = [
       { decoded: 0, encoded: 1 },
@@ -56,7 +57,7 @@ describe('Finite Field ElGamal Encryption', () => {
 
   it('compare decryption implementations', () => {
     const prnt = false
-    const [sp, { h: pk, sk }] = FFelGamal.Encryption.generateSystemParametersAndKeys(11, 3)
+    const [sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(11, 3)
 
     const message = FFelGamal.Helper.getSecureRandomValue(sp.q)
     for (let i = 0; i < 10; i++) {
@@ -80,7 +81,7 @@ describe('Finite Field ElGamal Encryption', () => {
 
   it('homomorphic addition', () => {
     for (let i = 0; i < 10; i++) {
-      const [sp, { h: pk, sk }] = FFelGamal.Encryption.generateSystemParametersAndKeys(137, 51)
+      const [sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(137, 51)
 
       // generate random messages of max size q = (p - 1)/2
       // so that the sum is max p-1

@@ -1,6 +1,5 @@
 export {}
 import { FFelGamal } from '../../src/index'
-import { getSecureRandomValue } from '../../src/ff-elgamal/helper'
 import { expect } from 'chai'
 
 describe('ElGamal Finite Field NIZKP for Decryption', () => {
@@ -13,7 +12,7 @@ describe('ElGamal Finite Field NIZKP for Decryption', () => {
         const prnt = false
         let sp, pk, sk
         try {
-          ;[sp, { h: pk, sk }] = FFelGamal.Encryption.generateSystemParametersAndKeys(p, g)
+          ;[sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(p, g)
           prnt && console.log('p:', sp.p, 'q:', sp.q, 'g:', sp.g)
         } catch (error) {
           console.error(error)
@@ -21,7 +20,7 @@ describe('ElGamal Finite Field NIZKP for Decryption', () => {
         }
 
         // sum
-        const sum = getSecureRandomValue(sp.q)
+        const sum = FFelGamal.Helper.getSecureRandomValue(sp.q)
         prnt && console.log(`Sum Proof for Message: ${sum}`)
 
         const sumEnc = FFelGamal.Encryption.encrypt(sum, sp, pk, prnt)

@@ -1,61 +1,6 @@
 import { Cipher, Helper, SystemParameters, KeyPair } from './index'
 import BN = require('bn.js')
 
-export const generateSystemParameters = (p: number, g: number): SystemParameters => {
-  return {
-    p: Helper.newBN(p),
-    q: Helper.newBN(Helper.getQofP(p)),
-    g: Helper.newBN(g),
-  }
-}
-
-export const generateKeyPair = (sp: SystemParameters): KeyPair => {
-  const sk = Helper.getSecureRandomValue(sp.q) // pick a random value in Z_q
-  const h = Helper.BNpow(sp.g, sk, sp.p) // compute public key h: g^sk mod p
-  return { h, sk }
-}
-
-export const generateSystemParametersAndKeys = (
-  p: number,
-  g: number
-): [SystemParameters, KeyPair] => {
-  const sysParams = generateSystemParameters(p, g)
-  const keyPair = generateKeyPair(sysParams)
-  return [sysParams, keyPair]
-}
-
-export const generateSystemParametersAndKeysZKP = (
-  _p: number,
-  _g: number
-): [SystemParameters, KeyPair] => {
-  const sysParams = generateSystemParameters(_p, _g)
-  const keyPair = generateKeyPair(sysParams)
-
-  // verify that g^q mod p == 1 (this means: gcd(q,p) == 1)
-  const test1 = Helper.BNpow(sysParams.g, sysParams.q, sysParams.p)
-  if (!test1.eq(Helper.newBN(1))) {
-    throw new Error(
-      `g^q mod p != 1 (== ${test1.toNumber()}. for p: ${_p}, q: ${sysParams.q.toNumber()} and g: ${_g}`
-    )
-  }
-
-  // verify that h^q mod p == 1 (this means: gcd(h,p) == 1)
-  const test2 = Helper.BNpow(keyPair.h, sysParams.q, sysParams.p)
-  if (!test2.eq(Helper.newBN(1))) {
-    throw new Error(
-      `h^q mod p != 1 (== ${test2.toNumber()}. for p: ${_p}, q: ${sysParams.q.toNumber()} and g: ${_g}`
-    )
-  }
-
-  // verify that the public key h is not 1
-  const test3 = keyPair.h.mod(sysParams.p)
-  if (test3.eq(Helper.newBN(1))) {
-    throw new Error(`h mod p == 1. for p: ${_p}, q: ${sysParams.q.toNumber()} and g: ${_g}`)
-  }
-
-  return [sysParams, keyPair]
-}
-
 export const encodeMessage = (m: number | BN, sysParams: SystemParameters): BN => {
   m = typeof m === 'number' ? Helper.newBN(m) : m
   return Helper.BNpow(sysParams.g, m, sysParams.p)
@@ -189,4 +134,22 @@ export const add = (em1: Cipher, em2: Cipher, sysParams: SystemParameters): Ciph
     a: Helper.BNmul(em1.a, em2.a, sysParams.p),
     b: Helper.BNmul(em1.b, em2.b, sysParams.p),
   }
+}
+
+export const decryptShare = (params: SystemParameters, cipher: Cipher, secretKeyShare: BN): BN => {
+  return Helper.BNpow(cipher.a, secretKeyShare, params.p)
+}
+
+export const combineDecryptedShares = (
+  params: SystemParameters,
+  cipher: Cipher,
+  decryptedShares: BN[]
+): BN => {
+  const mh = Helper.BNdiv(
+    cipher.b,
+    decryptedShares.reduce((product, share) => Helper.BNmul(product, share, params.p)),
+    params.p
+  )
+
+  return decodeMessage(mh, params)
 }

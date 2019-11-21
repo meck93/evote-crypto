@@ -19,7 +19,7 @@ describe('ElGamal Finite Field E2E Test', () => {
       let sk: BN
 
       try {
-        [sp, { h: pk, sk }] = FFelGamal.Encryption.generateSystemParametersAndKeys(p, g)
+        [sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(p, g)
         prnt && console.log('p:', sp.p, 'q:', sp.q, 'g:', sp.g, 'pk:', pk, 'sk:', sk)
       } catch (error) {
         console.error(error)
