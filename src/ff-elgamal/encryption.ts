@@ -1,11 +1,24 @@
-import { Cipher, Helper, SystemParameters, KeyPair } from './index'
+/**
+ * Encryption
+ * 
+ * ElGamal Finite Field Encryption
+ * - encode and decode messages
+ * - encrypt and decrypt messages
+ * - homomorphically add encrypted messages
+ * - decrypt cipher texts with a private key share
+ * - combine decrypted shares
+ */
+
+import { Cipher, Helper, SystemParameters } from './index'
 import BN = require('bn.js')
 
+// encode a message m to g^m
 export const encodeMessage = (m: number | BN, sysParams: SystemParameters): BN => {
   m = typeof m === 'number' ? Helper.newBN(m) : m
   return Helper.BNpow(sysParams.g, m, sysParams.p)
 }
 
+// decode a message g^m to m
 // TODO: use baby-step giant-step instead of brute force
 export const decodeMessage = (mh: number | BN, sysParams: SystemParameters): BN => {
   mh = typeof mh === 'number' ? Helper.newBN(mh) : mh
@@ -23,10 +36,10 @@ export const decodeMessage = (mh: number | BN, sysParams: SystemParameters): BN 
 // Finite Field ElGamal Encryption
 //
 // given:
+// - p: prime number
 // - g: generator
 // - h: public key (g^privateKey)
 // - m: message
-// (- p: prime number)
 //
 // steps:
 // 1. pick random value r: 0 < r < p
@@ -61,10 +74,10 @@ export const encrypt = (
 // Finite Field ElGamal Decryption
 //
 // given:
+// - p: prime number
 // - g: generator
 // - x: private key
 // - c1,c2: cipher
-// (- p: prime number)
 //
 // steps:
 // 1. compute s = c1^x
@@ -96,10 +109,10 @@ export const decrypt1 = (
 // Finite Field ElGamal Decryption Alternative (using Euler's Theorem)
 //
 // given:
+// - p: prime number
 // - g: generator
 // - x: private key
 // - c1,c2: cipher
-// (- p: prime number)
 //
 // steps:
 // 1. compute s = c1^x
@@ -129,6 +142,7 @@ export const decrypt2 = (
   return m
 }
 
+// homomorphic addition
 export const add = (em1: Cipher, em2: Cipher, sysParams: SystemParameters): Cipher => {
   return {
     a: Helper.BNmul(em1.a, em2.a, sysParams.p),
@@ -136,10 +150,12 @@ export const add = (em1: Cipher, em2: Cipher, sysParams: SystemParameters): Ciph
   }
 }
 
+// decrypt a cipher text with a private key share
 export const decryptShare = (params: SystemParameters, cipher: Cipher, secretKeyShare: BN): BN => {
   return Helper.BNpow(cipher.a, secretKeyShare, params.p)
 }
 
+// combine decrypted shares
 export const combineDecryptedShares = (
   params: SystemParameters,
   cipher: Cipher,

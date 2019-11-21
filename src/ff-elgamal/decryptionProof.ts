@@ -1,3 +1,15 @@
+/**
+ * Decryption Proof
+ *
+ * ElGamal Finite Field Non-Interactive Zero-Knowledge Proof for Decryption
+ * Using the Chaum-Pedersen Proof
+ * 
+ * Proving that the decryption is done using the corresponding private key to the
+ * public key used for the encryption.
+ * 
+ * - generate and verify proofs
+ */
+
 import { Cipher, Helper, SumProof, SystemParameters } from './index'
 import BN = require('bn.js')
 
@@ -9,39 +21,33 @@ const add = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNadd(a, b, sp.q)
 const mul = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNmul(a, b, sp.p)
 const pow = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNpow(a, b, sp.p)
 
-export function generateChallenge(q: BN, uniqueID: string, a: BN, b: BN, a1: BN, b1: BN): BN {
+// TODO: check paper https://eprint.iacr.org/2016/771.pdf why we should not hash a and b
+function generateChallenge(q: BN, uniqueID: string, a: BN, b: BN, a1: BN, b1: BN): BN {
   let c = web3.utils.soliditySha3(uniqueID, a, b, a1, b1)
   c = web3.utils.toBN(c)
   c = c.mod(q)
   return c
 }
 
-// Generates a proof for the valid sum.
-export function generate(
-  cipher: Cipher,
-  sp: SystemParameters,
-  sk: BN,
-  uniqueID: string
-): SumProof {
-  // a = g^r, b = public_key i.e. h^r*g^m
+// generate a proof for the decryption
+// given:
+// - a,b: cipher (a = g^r, b = h^r*g^m)
+// steps:
+// 1. generate random value x
+// 2. compute (a1, b1) = (a^x, g^x)
+// 3. generate the challenge
+// 3. compute f = x + c * sk (NOTE: mod q!)
+// 4. compute the decryption factor d = a^r
+export function generate(cipher: Cipher, sp: SystemParameters, sk: BN, uniqueID: string): SumProof {
   const { a, b }: Cipher = cipher
 
-  // generate random value
   const x: BN = Helper.getSecureRandomValue(sp.q)
 
-  // (a1, b1) = (a^x, g^x)
   const a1: BN = pow(a, x, sp)
   const b1: BN = pow(sp.g, x, sp)
 
-  // generate the challenge
-  // TODO: check paper https://eprint.iacr.org/2016/771.pdf why we should not hash a and b
   const c: BN = generateChallenge(sp.q, uniqueID, a, b, a1, b1)
-
-  // compute f = x + c * sk (NOTE: mod q!)
-  const cr: BN = c.mul(sk).mod(sp.q)
-  const f: BN = add(x, cr, sp)
-
-  // compute the decryption factor
+  const f: BN = add(x, c.mul(sk).mod(sp.q), sp)
   const d: BN = pow(a, sk, sp)
 
   printConsole && console.log('x\t\t\t', x.toNumber())
@@ -54,6 +60,10 @@ export function generate(
   return { a1, b1, f, d } as SumProof
 }
 
+// verify a proof for the decryption
+// 1. recompute the challenge
+// 2. verification a^f == a1 * d^c
+// 3. verification g^f == b1 * h^c
 export function verify(
   cipher: Cipher,
   proof: SumProof,
@@ -64,15 +74,12 @@ export function verify(
   const { a, b }: Cipher = cipher
   const { a1, b1, f, d }: SumProof = proof
 
-  // recompute the challenge
   const c: BN = generateChallenge(sp.q, uniqueID, a, b, a1, b1)
 
-  // verification a^f == a1 * d^c
   const l1: BN = pow(a, f, sp)
   const r1: BN = mul(a1, pow(d, c, sp), sp)
   const v1: boolean = l1.eq(r1)
 
-  // verification g^f == b1 * h^c
   const l2: BN = pow(sp.g, f, sp)
   const r2: BN = mul(b1, pow(pk, c, sp), sp)
   const v2: boolean = l2.eq(r2)

@@ -1,3 +1,14 @@
+/**
+ * Membership Proof
+ *
+ * ElGamal Finite Field Non-Interactive Zero-Knowledge Proof for Plaintext Membership
+ * Using the Disjunctive Chaum-Pedersen Proof
+ *
+ * Proof that one of two statements is true without revealing which one.
+ *
+ * - generate and verify proofs
+ */
+
 import { Cipher, Helper, ValidVoteProof, SystemParameters } from './index'
 import BN = require('bn.js')
 
@@ -11,7 +22,8 @@ const mul = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNmul(a, b, sp.p)
 const div = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNdiv(a, b, sp.p)
 const pow = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNpow(a, b, sp.p)
 
-export function generateChallenge(
+// TODO: check paper https://eprint.iacr.org/2016/771.pdf why we should not hash a and b
+function generateChallenge(
   q: BN,
   uniqueID: string,
   a: BN,
@@ -28,40 +40,41 @@ export function generateChallenge(
   return c
 }
 
-// Generates a proof for an encrypted yes vote.
+// generate a proof for an encrypted yes vote
+// given:
+// - cipher (a,b) = (g^r, h^r*g^m)
+// - random value r used to encrypt the message
+// steps:
+// 1. generate fake values c0,f0 for m=0 (random values in Z_q)
+// 2. compute fake (a0,b0) = (g^f0 / a^c0, h^f0 / b^c0)
+// 3. generate proof for m=1
+//    3.1 generate a random value x in Z_q
+//    3.2 compute (a1,b1) =  (g^x, h^x)
+// 4. generate the challenge c
+// 5. compute c1 = c - c0
+// 6. compute f1 = x + c1 * r (NOTE: mod q!)
 export function generateYesProof(
   cipher: Cipher,
   sp: SystemParameters,
   pk: BN,
   uniqueID: string
 ): ValidVoteProof {
-  // a = g^r, b = public_key i.e. h^r*g^m
   const { a, b, r } = cipher
 
-  // generate fake values for m=0
   const c0 = Helper.getSecureRandomValue(sp.q)
   const f0 = Helper.getSecureRandomValue(sp.q)
 
-  // compute fake a0. (a,b) = (a,b)
   const a0 = div(pow(sp.g, f0, sp), pow(a, c0, sp), sp)
-
-  // compute fake b0. (a,b) = (a,b)
   const b0 = div(pow(pk, f0, sp), pow(b, c0, sp), sp)
 
-  // generate proof for m=1
   const x = Helper.getSecureRandomValue(sp.q)
-
   const a1 = pow(sp.g, x, sp)
   const b1 = pow(pk, x, sp)
 
-  // generate the challenge
-  // TODO: check paper https://eprint.iacr.org/2016/771.pdf why we should not hash a and b
   const c = generateChallenge(sp.q, uniqueID, a, b, a0, b0, a1, b1)
   const c1 = add(sp.q, sub(c, c0, sp), sp)
 
-  // compute f1 = x + c1 * r (NOTE: mod q!)
-  const c1r = c1.mul(r as BN).mod(sp.q)
-  const f1 = add(x, c1r, sp)
+  const f1 = add(x, c1.mul(r as BN).mod(sp.q), sp)
 
   printConsole && console.log('c0\t\t\t', c0.toNumber())
   printConsole && console.log('f0\t\t\t', f0.toNumber())
@@ -75,43 +88,47 @@ export function generateYesProof(
   printConsole && console.log('f1 = x + c1*r\t\t', f1.toNumber())
   printConsole && console.log()
 
+  // TODO: proof is only c0,c1 f0,f1 (recompute a0,a1 and b0,b1 during the verification)
   return { a0, a1, b0, b1, c0, c1, f0, f1 }
 }
 
-// Generates a proof for an encrypted no vote.
+// generate a proof for an encrypted no vote
+// given:
+// - cipher (a,b) = (g^r, h^r*g^m)
+// - random value r used to encrypt the message
+// steps:
+// 1. generate fake values c1,f1 for m=1 (random values in Z_q)
+// 2. compute fake b_ = b/g
+// 3. compute fake (a1,b1) = (g^f1 / a^c1, h^f1 / b^c1)
+// 4. generate proof for m=0
+//    4.1 generate a random value x in Z_q
+//    4.2 compute (a0,b0) =  (g^x, h^x)
+// 5. generate the challenge c
+// 6. compute c0 = q + c-c1
+// 7. compute f0 = x + c0 * r (NOTE: mod q!)
 export function generateNoProof(
   cipher: Cipher,
   sp: SystemParameters,
   pk: BN,
   uniqueID: string
 ): ValidVoteProof {
-  // a = g^r, b = public_key i.e. h^r*g^m
   const { a, b, r } = cipher
 
-  // generate fake values for m=1
   const c1 = Helper.getSecureRandomValue(sp.q)
   const f1 = Helper.getSecureRandomValue(sp.q)
 
-  // compute fake b
   const b_ = div(b, sp.g, sp)
 
-  // compute fake a1
   const a1 = div(pow(sp.g, f1, sp), pow(a, c1, sp), sp)
-
-  // compute fake b1
   const b1 = div(pow(pk, f1, sp), pow(b_, c1, sp), sp)
 
-  // generate proof for m=0
   const x = Helper.getSecureRandomValue(sp.q)
   const a0 = pow(sp.g, x, sp)
   const b0 = pow(pk, x, sp)
 
-  // generate the challenge
-  // TODO: check paper https://eprint.iacr.org/2016/771.pdf why we should not hash a and b
   const c = generateChallenge(sp.q, uniqueID, a, b, a0, b0, a1, b1)
   const c0 = add(sp.q, sub(c, c1, sp), sp)
 
-  // compute f0 = x + c0 * r (NOTE: mod q!)
   const f0 = add(x, c0.mul(r as BN).mod(sp.q), sp)
 
   printConsole && console.log('c0\t\t\t', c0.toNumber())
@@ -129,6 +146,11 @@ export function generateNoProof(
   return { a0, a1, b0, b1, c0, c1, f0, f1 }
 }
 
+// verification g^f0 == a0*a^c0
+// verification g^f1 == a1*a^c1
+// verification h^f0 == b0 * b^c0
+// verification h^f1 == b1 * (b/g)^c1
+// recompute the hash and verify
 export function verify(
   cipher: Cipher,
   proof: ValidVoteProof,
@@ -139,31 +161,14 @@ export function verify(
   const { a, b } = cipher
   const { a0, a1, b0, b1, c0, c1, f0, f1 } = proof
 
-  // verification g^f0 == a0*a^c0
-  const l1 = pow(sp.g, f0, sp)
-  const r1 = mul(a0, pow(a, c0, sp), sp)
-  const v1 = l1.eq(r1)
-
-  // verification g^f1 == a1*a^c1
-  const l2 = pow(sp.g, f1, sp)
-  const r2 = mul(a1, pow(a, c1, sp), sp)
-  const v2 = l2.eq(r2)
-
-  // verification h^f0 == b0 * b^c0
-  const l3 = pow(pk, f0, sp)
-  const r3 = mul(b0, pow(b, c0, sp), sp)
-  const v3 = l3.eq(r3)
-
-  // verification h^f1 == b1 * (b/g)^c1
-  const l4 = pow(pk, f1, sp)
-  const r4 = mul(b1, pow(div(b, sp.g, sp), c1, sp), sp)
-  const v4 = l4.eq(r4)
-
-  // recompute the hash and verify
-  const lc = c1.add(c0).mod(sp.q)
-
-  const rc = generateChallenge(sp.q, uniqueID, a, b, a0, b0, a1, b1)
-  const v5 = lc.eq(rc)
+  const v1 = pow(sp.g, f0, sp).eq(mul(a0, pow(a, c0, sp), sp))
+  const v2 = pow(sp.g, f1, sp).eq(mul(a1, pow(a, c1, sp), sp))
+  const v3 = pow(pk, f0, sp).eq(mul(b0, pow(b, c0, sp), sp))
+  const v4 = pow(pk, f1, sp).eq(mul(b1, pow(div(b, sp.g, sp), c1, sp), sp))
+  const v5 = c1
+    .add(c0)
+    .mod(sp.q)
+    .eq(generateChallenge(sp.q, uniqueID, a, b, a0, b0, a1, b1))
 
   printConsole && console.log('g^f0 == a0*a^c0:\t', v1)
   printConsole && console.log('g^f1 == a1*a^c1\t', v2)
