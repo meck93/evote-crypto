@@ -1,9 +1,8 @@
 export {}
-import { FFelGamal } from '../../src/index'
-import { expect } from 'chai'
-
-//import { primes as primes2 } from './primes.spec'
 import BN = require('bn.js')
+import { expect } from 'chai'
+import { FFelGamal } from '../../src/index'
+//import { primes as primes2 } from './primes.spec'
 
 const Helper = FFelGamal.Helper
 

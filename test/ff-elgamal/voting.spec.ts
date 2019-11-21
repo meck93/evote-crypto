@@ -1,6 +1,6 @@
 export {}
-import { FFelGamal } from '../../src/index'
 import { expect } from 'chai'
+import { FFelGamal } from '../../src/index'
 
 describe('Finite Field ElGamal Voting', () => {
   it('vote', () => {

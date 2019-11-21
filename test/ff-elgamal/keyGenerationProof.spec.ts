@@ -1,7 +1,6 @@
 export {}
-import { FFelGamal } from '../../src/index'
-import { newBN } from '../../src/ff-elgamal/helper'
 import { expect } from 'chai'
+import { FFelGamal } from '../../src/index'
 
 describe('ElGamal Finite Field NIZKP for Key Generation', () => {
   it('generate and verify (distributed) key share', () => {
@@ -61,8 +60,7 @@ describe('ElGamal Finite Field NIZKP for Key Generation', () => {
       share1,
       uniqueId1
     )
-    expect(FFelGamal.KeyGenerationProof.verify(sp, proof1, share1.h, uniqueId1)).to.be
-      .true
+    expect(FFelGamal.KeyGenerationProof.verify(sp, proof1, share1.h, uniqueId1)).to.be.true
 
     // second authority
     // generate the public and private key share and the key generation proof
@@ -73,8 +71,7 @@ describe('ElGamal Finite Field NIZKP for Key Generation', () => {
       share2,
       uniqueId2
     )
-    expect(FFelGamal.KeyGenerationProof.verify(sp, proof2, share2.h, uniqueId2)).to.be
-      .true
+    expect(FFelGamal.KeyGenerationProof.verify(sp, proof2, share2.h, uniqueId2)).to.be.true
 
     prnt && console.log('1: pk, sk', share1.h.toNumber(), share1.sk.toNumber())
     prnt && console.log('2: pk, sk', share2.h.toNumber(), share2.sk.toNumber())
@@ -87,7 +84,7 @@ describe('ElGamal Finite Field NIZKP for Key Generation', () => {
     prnt && console.log('sk', privateKey.toNumber())
 
     // encrypt some message
-    const plaintext = newBN(3)
+    const plaintext = FFelGamal.Helper.newBN(3)
     const cipherText = FFelGamal.Encryption.encrypt(plaintext, sp, publicKey)
 
     prnt && console.log('plaintext', plaintext.toNumber())

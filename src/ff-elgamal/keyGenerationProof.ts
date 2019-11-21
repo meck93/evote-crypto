@@ -10,8 +10,8 @@
  * - generate and verify proofs
  */
 
- import { Helper, KeyShareProof, SystemParameters, KeyPair } from './index'
 import BN = require('bn.js')
+import { Helper, KeyShareProof, SystemParameters, KeyPair } from './index'
 
 const web3 = require('web3')
 const log = false

@@ -1,6 +1,6 @@
 export {}
-import { FFelGamal } from '../../src/index'
 import { expect } from 'chai'
+import { FFelGamal } from '../../src/index'
 
 describe('ElGamal Finite Field NIZKP for Decryption', () => {
   it('create and verify sum proof', () => {

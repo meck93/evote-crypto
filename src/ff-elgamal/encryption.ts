@@ -1,6 +1,6 @@
 /**
  * Encryption
- * 
+ *
  * ElGamal Finite Field Encryption
  * - encode and decode messages
  * - encrypt and decrypt messages
@@ -9,8 +9,8 @@
  * - combine decrypted shares
  */
 
-import { Cipher, Helper, SystemParameters } from './index'
 import BN = require('bn.js')
+import { Cipher, Helper, SystemParameters } from './index'
 
 // encode a message m to g^m
 export const encodeMessage = (m: number | BN, sysParams: SystemParameters): BN => {

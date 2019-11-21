@@ -1,8 +1,7 @@
 export {}
-import { FFelGamal } from '../../src/index'
-import { expect } from 'chai'
-import { SystemParameters } from '../../src/ff-elgamal'
 import BN = require('bn.js')
+import { expect } from 'chai'
+import { FFelGamal } from '../../src/index'
 
 const random = require('random')
 const web3 = require('web3')
@@ -14,12 +13,12 @@ describe('ElGamal Finite Field E2E Test', () => {
 
       const prnt = true
 
-      let sp: SystemParameters;
+      let sp: FFelGamal.SystemParameters
       let pk: BN
       let sk: BN
 
       try {
-        [sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(p, g)
+        ;[sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(p, g)
         prnt && console.log('p:', sp.p, 'q:', sp.q, 'g:', sp.g, 'pk:', pk, 'sk:', sk)
       } catch (error) {
         console.error(error)

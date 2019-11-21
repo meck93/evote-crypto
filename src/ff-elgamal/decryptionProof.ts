@@ -3,15 +3,15 @@
  *
  * ElGamal Finite Field Non-Interactive Zero-Knowledge Proof for Decryption
  * Using the Chaum-Pedersen Proof
- * 
+ *
  * Proving that the decryption is done using the corresponding private key to the
  * public key used for the encryption.
- * 
+ *
  * - generate and verify proofs
  */
 
-import { Cipher, Helper, SumProof, SystemParameters } from './index'
 import BN = require('bn.js')
+import { Cipher, Helper, SumProof, SystemParameters } from './index'
 
 const web3 = require('web3')
 const printConsole = false

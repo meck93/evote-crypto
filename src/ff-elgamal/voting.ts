@@ -1,7 +1,6 @@
+import BN = require('bn.js')
 import { Summary } from '../index'
 import { Cipher, Encryption, Helper, SystemParameters } from './index'
-
-import BN = require('bn.js')
 
 export const generateYesVote = (sp: SystemParameters, pk: BN): Cipher =>
   Encryption.encrypt(1, sp, pk)

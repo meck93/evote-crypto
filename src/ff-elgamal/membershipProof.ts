@@ -9,8 +9,8 @@
  * - generate and verify proofs
  */
 
-import { Cipher, Helper, ValidVoteProof, SystemParameters } from './index'
 import BN = require('bn.js')
+import { Cipher, Helper, ValidVoteProof, SystemParameters } from './index'
 
 const web3 = require('web3')
 const printConsole = false

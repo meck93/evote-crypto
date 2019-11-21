@@ -1,7 +1,6 @@
 export {}
-import { FFelGamal } from '../../src/index'
-import { newBN } from '../../src/ff-elgamal/helper'
 import { expect } from 'chai'
+import { FFelGamal } from '../../src/index'
 
 describe('Finite Field ElGamal Encryption', () => {
   it('should encode a message', () => {
