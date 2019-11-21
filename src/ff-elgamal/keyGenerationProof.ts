@@ -11,7 +11,7 @@ export const generateChallenge = (q: BN, uniqueID: string, h_: BN, b: BN): BN =>
   return c
 }
 
-export const generateKeyGenerationProof = (
+export const generate = (
   params: SystemParameters,
   keyPair: KeyPair, // share
   id: string
@@ -33,7 +33,7 @@ export const generateKeyGenerationProof = (
   return { c: c, d: d }
 }
 
-export const verifyKeyGenerationProof = (
+export const verify = (
   params: SystemParameters,
   proof: KeyShareProof,
   h_: BN,
