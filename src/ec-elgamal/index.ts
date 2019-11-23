@@ -4,7 +4,8 @@ import * as VoteZKP from './voteZKP'
 import * as SumZKP from './sumZKP'
 import * as Helper from './helper'
 import * as KeyGeneration from './keygen'
-export { Encryption, Voting, VoteZKP, SumZKP, Helper, KeyGeneration }
+import * as Curve from './activeCurve'
+export { Encryption, Voting, VoteZKP, SumZKP, Helper, KeyGeneration, Curve }
 
 import {
   Cipher,
