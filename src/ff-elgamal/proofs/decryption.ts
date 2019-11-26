@@ -39,7 +39,12 @@ function generateChallenge(q: BN, uniqueID: string, a: BN, b: BN, a1: BN, b1: BN
 // 3. generate the challenge
 // 3. compute f = x + c * sk (NOTE: mod q!)
 // 4. compute the decryption factor d = a^r
-export function generate(cipher: Cipher, sp: SystemParameters, sk: BN, uniqueID: string): DecryptionProof {
+export function generate(
+  cipher: Cipher,
+  sp: SystemParameters,
+  sk: BN,
+  uniqueID: string
+): DecryptionProof {
   const { a, b }: Cipher = cipher
 
   const x: BN = Helper.getSecureRandomValue(sp.q)
