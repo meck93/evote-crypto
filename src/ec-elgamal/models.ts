@@ -46,13 +46,6 @@ export interface ValidVoteProof {
   f1: BN
 }
 
-export interface SumProof {
-  a1: CurvePoint
-  b1: CurvePoint
-  f: BN
-  d: CurvePoint
-}
-
 export interface KeyShareProof {
   c: BN
   d: BN

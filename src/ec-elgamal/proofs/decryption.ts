@@ -1,27 +1,10 @@
-import { ECParams, CurvePoint, Cipher, SumProof } from './models'
-import { ECelGamal } from '../index'
-import { ECmul, ECpow, BNmul, BNadd } from './helper'
-
 import BN = require('bn.js')
-import { activeCurve } from './activeCurve'
+import { ECParams, CurvePoint, Cipher } from '../models'
+import { ECmul, ECpow, BNmul, BNadd } from '../helper'
 
-const log = false
-
-// fix type of point to be CurvePoint => requires all other to be ShortPoint
-export function convertECPointToString(point: CurvePoint): string {
-  const pointAsJSON = point.toJSON()
-  const Px = (pointAsJSON[0] as BN).toString('hex')
-  const Py = (pointAsJSON[1] as BN).toString('hex')
-  return Px + Py
-}
-
-export function convertAllECPointsToString(points: CurvePoint[]): string {
-  let asString = ''
-  for (const point of points) {
-    asString += convertECPointToString(point)
-  }
-  return asString
-}
+import { activeCurve } from '../activeCurve'
+import { DecryptionProof } from './models'
+import { Helper } from '../index'
 
 export function generateChallenge(
   n: BN,
@@ -31,7 +14,7 @@ export function generateChallenge(
   a1: CurvePoint,
   b1: CurvePoint
 ): BN {
-  const pointsAsString: string = convertAllECPointsToString([a, b, a1, b1])
+  const pointsAsString: string = Helper.curvePointsToString([a, b, a1, b1])
   const input = id + pointsAsString
 
   let c = activeCurve
@@ -45,31 +28,30 @@ export function generateChallenge(
   return c
 }
 
-export const generateSumProof = (
-  encryptedVote: Cipher,
+// generate a proof for the decryption
+// steps:
+// 1. generate random value x
+// 2. compute (a1, b1) = (a^x, g^x)
+// 3. generate the challenge
+// 4. compute f = x + c * sk (NOTE: mod q!)
+// 5. compute the decryption factor d = a^r
+export const generate = (
+  cipher: Cipher,
   params: ECParams,
   sk: BN,
-  id: string
-): SumProof => {
-  // a = g^r, b = public_key i.e. h^r*g^m
-  const { a, b } = encryptedVote
+  id: string,
+  log = false
+): DecryptionProof => {
+  const { a, b } = cipher
   const { g, n } = params
 
-  // generate random value
-  const x: BN = ECelGamal.Helper.getSecureRandomValue(n)
+  const x: BN = Helper.getSecureRandomValue(n)
 
-  // (a1, b1) = (a^x, g^x)
   const a1 = ECpow(a, x)
   const b1 = ECpow(g, x)
 
-  // generate the challenge
   const c = generateChallenge(n, id, a, b, a1, b1)
-
-  // compute f = x + c * sk (NOTE: mod q!)
-  const cr = BNmul(c, sk, n)
-  const f = BNadd(x, cr, n)
-
-  // comute the decryption factor
+  const f = BNadd(x, BNmul(c, sk, n), n)
   const d = ECpow(a, sk)
 
   log && console.log('a1 is on the curve?\t', activeCurve.curve.validate(a1))
@@ -86,26 +68,28 @@ export const generateSumProof = (
   return { a1, b1, f, d }
 }
 
-export const verifySumProof = (
+// verify a proof for the decryption
+// 1. recompute the challenge
+// 2. verification a^f == a1 * d^c
+// 3. verification g^f == b1 * h^c
+export const verify = (
   encryptedSum: Cipher,
-  proof: SumProof,
+  proof: DecryptionProof,
   params: ECParams,
   pk: CurvePoint,
-  id: string
+  id: string,
+  log = false
 ): boolean => {
   const { a, b } = encryptedSum
   const { h, g, n } = params
   const { a1, b1, f, d } = proof
 
-  // recompute the challenge
   const c = generateChallenge(n, id, a, b, a1, b1)
 
-  // verification a^f == a1 * d^c
   const l1 = ECpow(a, f)
   const r1 = ECmul(a1, ECpow(d, c))
   const v1 = l1.eq(r1)
 
-  // verification g^f == b1 * h^c
   const l2 = ECpow(g, f)
   const r2 = ECmul(b1, ECpow(h, c))
   const v2 = l2.eq(r2)

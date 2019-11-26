@@ -1,6 +1,6 @@
 export {}
 import { ECelGamal } from '../../src/index'
-import { ECParams, CurvePoint, Cipher, SumProof } from '../../src/ec-elgamal/models'
+import { ECParams, CurvePoint, Cipher } from '../../src/ec-elgamal/models'
 import { ec } from 'elliptic'
 
 import BN = require('bn.js')
@@ -41,7 +41,7 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
 
       // homomorphically add votes + generate sum proof
       const encryptedSum: Cipher = ECelGamal.Voting.addVotes(votes, publicKey)
-      const sumProof: SumProof = ECelGamal.SumZKP.generateSumProof(
+      const sumProof: ECelGamal.Proof.DecryptionProof = ECelGamal.Proof.Decryption.generate(
         encryptedSum,
         params,
         privateKey,
@@ -49,7 +49,7 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
       )
 
       // verify proof
-      const verifiedSumProof: boolean = ECelGamal.SumZKP.verifySumProof(
+      const verifiedSumProof: boolean = ECelGamal.Proof.Decryption.verify(
         encryptedSum,
         sumProof,
         params,
