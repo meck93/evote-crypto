@@ -137,14 +137,14 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
     log && console.log('cipherText (a,b)', cipherText.a, cipherText.b)
 
     // decrypt shares
-    const share1Decrypted = ECelGamal.KeyGeneration.decryptShare(cipherText, share1.sk)
-    const share2Decrypted = ECelGamal.KeyGeneration.decryptShare(cipherText, share2.sk)
+    const share1Decrypted = ECelGamal.Encryption.decryptShare(cipherText, share1.sk)
+    const share2Decrypted = ECelGamal.Encryption.decryptShare(cipherText, share2.sk)
 
     log && console.log('share 1 - decrypted\t', share1Decrypted)
     log && console.log('share 2 - decrypted\t', share2Decrypted)
 
     // finish decryption by combining decrypted shares
-    const distributedDecrypted = ECelGamal.KeyGeneration.combineDecryptedShares(cipherText, [
+    const distributedDecrypted = ECelGamal.Encryption.combineDecryptedShares(cipherText, [
       share1Decrypted,
       share2Decrypted,
     ])

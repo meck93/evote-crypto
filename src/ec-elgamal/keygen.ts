@@ -66,18 +66,3 @@ export const verifyKeyGenerationProof = (
 
   return hashCheck && dCheck
 }
-
-export const decryptShare = (cipher: Cipher, secretKeyShare: BN): CurvePoint => {
-  return ECpow(cipher.a, secretKeyShare)
-}
-
-export const combineDecryptedShares = (
-  cipher: Cipher,
-  decryptedShares: CurvePoint[]
-): CurvePoint => {
-  const mh = ECdiv(
-    cipher.b,
-    decryptedShares.reduce((product, share) => ECmul(product, share))
-  )
-  return mh
-}

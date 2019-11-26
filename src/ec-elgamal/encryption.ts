@@ -1,10 +1,6 @@
-import { getSecureRandomValue } from './helper'
-import { CurvePoint, Cipher } from './models'
-
 import BN = require('bn.js')
+import { Cipher, CurvePoint, Helper } from './index'
 import { activeCurve } from './activeCurve'
-
-const shouldLog = false
 
 // Elliptic Curve ElGamal Encryption
 //
@@ -18,16 +14,16 @@ const shouldLog = false
 // 2. compute c1 = g^r (ec-multiplication)
 // 3. compute s = h^r (ec-multiplication)
 // 4. compute c2 = s*m
-export const encrypt = (message: CurvePoint, pubK: CurvePoint): Cipher => {
-  const r = getSecureRandomValue(activeCurve.curve.n)
+export const encrypt = (message: CurvePoint, publicKey: CurvePoint, log = false): Cipher => {
+  const r = Helper.getSecureRandomValue(activeCurve.curve.n)
 
   const c1 = activeCurve.g.mul(r) as CurvePoint
-  const s = pubK.mul(r)
+  const s = publicKey.mul(r)
   const c2 = s.add(message) as CurvePoint
 
-  shouldLog && console.log('Is c1 on the curve?\t', activeCurve.curve.validate(c1))
-  shouldLog && console.log('Is point s on the curve?', activeCurve.curve.validate(s))
-  shouldLog && console.log('Is c2 on curve?\t\t', activeCurve.curve.validate(c2))
+  log && console.log('Is c1 on the curve?\t', activeCurve.curve.validate(c1))
+  log && console.log('Is point s on the curve?', activeCurve.curve.validate(s))
+  log && console.log('Is c2 on curve?\t\t', activeCurve.curve.validate(c2))
 
   return { a: c1, b: c2, r: r }
 }
@@ -43,16 +39,16 @@ export const encrypt = (message: CurvePoint, pubK: CurvePoint): Cipher => {
 // 1. compute s = c1^x (ec-multiplication)
 // 2. compute s^-1 = multiplicative inverse of s
 // 3. compute m = c2 * s^-1 (ec-addition)
-export const decrypt = (cipherText: Cipher, privK: BN): CurvePoint => {
+export const decrypt = (cipherText: Cipher, privateKey: BN, log = false): CurvePoint => {
   const { a: c1, b: c2 } = cipherText
 
-  const s = c1.mul(privK)
+  const s = c1.mul(privateKey)
   const sInverse = s.neg()
   const m = c2.add(sInverse)
 
-  shouldLog && console.log('is s on the curve?', activeCurve.curve.validate(s))
-  shouldLog && console.log('is s^-1 on the curve?', activeCurve.curve.validate(sInverse))
-  shouldLog && console.log('is m on curve?', activeCurve.curve.validate(m))
+  log && console.log('is s on the curve?', activeCurve.curve.validate(s))
+  log && console.log('is s^-1 on the curve?', activeCurve.curve.validate(sInverse))
+  log && console.log('is m on curve?', activeCurve.curve.validate(m))
 
   return m as CurvePoint
 }
@@ -62,4 +58,21 @@ export const homomorphicAdd = (cipher0: Cipher, cipher1: Cipher): Cipher => {
     a: cipher0.a.add(cipher1.a) as CurvePoint,
     b: cipher0.b.add(cipher1.b) as CurvePoint,
   }
+}
+
+// decrypt a cipher text with a private key share
+export const decryptShare = (cipher: Cipher, secretKeyShare: BN): CurvePoint => {
+  return Helper.ECpow(cipher.a, secretKeyShare)
+}
+
+// combine decrypted shares
+export const combineDecryptedShares = (
+  cipher: Cipher,
+  decryptedShares: CurvePoint[]
+): CurvePoint => {
+  const mh = Helper.ECdiv(
+    cipher.b,
+    decryptedShares.reduce((product, share) => Helper.ECmul(product, share))
+  )
+  return mh
 }
