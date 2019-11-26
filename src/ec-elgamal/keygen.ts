@@ -7,31 +7,6 @@ import { activeCurve } from './activeCurve'
 import { CurvePoint, KeyShareProof, Cipher } from './models'
 const web3 = require('web3')
 
-export const generateSystemParameters = (): ECelGamal.SystemParameters => {
-  return { p: activeCurve.curve.p, n: activeCurve.curve.n, g: activeCurve.curve.g }
-}
-
-export const generateKeyPair = (): EC.KeyPair => {
-  return activeCurve.genKeyPair()
-}
-
-export const generateKeyShares = (): ECelGamal.KeyShare => {
-  // generate first key pair (sk, h)
-  const keyPair: EC.KeyPair = generateKeyPair()
-  const sk: BN = keyPair.getPrivate()
-  const h: CurvePoint = keyPair.getPublic() as CurvePoint
-
-  return { h_: h, sk_: sk }
-}
-
-export const generateKeyPairs = (n: number): EC.KeyPair[] => {
-  const res: EC.KeyPair[] = []
-  for (let i = 0; i < n; i++) {
-    res.push(generateKeyPair())
-  }
-  return res
-}
-
 export const generateChallenge = (n: BN, uniqueID: string, h_: CurvePoint, b: CurvePoint): BN => {
   const pointsAsString = curvePointsToString([h_, b])
   const hashString: string = web3.utils.soliditySha3(uniqueID, pointsAsString)
@@ -42,11 +17,11 @@ export const generateChallenge = (n: BN, uniqueID: string, h_: CurvePoint, b: Cu
 
 export const generateKeyGenerationProof = (
   params: ECelGamal.SystemParameters,
-  share: ECelGamal.KeyShare,
+  share: ECelGamal.KeyPair,
   id: string
 ): KeyShareProof => {
   const { n } = params
-  const { h_, sk_ } = share
+  const { h, sk } = share
 
   // generate a second key pair (a,b)
   const keyPair: EC.KeyPair = activeCurve.genKeyPair()
@@ -54,10 +29,10 @@ export const generateKeyGenerationProof = (
   const b: CurvePoint = keyPair.getPublic() as CurvePoint
 
   // compute challenge hash(h_, b)
-  const c: BN = generateChallenge(n, id, h_, b)
+  const c: BN = generateChallenge(n, id, h, b)
 
   // compute d = a + c*sk_
-  const d: BN = BNadd(a, BNmul(c, sk_, n), n)
+  const d: BN = BNadd(a, BNmul(c, sk, n), n)
 
   return { c: c, d: d }
 }
@@ -90,19 +65,6 @@ export const verifyKeyGenerationProof = (
   log && console.log()
 
   return hashCheck && dCheck
-}
-
-export const combinePublicKeys = (publicKeyShares: CurvePoint[]): CurvePoint => {
-  return publicKeyShares.reduce((product, share) => ECmul(product, share))
-}
-
-// NOTE: this should not be used as the distributed secret keys will become "useless"
-// it is only used for testing purpose
-export const combinePrivateKeys = (
-  params: ECelGamal.SystemParameters,
-  privateKeyShares: BN[]
-): BN => {
-  return privateKeyShares.reduce((sum, share) => BNadd(sum, share, params.n))
 }
 
 export const decryptShare = (cipher: Cipher, secretKeyShare: BN): CurvePoint => {

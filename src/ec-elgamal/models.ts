@@ -4,6 +4,17 @@ import BN = require('bn.js')
 //eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface CurvePoint extends curve.short.ShortPoint {}
 
+export interface SystemParameters {
+  p: BN
+  n: BN
+  g: CurvePoint
+}
+
+export interface KeyPair {
+  h: CurvePoint
+  sk: BN
+}
+
 export interface Cipher {
   a: CurvePoint
   b: CurvePoint
@@ -22,18 +33,6 @@ export interface ECParamsTransfer {
   n: BN // prime factor: p = 2*n+1
   g: string // generator
   h: string
-}
-
-export interface KeyShare {
-  h_: CurvePoint
-  sk_: BN
-  r?: BN
-}
-
-export interface SystemParameters {
-  p: BN
-  n: BN
-  g: CurvePoint
 }
 
 export interface ValidVoteProof {

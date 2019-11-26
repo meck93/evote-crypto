@@ -3,9 +3,16 @@ import { ECelGamal } from '../../src/index'
 import { ECpow, ECmul } from '../../src/ec-elgamal/helper'
 
 import { expect } from 'chai'
-import { ec } from 'elliptic'
 import { activeCurve } from '../../src/ec-elgamal/activeCurve'
 import { CurvePoint, KeyShareProof } from '../../src/ec-elgamal/models'
+
+const generateKeyPairs = (n: number): ECelGamal.KeyPair[] => {
+  const res: ECelGamal.KeyPair[] = []
+  for (let i = 0; i < n; i++) {
+    res.push(ECelGamal.SystemSetup.generateKeyPair())
+  }
+  return res
+}
 
 describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
   it('generate and verify (distributed) key share', () => {
@@ -13,18 +20,18 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
       const log = false
 
       // generate the system parameters: P, Q, G
-      const params: ECelGamal.SystemParameters = ECelGamal.KeyGeneration.generateSystemParameters()
+      const params: ECelGamal.SystemParameters = ECelGamal.SystemSetup.generateSystemParameters()
       const { g } = params
 
       // generate the public and private key share: H_, SK_
-      const share: ECelGamal.KeyShare = ECelGamal.KeyGeneration.generateKeyShares()
-      const { h_: h1_, sk_: sk1_ } = share
+      const share: ECelGamal.KeyPair = ECelGamal.SystemSetup.generateKeyPair()
+      const { h: h1, sk: sk1 } = share
 
-      expect(h1_).to.eql(ECpow(g, sk1_))
+      expect(h1).to.eql(ECpow(g, sk1))
 
       log && console.log('Key Parts')
-      log && console.log('h_:\t', h1_.toString())
-      log && console.log('sk_:\t', sk1_.toString())
+      log && console.log('h_:\t', h1.toString())
+      log && console.log('sk_:\t', sk1.toString())
       log && console.log()
 
       // generate the key share generation proof
@@ -45,7 +52,7 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
       const verifiedProof: boolean = ECelGamal.KeyGeneration.verifyKeyGenerationProof(
         params,
         proof,
-        h1_,
+        h1,
         uniqueId
       )
 
@@ -55,36 +62,32 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
 
   it('combine public keys', () => {
     // generate one share
-    let keyPairs: ec.KeyPair[] = ECelGamal.KeyGeneration.generateKeyPairs(1)
-    let shares: CurvePoint[] = [keyPairs[0].getPublic() as CurvePoint]
+    let keyPairs: ECelGamal.KeyPair[] = generateKeyPairs(1)
+    let shares: CurvePoint[] = [keyPairs[0].h]
     let product: CurvePoint = shares[0]
-    expect(ECelGamal.KeyGeneration.combinePublicKeys(shares)).to.eql(product)
+    expect(ECelGamal.SystemSetup.combinePublicKeys(shares)).to.eql(product)
 
     // generate two shares + combine them
-    keyPairs = ECelGamal.KeyGeneration.generateKeyPairs(2)
-    shares = [keyPairs[0].getPublic() as CurvePoint, keyPairs[1].getPublic() as CurvePoint]
+    keyPairs = generateKeyPairs(2)
+    shares = [keyPairs[0].h, keyPairs[1].h]
     product = ECmul(shares[0], shares[1])
-    expect(ECelGamal.KeyGeneration.combinePublicKeys(shares)).to.eql(product)
+    expect(ECelGamal.SystemSetup.combinePublicKeys(shares)).to.eql(product)
 
     // generate three shares + combine them
-    keyPairs = ECelGamal.KeyGeneration.generateKeyPairs(3)
-    shares = [
-      keyPairs[0].getPublic() as CurvePoint,
-      keyPairs[1].getPublic() as CurvePoint,
-      keyPairs[2].getPublic() as CurvePoint,
-    ]
+    keyPairs = generateKeyPairs(3)
+    shares = [keyPairs[0].h, keyPairs[1].h, keyPairs[2].h]
     product = ECmul(ECmul(shares[0], shares[1]), shares[2])
-    expect(ECelGamal.KeyGeneration.combinePublicKeys(shares)).to.eql(product)
+    expect(ECelGamal.SystemSetup.combinePublicKeys(shares)).to.eql(product)
   })
 
   it('perform distributed key generation', () => {
     const log = false
 
-    const params: ECelGamal.SystemParameters = ECelGamal.KeyGeneration.generateSystemParameters()
+    const params: ECelGamal.SystemParameters = ECelGamal.SystemSetup.generateSystemParameters()
 
     // first authority
     // generate the public and private key share and the key generation proof
-    const share1: ECelGamal.KeyShare = ECelGamal.KeyGeneration.generateKeyShares()
+    const share1: ECelGamal.KeyPair = ECelGamal.SystemSetup.generateKeyPair()
     const uniqueId1 = 'IamReallyUnique;-)'
     const proof1: KeyShareProof = ECelGamal.KeyGeneration.generateKeyGenerationProof(
       params,
@@ -94,14 +97,14 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
     const verified1: boolean = ECelGamal.KeyGeneration.verifyKeyGenerationProof(
       params,
       proof1,
-      share1.h_,
+      share1.h,
       uniqueId1
     )
     expect(verified1).to.be.true
 
     // second authority
     // generate the public and private key share and the key generation proof
-    const share2: ECelGamal.KeyShare = ECelGamal.KeyGeneration.generateKeyShares()
+    const share2: ECelGamal.KeyPair = ECelGamal.SystemSetup.generateKeyPair()
     const uniqueId2 = 'IamMuchMoreUnique_o.o'
     const proof2: KeyShareProof = ECelGamal.KeyGeneration.generateKeyGenerationProof(
       params,
@@ -111,17 +114,17 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
     const verified2: boolean = ECelGamal.KeyGeneration.verifyKeyGenerationProof(
       params,
       proof2,
-      share2.h_,
+      share2.h,
       uniqueId2
     )
     expect(verified2).to.be.true
 
-    log && console.log('1: pk, sk', share1.h_, share1.sk_)
-    log && console.log('2: pk, sk', share2.h_, share2.sk_)
+    log && console.log('1: pk, sk', share1.h, share1.sk)
+    log && console.log('2: pk, sk', share2.h, share2.sk)
 
     // combined keys
-    const publicKey = ECelGamal.KeyGeneration.combinePublicKeys([share1.h_, share2.h_])
-    const privateKey = ECelGamal.KeyGeneration.combinePrivateKeys(params, [share1.sk_, share2.sk_])
+    const publicKey = ECelGamal.SystemSetup.combinePublicKeys([share1.h, share2.h])
+    const privateKey = ECelGamal.SystemSetup.combinePrivateKeys(params, [share1.sk, share2.sk])
 
     log && console.log('pk', publicKey)
     log && console.log('sk', privateKey)
@@ -134,8 +137,8 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
     log && console.log('cipherText (a,b)', cipherText.a, cipherText.b)
 
     // decrypt shares
-    const share1Decrypted = ECelGamal.KeyGeneration.decryptShare(cipherText, share1.sk_)
-    const share2Decrypted = ECelGamal.KeyGeneration.decryptShare(cipherText, share2.sk_)
+    const share1Decrypted = ECelGamal.KeyGeneration.decryptShare(cipherText, share1.sk)
+    const share2Decrypted = ECelGamal.KeyGeneration.decryptShare(cipherText, share2.sk)
 
     log && console.log('share 1 - decrypted\t', share1Decrypted)
     log && console.log('share 2 - decrypted\t', share2Decrypted)

@@ -5,14 +5,15 @@ import * as SumZKP from './sumZKP'
 import * as Helper from './helper'
 import * as KeyGeneration from './keygen'
 import * as Curve from './activeCurve'
-export { Encryption, Voting, VoteZKP, SumZKP, Helper, KeyGeneration, Curve }
+import * as SystemSetup from './systemSetup'
+export { Encryption, Voting, VoteZKP, SumZKP, Helper, KeyGeneration, Curve, SystemSetup }
 
 import {
   Cipher,
   SumProof,
   SystemParameters,
-  KeyShare,
   KeyShareProof,
   ValidVoteProof,
+  KeyPair
 } from './models'
-export { Cipher, SumProof, SystemParameters, KeyShare, KeyShareProof, ValidVoteProof }
+export { Cipher, SumProof, SystemParameters, KeyShareProof, ValidVoteProof, KeyPair }
