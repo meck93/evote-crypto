@@ -1,6 +1,6 @@
 export {}
 import { ECelGamal } from '../../src/index'
-import { ECParams, CurvePoint, Cipher } from '../../src/ec-elgamal/models'
+import { CurvePoint, Cipher } from '../../src/ec-elgamal/models'
 import { ec } from 'elliptic'
 
 import BN = require('bn.js')
@@ -23,9 +23,8 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
     const privateKey: BN = keyPair.getPrivate()
     const publicKey: CurvePoint = keyPair.getPublic() as CurvePoint
 
-    const params: ECParams = {
+    const params: ECelGamal.SystemParameters = {
       p: activeCurve.curve.p,
-      h: publicKey,
       g: activeCurve.curve.g,
       n: activeCurve.curve.n,
     }

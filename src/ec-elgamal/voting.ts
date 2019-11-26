@@ -1,11 +1,12 @@
 import { encrypt, decrypt } from './encryption'
-import { VoteZKP, Encryption } from './'
-import { ECParams, ECParamsTransfer, CurvePoint, Cipher, ValidVoteProof } from './models'
+import { VoteZKP, Encryption, Proof } from './'
+import { ECParamsTransfer, CurvePoint, Cipher, ValidVoteProof, SystemParameters } from './models'
 
 import BN = require('bn.js')
 import { Summary } from '../models'
 
 import { activeCurve } from './activeCurve'
+import { DecryptionProof } from './proofs'
 
 const startingPoint = activeCurve.curve.g
 const infinityPoint = startingPoint.add(startingPoint.neg())
@@ -86,13 +87,15 @@ export const getSummary = (total: number, tallyResult: number): Summary => {
   return { total, yes, no } as Summary
 }
 
-const createParams = (params: ECParamsTransfer): ECParams => {
-  return {
-    p: params.p, // BN
-    n: params.n, // BN
-    g: activeCurve.curve.pointFromJSON(params.g), // string JSON
-    h: activeCurve.keyFromPublic(params.h, 'hex').pub, // string
-  }
+const createParams = (params: ECParamsTransfer): [SystemParameters, CurvePoint] => {
+  return [
+    {
+      p: params.p, // BN
+      n: params.n, // BN
+      g: activeCurve.curve.pointFromJSON(params.g), // string JSON
+    },
+    activeCurve.keyFromPublic(params.h, 'hex').pub, // string
+  ]
 }
 
 export function generateYesProof(
@@ -100,9 +103,8 @@ export function generateYesProof(
   params: ECParamsTransfer,
   id: string
 ): ValidVoteProof {
-  const _params: ECParams = createParams(params)
-
-  return VoteZKP.generateYesProof(encryptedVote, _params, id)
+  const _params: [SystemParameters, CurvePoint] = createParams(params)
+  return VoteZKP.generateYesProof(encryptedVote, _params[0], _params[1], id)
 }
 
 export const generateNoProof = (
@@ -110,9 +112,8 @@ export const generateNoProof = (
   params: ECParamsTransfer,
   id: string
 ): ValidVoteProof => {
-  const _params: ECParams = createParams(params)
-
-  return VoteZKP.generateNoProof(encryptedVote, _params, id)
+  const _params: [SystemParameters, CurvePoint] = createParams(params)
+  return VoteZKP.generateNoProof(encryptedVote, _params[0], _params[1], id)
 }
 
 export const verifyZKP = (
@@ -121,7 +122,26 @@ export const verifyZKP = (
   params: ECParamsTransfer,
   id: string
 ): boolean => {
-  const _params: ECParams = createParams(params)
+  const _params: [SystemParameters, CurvePoint] = createParams(params)
+  return VoteZKP.verifyZKP(encryptedVote, proof, _params[0], _params[1], id)
+}
 
-  return VoteZKP.verifyZKP(encryptedVote, proof, _params, id)
+export const generateSumProof = (
+  encryptedVote: Cipher,
+  params: ECParamsTransfer,
+  sk: BN,
+  id: string
+): DecryptionProof => {
+  const _params: [SystemParameters, CurvePoint] = createParams(params)
+  return Proof.Decryption.generate(encryptedVote, _params[0], sk, id)
+}
+
+export const verifySumProof = (
+  encryptedSum: Cipher,
+  proof: DecryptionProof,
+  params: ECParamsTransfer,
+  id: string
+): boolean => {
+  const _params: [SystemParameters, CurvePoint] = createParams(params)
+  return Proof.Decryption.verify(encryptedSum, proof, _params[0], _params[1], id)
 }

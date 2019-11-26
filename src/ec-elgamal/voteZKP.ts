@@ -1,5 +1,5 @@
 import { ECelGamal } from '../index'
-import { ECParams, Cipher, CurvePoint, ValidVoteProof } from './models'
+import { Cipher, CurvePoint, ValidVoteProof, SystemParameters } from './models'
 import { ECmul, ECdiv, ECpow, BNmul, BNadd, BNsub, curvePointsToString } from './helper'
 
 import BN = require('bn.js')
@@ -34,11 +34,13 @@ export function generateChallenge(
 // Generates a proof for an encrypted yes vote.
 export function generateYesProof(
   encryptedVote: Cipher,
-  params: ECParams,
+  params: SystemParameters,
+  publicKey: CurvePoint,
   id: string
 ): ValidVoteProof {
   const { a, b, r } = encryptedVote
-  const { h, g, n } = params
+  const { g, n } = params
+  const h = publicKey;
 
   if (r === undefined || r === null) {
     throw new Error('value r is undefined')
@@ -87,11 +89,13 @@ export function generateYesProof(
 // Generates a proof for an encrypted no vote.
 export function generateNoProof(
   encryptedVote: Cipher,
-  params: ECParams,
+  params: SystemParameters,
+  publicKey: CurvePoint,
   id: string
 ): ValidVoteProof {
   const { a, b, r } = encryptedVote
-  const { h, g, n } = params
+  const { g, n } = params
+  const h = publicKey;
 
   if (r === undefined || r === null) {
     throw new Error('value r is undefined')
@@ -143,11 +147,13 @@ export function generateNoProof(
 export function verifyZKP(
   encryptedVote: Cipher,
   proof: ValidVoteProof,
-  params: ECParams,
+  params: SystemParameters,
+  publicKey: CurvePoint,
   id: string
 ): boolean {
   const { a0, a1, b0, b1, c0, c1, f0, f1 } = proof
-  const { h, g, n } = params
+  const { g, n } = params
+  const h = publicKey;
   const { a, b } = encryptedVote
 
   // verification g^f0 == a0*a^c0

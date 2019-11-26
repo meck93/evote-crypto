@@ -1,5 +1,5 @@
 import BN = require('bn.js')
-import { ECParams, CurvePoint, Cipher } from '../models'
+import { CurvePoint, Cipher, SystemParameters } from '../models'
 import { ECmul, ECpow, BNmul, BNadd } from '../helper'
 
 import { activeCurve } from '../activeCurve'
@@ -37,7 +37,7 @@ export function generateChallenge(
 // 5. compute the decryption factor d = a^r
 export const generate = (
   cipher: Cipher,
-  params: ECParams,
+  params: SystemParameters,
   sk: BN,
   id: string,
   log = false
@@ -75,13 +75,13 @@ export const generate = (
 export const verify = (
   encryptedSum: Cipher,
   proof: DecryptionProof,
-  params: ECParams,
+  params: SystemParameters,
   pk: CurvePoint,
   id: string,
   log = false
 ): boolean => {
   const { a, b } = encryptedSum
-  const { h, g, n } = params
+  const { g, n } = params
   const { a1, b1, f, d } = proof
 
   const c = generateChallenge(n, id, a, b, a1, b1)
@@ -91,7 +91,7 @@ export const verify = (
   const v1 = l1.eq(r1)
 
   const l2 = ECpow(g, f)
-  const r2 = ECmul(b1, ECpow(h, c))
+  const r2 = ECmul(b1, ECpow(pk, c))
   const v2 = l2.eq(r2)
 
   log && console.log('a^f == a1*d^c:\t\t', v1)

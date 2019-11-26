@@ -5,9 +5,9 @@ import BN = require('bn.js')
 export interface CurvePoint extends curve.short.ShortPoint {}
 
 export interface SystemParameters {
-  p: BN
-  n: BN
-  g: CurvePoint
+  p: BN // prime
+  n: BN // prime factor: p = 2*n+1
+  g: CurvePoint // generator
 }
 
 export interface KeyPair {
@@ -19,13 +19,6 @@ export interface Cipher {
   a: CurvePoint
   b: CurvePoint
   r?: BN
-}
-
-export interface ECParams {
-  p: BN
-  n: BN // prime factor: p = 2*n+1
-  g: CurvePoint // generator
-  h: CurvePoint
 }
 
 export interface ECParamsTransfer {

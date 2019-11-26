@@ -3,7 +3,7 @@ import { ECelGamal } from '../../src/index'
 import { ec } from 'elliptic'
 
 import { expect, assert } from 'chai'
-import { ECParams, Cipher, CurvePoint, ValidVoteProof } from '../../src/ec-elgamal/models'
+import { Cipher, CurvePoint, ValidVoteProof } from '../../src/ec-elgamal/models'
 
 import { activeCurve } from '../../src/ec-elgamal/activeCurve'
 
@@ -22,9 +22,8 @@ describe('Elliptic Curve ElGamal Vote ZKP', () => {
     const keyPair: ec.KeyPair = activeCurve.genKeyPair()
     const publicKey: CurvePoint = keyPair.getPublic() as CurvePoint
 
-    const params: ECParams = {
+    const params: ECelGamal.SystemParameters = {
       p: activeCurve.curve.p,
-      h: publicKey,
       g: activeCurve.curve.g,
       n: activeCurve.curve.n,
     }
@@ -36,6 +35,7 @@ describe('Elliptic Curve ElGamal Vote ZKP', () => {
     const yesProof: ValidVoteProof = ECelGamal.VoteZKP.generateYesProof(
       encryptedYesVote,
       params,
+      publicKey,
       uniqueID
     )
 
@@ -44,6 +44,7 @@ describe('Elliptic Curve ElGamal Vote ZKP', () => {
       encryptedYesVote,
       yesProof,
       params,
+      publicKey,
       uniqueID
     )
     expect(verifiedYesProof).to.be.true
@@ -53,9 +54,8 @@ describe('Elliptic Curve ElGamal Vote ZKP', () => {
     const keyPair: ec.KeyPair = activeCurve.genKeyPair()
     const publicKey: CurvePoint = keyPair.getPublic() as CurvePoint
 
-    const params: ECParams = {
+    const params: ECelGamal.SystemParameters = {
       p: activeCurve.curve.p,
-      h: publicKey,
       g: activeCurve.curve.g,
       n: activeCurve.curve.n,
     }
@@ -64,13 +64,14 @@ describe('Elliptic Curve ElGamal Vote ZKP', () => {
     // encrypt no vote + generate proof
     log && console.log('NO PROOF\n')
     const encryptedNoVote: Cipher = ECelGamal.Encryption.encrypt(noVoteOnCurve, publicKey)
-    const noProof = ECelGamal.VoteZKP.generateNoProof(encryptedNoVote, params, uniqueID)
+    const noProof = ECelGamal.VoteZKP.generateNoProof(encryptedNoVote, params, publicKey, uniqueID)
 
     // verify no vote proof
     const verifiedNoProof: boolean = ECelGamal.VoteZKP.verifyZKP(
       encryptedNoVote,
       noProof,
       params,
+      publicKey,
       uniqueID
     )
     expect(verifiedNoProof).to.be.true
