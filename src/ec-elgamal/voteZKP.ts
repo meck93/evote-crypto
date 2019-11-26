@@ -1,6 +1,22 @@
 import { ECelGamal } from '../index'
-import { Cipher, CurvePoint, ValidVoteProof, SystemParameters } from './models'
-import { ECmul, ECdiv, ECpow, BNmul, BNadd, BNsub, curvePointsToString } from './helper'
+import {
+  Cipher,
+  CurvePoint,
+  ValidVoteProof,
+  SystemParameters,
+  SystemParametersSerialized,
+} from './models'
+import {
+  ECmul,
+  ECdiv,
+  ECpow,
+  BNmul,
+  BNadd,
+  BNsub,
+  curvePointsToString,
+  deserializeParams,
+  deserializeCurvePoint,
+} from './helper'
 
 import BN = require('bn.js')
 import { activeCurve } from './activeCurve'
@@ -34,13 +50,13 @@ export function generateChallenge(
 // Generates a proof for an encrypted yes vote.
 export function generateYesProof(
   encryptedVote: Cipher,
-  params: SystemParameters,
-  publicKey: CurvePoint,
+  params: SystemParameters | SystemParametersSerialized,
+  publicKey: CurvePoint | string,
   id: string
 ): ValidVoteProof {
   const { a, b, r } = encryptedVote
-  const { g, n } = params
-  const h = publicKey;
+  const { g, n } = deserializeParams(params)
+  const h = deserializeCurvePoint(publicKey)
 
   if (r === undefined || r === null) {
     throw new Error('value r is undefined')
@@ -89,13 +105,13 @@ export function generateYesProof(
 // Generates a proof for an encrypted no vote.
 export function generateNoProof(
   encryptedVote: Cipher,
-  params: SystemParameters,
-  publicKey: CurvePoint,
+  params: SystemParameters | SystemParametersSerialized,
+  publicKey: CurvePoint | string,
   id: string
 ): ValidVoteProof {
   const { a, b, r } = encryptedVote
-  const { g, n } = params
-  const h = publicKey;
+  const { g, n } = deserializeParams(params)
+  const h = deserializeCurvePoint(publicKey)
 
   if (r === undefined || r === null) {
     throw new Error('value r is undefined')
@@ -147,13 +163,13 @@ export function generateNoProof(
 export function verifyZKP(
   encryptedVote: Cipher,
   proof: ValidVoteProof,
-  params: SystemParameters,
-  publicKey: CurvePoint,
+  params: SystemParameters | SystemParametersSerialized,
+  publicKey: CurvePoint | string,
   id: string
 ): boolean {
   const { a0, a1, b0, b1, c0, c1, f0, f1 } = proof
-  const { g, n } = params
-  const h = publicKey;
+  const { g, n } = deserializeParams(params)
+  const h = deserializeCurvePoint(publicKey)
   const { a, b } = encryptedVote
 
   // verification g^f0 == a0*a^c0

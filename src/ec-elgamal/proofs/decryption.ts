@@ -1,6 +1,6 @@
 import BN = require('bn.js')
-import { CurvePoint, Cipher, SystemParameters } from '../models'
-import { ECmul, ECpow, BNmul, BNadd } from '../helper'
+import { CurvePoint, Cipher, SystemParameters, SystemParametersSerialized } from '../models'
+import { ECmul, ECpow, BNmul, BNadd, deserializeParams, deserializeCurvePoint } from '../helper'
 
 import { activeCurve } from '../activeCurve'
 import { DecryptionProof } from './models'
@@ -37,13 +37,13 @@ export function generateChallenge(
 // 5. compute the decryption factor d = a^r
 export const generate = (
   cipher: Cipher,
-  params: SystemParameters,
+  params: SystemParameters | SystemParametersSerialized,
   sk: BN,
   id: string,
   log = false
 ): DecryptionProof => {
   const { a, b } = cipher
-  const { g, n } = params
+  const { g, n } = deserializeParams(params)
 
   const x: BN = Helper.getSecureRandomValue(n)
 
@@ -75,13 +75,14 @@ export const generate = (
 export const verify = (
   encryptedSum: Cipher,
   proof: DecryptionProof,
-  params: SystemParameters,
-  pk: CurvePoint,
+  params: SystemParameters | SystemParametersSerialized,
+  pk: CurvePoint | string,
   id: string,
   log = false
 ): boolean => {
   const { a, b } = encryptedSum
-  const { g, n } = params
+  const { g, n } = deserializeParams(params)
+  pk = deserializeCurvePoint(pk)
   const { a1, b1, f, d } = proof
 
   const c = generateChallenge(n, id, a, b, a1, b1)

@@ -10,6 +10,12 @@ export interface SystemParameters {
   g: CurvePoint // generator
 }
 
+export interface SystemParametersSerialized {
+  p: string
+  n: string
+  g: string
+}
+
 export interface KeyPair {
   h: CurvePoint
   sk: BN
@@ -19,13 +25,6 @@ export interface Cipher {
   a: CurvePoint
   b: CurvePoint
   r?: BN
-}
-
-export interface ECParamsTransfer {
-  p: BN
-  n: BN // prime factor: p = 2*n+1
-  g: string // generator
-  h: string
 }
 
 export interface ValidVoteProof {
@@ -42,4 +41,24 @@ export interface ValidVoteProof {
 export interface KeyShareProof {
   c: BN
   d: BN
+}
+
+interface A {
+  member: string
+}
+
+export const instanceOfSystemParametersSerialized = (
+  object: any
+): object is SystemParametersSerialized => {
+  /*const test = (field: string, type: string): boolean => {
+    return field in object && typeof object[field] === type
+  }*/
+  return (
+    'p' in object &&
+    typeof object.p === 'string' &&
+    'n' in object &&
+    typeof object.n === 'string' &&
+    'g' in object &&
+    typeof object.g === 'string'
+  )
 }

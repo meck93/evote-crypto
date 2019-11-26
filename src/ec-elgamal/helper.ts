@@ -1,6 +1,12 @@
 import crypto = require('crypto')
 import BN = require('bn.js')
-import { CurvePoint } from './models'
+import {
+  CurvePoint,
+  SystemParameters,
+  SystemParametersSerialized,
+  instanceOfSystemParametersSerialized,
+} from './models'
+import { activeCurve } from './activeCurve'
 
 export const getSecureRandomValue = (n: BN, byteSize = 32): BN => {
   const one = new BN(1, 10)
@@ -40,4 +46,45 @@ export function curvePointsToString(points: CurvePoint[]): string {
     asString += curvePointToString(point)
   }
   return asString
+}
+
+export const serializeSystemParameters = (params: SystemParameters): SystemParametersSerialized => {
+  return {
+    p: serializeBN(params.p),
+    n: serializeBN(params.n),
+    g: serializeCurvePoint(params.g),
+  }
+}
+
+export const deserializeParams = (
+  params: SystemParameters | SystemParametersSerialized
+): SystemParameters => {
+  if (!instanceOfSystemParametersSerialized(params)) {
+    return params
+  }
+  return {
+    p: deserializeBN(params.p), // BN
+    n: deserializeBN(params.n), // BN
+    g: deserializeCurvePoint(params.g),
+  }
+}
+
+export const serializeBN = (bn: BN): string => {
+  return bn.toString('hex')
+}
+
+export const deserializeBN = (bn: string): BN => {
+  return new BN(bn, 'hex')
+}
+
+// https://github.com/indutny/elliptic/blob/71e4e8e2f5b8f0bdbfbe106c72cc9fbc746d3d60/test/curve-test.js#L265
+export const serializeCurvePoint = (point: CurvePoint): string => {
+  return point.encode('hex', false)
+}
+
+export const deserializeCurvePoint = (point: CurvePoint | string): CurvePoint => {
+  if (typeof point !== 'string') {
+    return point
+  }
+  return activeCurve.curve.decodePoint(point, 'hex')
 }
