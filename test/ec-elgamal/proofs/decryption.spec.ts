@@ -49,7 +49,10 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
       expect(verifiedSumProof).to.be.true
 
       // decrypt sum
-      const decryptedSum: ECelGamal.CurvePoint = ECelGamal.Encryption.decrypt(encryptedSum, privateKey)
+      const decryptedSum: ECelGamal.CurvePoint = ECelGamal.Encryption.decrypt(
+        encryptedSum,
+        privateKey
+      )
       const result = ECelGamal.Voting.checkDecrypedSum(decryptedSum)
 
       const summary = ECelGamal.Voting.getSummary(votes.length, result)
