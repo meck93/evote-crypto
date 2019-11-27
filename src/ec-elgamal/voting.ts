@@ -1,5 +1,5 @@
 import { encrypt, decrypt } from './encryption'
-import { Encryption } from './'
+import { Encryption, Helper } from './'
 import { CurvePoint, Cipher } from './models'
 
 import BN = require('bn.js')
@@ -10,24 +10,16 @@ import { activeCurve } from './activeCurve'
 const startingPoint = activeCurve.curve.g
 const infinityPoint = startingPoint.add(startingPoint.neg())
 
-const pkToCurvePoint = (pk: string | CurvePoint): CurvePoint => {
-  if (typeof pk === 'string' || pk instanceof String) {
-    return activeCurve.keyFromPublic(pk, 'hex').pub
-  } else {
-    return pk
-  }
-}
-
 export const generateYesVote = (pk: string | CurvePoint): Cipher => {
-  return encrypt(startingPoint, pkToCurvePoint(pk))
+  return encrypt(startingPoint, Helper.deserializeCurvePoint(pk))
 }
 
 export const generateNoVote = (pk: string | CurvePoint): Cipher => {
-  return encrypt(startingPoint.neg(), pkToCurvePoint(pk))
+  return encrypt(startingPoint.neg(), Helper.deserializeCurvePoint(pk))
 }
 
 export const generateBaseVote = (pk: string | CurvePoint): Cipher => {
-  return encrypt(infinityPoint, pkToCurvePoint(pk))
+  return encrypt(infinityPoint, Helper.deserializeCurvePoint(pk))
 }
 
 export const addVotes = (votes: Cipher[], pk: string | CurvePoint): Cipher => {
@@ -57,7 +49,7 @@ export const tallyVotes = (pk: string, sk: BN, votes: Cipher[]): number => {
   // the encrypt function with 'red works only with red numbers'.
 
   // Fix: Serialize the key in the fronend and extract the public key from the passed hex-string
-  const publicKey = pkToCurvePoint(pk)
+  const publicKey = Helper.deserializeCurvePoint(pk)
 
   const sum = decrypt(addVotes(votes, publicKey), sk)
   return checkDecrypedSum(sum)
