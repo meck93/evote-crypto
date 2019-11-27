@@ -1,13 +1,11 @@
 import { encrypt, decrypt } from './encryption'
-import { Encryption, Helper } from './'
+import { Encryption, Helper, Curve } from './'
 import { CurvePoint, Cipher } from './models'
 
 import BN = require('bn.js')
 import { Summary } from '../models'
 
-import { activeCurve } from './activeCurve'
-
-const startingPoint = activeCurve.curve.g
+const startingPoint = Curve.g
 const infinityPoint = startingPoint.add(startingPoint.neg())
 
 export const generateYesVote = (pk: string | CurvePoint): Cipher => {

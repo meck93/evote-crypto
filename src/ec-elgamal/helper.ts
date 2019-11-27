@@ -6,9 +6,10 @@ import {
   SystemParametersSerialized,
   instanceOfSystemParametersSerialized,
 } from './models'
-import { activeCurve } from './activeCurve'
+import { Curve } from './index'
 
-export const getSecureRandomValue = (n: BN, byteSize = 32): BN => {
+export const getSecureRandomValue = (n: BN): BN => {
+  const byteSize = 32
   const one = new BN(1, 10)
   const UPPER_BOUND_RANDOM: BN = n.sub(one)
 
@@ -86,5 +87,5 @@ export const deserializeCurvePoint = (point: CurvePoint | string): CurvePoint =>
   if (typeof point !== 'string') {
     return point
   }
-  return activeCurve.curve.decodePoint(point, 'hex')
+  return Curve.decodePoint(point, 'hex')
 }

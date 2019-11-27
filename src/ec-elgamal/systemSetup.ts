@@ -1,16 +1,16 @@
 import BN = require('bn.js')
 import { ec as EC } from 'elliptic'
 
-import { activeCurve } from './activeCurve'
 import { SystemParameters, CurvePoint, KeyPair } from './models'
-import { Helper } from './index'
+import { Helper, Curve } from './index'
+import { curveDefinition } from './curve'
 
 export const generateSystemParameters = (): SystemParameters => {
-  return { p: activeCurve.curve.p, n: activeCurve.curve.n, g: activeCurve.curve.g }
+  return { p: Curve.p, n: Curve.n, g: Curve.g }
 }
 
 export const generateKeyPair = (): KeyPair => {
-  const keyPair: EC.KeyPair = activeCurve.genKeyPair()
+  const keyPair: EC.KeyPair = curveDefinition.genKeyPair()
   const sk: BN = keyPair.getPrivate()
   const h: CurvePoint = keyPair.getPublic() as CurvePoint
   return { h, sk }

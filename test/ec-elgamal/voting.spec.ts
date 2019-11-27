@@ -1,15 +1,14 @@
 export {}
 import { ECelGamal } from '../../src/index'
 import { assert } from 'chai'
-import { activeCurve } from '../../src/ec-elgamal/activeCurve'
 
 describe('Elliptic Curve ElGamal Voting', () => {
   it('Voting works correctly in various scenarii', () => {
     const vote = (_result: number, _votes: number[]): void => {
       const log = false
-      const keyPair = activeCurve.genKeyPair()
-      const privateKey = keyPair.getPrivate()
-      const publicKey = keyPair.getPublic().encode('hex', false)
+
+      const { h, sk: privateKey } = ECelGamal.SystemSetup.generateKeyPair()
+      const publicKey = ECelGamal.Helper.serializeCurvePoint(h)
 
       const votes: ECelGamal.Cipher[] = []
       for (const vote of _votes) {

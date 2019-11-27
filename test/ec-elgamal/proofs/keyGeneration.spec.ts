@@ -3,7 +3,6 @@ import { ECelGamal } from '../../../src/index'
 import { ECpow, ECmul } from '../../../src/ec-elgamal/helper'
 
 import { expect } from 'chai'
-import { activeCurve } from '../../../src/ec-elgamal/activeCurve'
 import { CurvePoint } from '../../../src/ec-elgamal/models'
 
 const generateKeyPairs = (n: number): ECelGamal.KeyPair[] => {
@@ -130,7 +129,7 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
     log && console.log('sk', privateKey)
 
     // encrypt a single yes vote -> we use the generator
-    const plaintext = activeCurve.curve.g
+    const plaintext = ECelGamal.Curve.g
     const cipherText = ECelGamal.Encryption.encrypt(plaintext, publicKey)
 
     log && console.log('plaintext', plaintext)

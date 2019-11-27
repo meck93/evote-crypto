@@ -1,6 +1,5 @@
 import BN = require('bn.js')
-import { Cipher, CurvePoint, Helper } from './index'
-import { activeCurve } from './activeCurve'
+import { Cipher, CurvePoint, Helper, Curve } from './index'
 
 // Elliptic Curve ElGamal Encryption
 //
@@ -15,15 +14,15 @@ import { activeCurve } from './activeCurve'
 // 3. compute s = h^r (ec-multiplication)
 // 4. compute c2 = s*m
 export const encrypt = (message: CurvePoint, publicKey: CurvePoint, log = false): Cipher => {
-  const r = Helper.getSecureRandomValue(activeCurve.curve.n)
+  const r = Helper.getSecureRandomValue(Curve.n)
 
-  const c1 = activeCurve.g.mul(r) as CurvePoint
+  const c1 = Curve.g.mul(r) as CurvePoint
   const s = publicKey.mul(r)
   const c2 = s.add(message) as CurvePoint
 
-  log && console.log('Is c1 on the curve?\t', activeCurve.curve.validate(c1))
-  log && console.log('Is point s on the curve?', activeCurve.curve.validate(s))
-  log && console.log('Is c2 on curve?\t\t', activeCurve.curve.validate(c2))
+  log && console.log('Is c1 on the curve?\t', Curve.validate(c1))
+  log && console.log('Is point s on the curve?', Curve.validate(s))
+  log && console.log('Is c2 on curve?\t\t', Curve.validate(c2))
 
   return { a: c1, b: c2, r: r }
 }
@@ -46,9 +45,9 @@ export const decrypt = (cipherText: Cipher, privateKey: BN, log = false): CurveP
   const sInverse = s.neg()
   const m = c2.add(sInverse)
 
-  log && console.log('is s on the curve?', activeCurve.curve.validate(s))
-  log && console.log('is s^-1 on the curve?', activeCurve.curve.validate(sInverse))
-  log && console.log('is m on curve?', activeCurve.curve.validate(m))
+  log && console.log('is s on the curve?', Curve.validate(s))
+  log && console.log('is s^-1 on the curve?', Curve.validate(sInverse))
+  log && console.log('is m on curve?', Curve.validate(m))
 
   return m as CurvePoint
 }

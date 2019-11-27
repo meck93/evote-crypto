@@ -3,9 +3,9 @@ import { ec as EC } from 'elliptic'
 import { ECelGamal } from '../..'
 import { ECpow, ECdiv, ECmul, BNmul, BNadd, curvePointsToString } from '../helper'
 
-import { activeCurve } from '../activeCurve'
 import { CurvePoint } from '../models'
 import { KeyGenerationProof } from './models'
+import { SystemSetup, KeyPair } from '..'
 
 const web3 = require('web3')
 
@@ -28,9 +28,9 @@ export const generate = (
   const { n } = params
   const { h, sk } = share
 
-  const keyPair: EC.KeyPair = activeCurve.genKeyPair()
-  const a: BN = keyPair.getPrivate()
-  const b: CurvePoint = keyPair.getPublic() as CurvePoint
+  const keyPair: KeyPair = SystemSetup.generateKeyPair()
+  const a: BN = keyPair.sk
+  const b: CurvePoint = keyPair.h
 
   const c: BN = generateChallenge(n, id, h, b)
   const d: BN = BNadd(a, BNmul(c, sk, n), n)

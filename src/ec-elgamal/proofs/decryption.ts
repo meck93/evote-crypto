@@ -2,9 +2,9 @@ import BN = require('bn.js')
 import { CurvePoint, Cipher, SystemParameters, SystemParametersSerialized } from '../models'
 import { ECmul, ECpow, BNmul, BNadd, deserializeParams, deserializeCurvePoint } from '../helper'
 
-import { activeCurve } from '../activeCurve'
 import { DecryptionProof } from './models'
-import { Helper } from '../index'
+import { Helper, Curve } from '../index'
+import { curveDefinition } from '../curve'
 
 export function generateChallenge(
   n: BN,
@@ -17,7 +17,7 @@ export function generateChallenge(
   const pointsAsString: string = Helper.curvePointsToString([a, b, a1, b1])
   const input = id + pointsAsString
 
-  let c = activeCurve
+  let c = curveDefinition
     .hash()
     .update(input)
     .digest('hex')
@@ -54,9 +54,9 @@ export const generate = (
   const f = BNadd(x, BNmul(c, sk, n), n)
   const d = ECpow(a, sk)
 
-  log && console.log('a1 is on the curve?\t', activeCurve.curve.validate(a1))
-  log && console.log('b1 is on the curve?\t', activeCurve.curve.validate(b1))
-  log && console.log('d is on the curve?\t', activeCurve.curve.validate(d))
+  log && console.log('a1 is on the curve?\t', Curve.validate(a1))
+  log && console.log('b1 is on the curve?\t', Curve.validate(b1))
+  log && console.log('d is on the curve?\t', Curve.validate(d))
 
   log && console.log('x\t\t\t', x)
   log && console.log('a1\t\t\t', a1)

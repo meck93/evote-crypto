@@ -8,16 +8,17 @@ To add the curve, do the following:
 - now, `curve25519-weier` can be instantiated via:
 
 ```javascript
-const curve = new EC('curve25519-weier)
+const curve = new EC('curve25519-weier')
 ```
 
-We define the `activeCurve` inside `src/ec-elgamal/activeCurve.ts`.
+We define the `curve` inside `src/ec-elgamal/curve.ts`.
 
 ```javascript
 // activeCurve.ts
 const EC = require('elliptic').ec
 const curve25519 = new EC('curve25519-weier')
-export const activeCurve = curve25519
+export const curveDefinition = curve25519
+export const curve = curveDefinition.curve
 ```
 
 ## Curve Configuration

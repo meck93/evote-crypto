@@ -1,4 +1,4 @@
-import { Helper } from '../index'
+import { Helper, Curve } from '../index'
 import {
   Cipher,
   CurvePoint,
@@ -18,8 +18,8 @@ import {
 } from '../helper'
 
 import BN = require('bn.js')
-import { activeCurve } from '../activeCurve'
 import { MembershipProof } from './models'
+import { curveDefinition } from '../curve'
 
 const printConsole = false
 
@@ -36,7 +36,7 @@ export function generateChallenge(
   const pointsAsString = curvePointsToString([c1, c2, a1, a2, b1, b2])
   const input = id + pointsAsString
 
-  let c = activeCurve
+  let c = curveDefinition
     .hash()
     .update(input)
     .digest('hex')
@@ -86,10 +86,10 @@ export function generateYesProof(
 
   const f1 = BNadd(x, BNmul(c1, r, n), n)
 
-  printConsole && console.log('a0 is on the curve?\t', activeCurve.curve.validate(a0))
-  printConsole && console.log('b0 is on the curve?\t', activeCurve.curve.validate(b0))
-  printConsole && console.log('a1 is on the curve?\t', activeCurve.curve.validate(a1))
-  printConsole && console.log('b1 is on the curve?\t', activeCurve.curve.validate(b1))
+  printConsole && console.log('a0 is on the curve?\t', Curve.validate(a0))
+  printConsole && console.log('b0 is on the curve?\t', Curve.validate(b0))
+  printConsole && console.log('a1 is on the curve?\t', Curve.validate(a1))
+  printConsole && console.log('b1 is on the curve?\t', Curve.validate(b1))
 
   printConsole && console.log('c0\t\t\t\t', c0.toString('hex'))
   printConsole && console.log('f0\t\t\t\t', f0.toString('hex'))
@@ -143,10 +143,10 @@ export function generateNoProof(
 
   const f0 = BNadd(x, BNmul(c0, r, n), n)
 
-  printConsole && console.log('a1 is on the curve?\t', activeCurve.curve.validate(a1))
-  printConsole && console.log('b1 is on the curve?\t', activeCurve.curve.validate(b1))
-  printConsole && console.log('a0 is on the curve?\t', activeCurve.curve.validate(a0))
-  printConsole && console.log('b0 is on the curve?\t', activeCurve.curve.validate(b0))
+  printConsole && console.log('a1 is on the curve?\t', Curve.validate(a1))
+  printConsole && console.log('b1 is on the curve?\t', Curve.validate(b1))
+  printConsole && console.log('a0 is on the curve?\t', Curve.validate(a0))
+  printConsole && console.log('b0 is on the curve?\t', Curve.validate(b0))
 
   printConsole && console.log('c1\t\t\t\t', c1.toString('hex'))
   printConsole && console.log('f1\t\t\t\t', f1.toString('hex'))
