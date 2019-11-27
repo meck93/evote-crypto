@@ -1,11 +1,11 @@
 export {}
-import { ECelGamal } from '../../src/index'
+import { ECelGamal } from '../../../src/index'
 import { ec } from 'elliptic'
 
 import { expect, assert } from 'chai'
-import { Cipher, CurvePoint, ValidVoteProof } from '../../src/ec-elgamal/models'
+import { Cipher, CurvePoint, ValidVoteProof } from '../../../src/ec-elgamal/models'
 
-import { activeCurve } from '../../src/ec-elgamal/activeCurve'
+import { activeCurve } from '../../../src/ec-elgamal/activeCurve'
 
 const log = false
 
@@ -32,7 +32,7 @@ describe('Elliptic Curve ElGamal Vote ZKP', () => {
     // encrypted yes vote + generate proof
     log && console.log('YES PROOF\n')
     const encryptedYesVote: Cipher = ECelGamal.Encryption.encrypt(yesVoteOnCurve, publicKey)
-    const yesProof: ValidVoteProof = ECelGamal.VoteZKP.generateYesProof(
+    const yesProof: ValidVoteProof = ECelGamal.Proof.Membership.generateYesProof(
       encryptedYesVote,
       params,
       publicKey,
@@ -40,7 +40,7 @@ describe('Elliptic Curve ElGamal Vote ZKP', () => {
     )
 
     // verify yes vote proof
-    const verifiedYesProof: boolean = ECelGamal.VoteZKP.verifyZKP(
+    const verifiedYesProof: boolean = ECelGamal.Proof.Membership.verifyZKP(
       encryptedYesVote,
       yesProof,
       params,
@@ -64,10 +64,10 @@ describe('Elliptic Curve ElGamal Vote ZKP', () => {
     // encrypt no vote + generate proof
     log && console.log('NO PROOF\n')
     const encryptedNoVote: Cipher = ECelGamal.Encryption.encrypt(noVoteOnCurve, publicKey)
-    const noProof = ECelGamal.VoteZKP.generateNoProof(encryptedNoVote, params, publicKey, uniqueID)
+    const noProof = ECelGamal.Proof.Membership.generateNoProof(encryptedNoVote, params, publicKey, uniqueID)
 
     // verify no vote proof
-    const verifiedNoProof: boolean = ECelGamal.VoteZKP.verifyZKP(
+    const verifiedNoProof: boolean = ECelGamal.Proof.Membership.verifyZKP(
       encryptedNoVote,
       noProof,
       params,

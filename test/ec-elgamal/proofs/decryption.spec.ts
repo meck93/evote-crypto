@@ -1,12 +1,12 @@
 export {}
-import { ECelGamal } from '../../src/index'
-import { CurvePoint, Cipher } from '../../src/ec-elgamal/models'
+import { ECelGamal } from '../../../src/index'
+import { CurvePoint, Cipher } from '../../../src/ec-elgamal/models'
 import { ec } from 'elliptic'
 
 import BN = require('bn.js')
 
 import { expect, assert } from 'chai'
-import { activeCurve } from '../../src/ec-elgamal/activeCurve'
+import { activeCurve } from '../../../src/ec-elgamal/activeCurve'
 
 // fixed constants for values 1 -> generator and 0 -> generator^-1
 const yesVoteOnCurve = activeCurve.curve.g

@@ -100,13 +100,13 @@ export function generateYesProof(
 // steps:
 // 1. generate fake values c1,f1 for m=1 (random values in Z_q)
 // 2. compute fake b_ = b/g
-// 3. compute fake (a1,b1) = (g^f1 / a^c1, h^f1 / b^c1)
+// 3. compute fake (a1,b1) = (g^f1 / a^c1, h^f1 / (b/g)^c1)
 // 4. generate proof for m=0
 //    4.1 generate a random value x in Z_q
 //    4.2 compute (a0,b0) =  (g^x, h^x)
 // 5. generate the challenge c
-// 6. compute c0 = q + c-c1
-// 7. compute f0 = x + c0 * r (NOTE: mod q!)
+// 6. compute c0 = c - c1
+// 7. compute f0 = x + c0 * r (NOTE: mod q! = mod n!)
 export function generateNoProof(
   cipher: Cipher,
   sp: SystemParameters,

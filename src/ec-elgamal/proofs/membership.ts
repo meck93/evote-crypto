@@ -1,11 +1,11 @@
-import { ECelGamal } from '../index'
+import { Helper } from '../index'
 import {
   Cipher,
   CurvePoint,
   ValidVoteProof,
   SystemParameters,
   SystemParametersSerialized,
-} from './models'
+} from '../models'
 import {
   ECmul,
   ECdiv,
@@ -16,10 +16,10 @@ import {
   curvePointsToString,
   deserializeParams,
   deserializeCurvePoint,
-} from './helper'
+} from '../helper'
 
 import BN = require('bn.js')
-import { activeCurve } from './activeCurve'
+import { activeCurve } from '../activeCurve'
 
 const printConsole = false
 
@@ -47,7 +47,16 @@ export function generateChallenge(
   return c
 }
 
-// Generates a proof for an encrypted yes vote.
+// generate a proof for an encrypted yes vote
+// steps:
+// 1. generate fake values c0,f0 for m=0 (random values in Z_q = Z_n)
+// 2. compute fake (a0,b0) = (g^f0 / a^c0, h^f0 / b^c0)
+// 3. generate proof for m=1
+//    3.1 generate a random value x in Z_q = Z_n
+//    3.2 compute (a1,b1) =  (g^x, h^x)
+// 4. generate the challenge c
+// 5. compute c1 = c - c0
+// 6. compute f1 = x + c1 * r (NOTE: mod q! = mod n!)
 export function generateYesProof(
   encryptedVote: Cipher,
   params: SystemParameters | SystemParametersSerialized,
@@ -62,29 +71,20 @@ export function generateYesProof(
     throw new Error('value r is undefined')
   }
 
-  // generate fake values for m=0 part
-  const c0: BN = ECelGamal.Helper.getSecureRandomValue(n)
-  const f0: BN = ECelGamal.Helper.getSecureRandomValue(n)
+  const c0: BN = Helper.getSecureRandomValue(n)
+  const f0: BN = Helper.getSecureRandomValue(n)
 
-  // compute fake a0. g^f0/a^c0
   const a0 = ECdiv(ECpow(g, f0), ECpow(a, c0))
-
-  // compute fake b0. h^f0/b^c0
   const b0 = ECdiv(ECpow(h, f0), ECpow(b, c0))
 
-  // generate proof for m=1 part
-  const x: BN = ECelGamal.Helper.getSecureRandomValue(n)
-
+  const x: BN = Helper.getSecureRandomValue(n)
   const a1 = ECpow(g, x)
   const b1 = ECpow(h, x)
 
-  // generate the challenge
   const c = generateChallenge(n, id, a, b, a0, b0, a1, b1)
   const c1 = BNadd(n, BNsub(c, c0, n), n)
 
-  // compute f1 = x + c1 * r (NOTE: mod q!) => in the EC case this is (mod n) instead of (mod p)
-  const c1r = BNmul(c1, r, n)
-  const f1 = BNadd(x, c1r, n)
+  const f1 = BNadd(x, BNmul(c1, r, n), n)
 
   printConsole && console.log('a0 is on the curve?\t', activeCurve.curve.validate(a0))
   printConsole && console.log('b0 is on the curve?\t', activeCurve.curve.validate(b0))
@@ -102,7 +102,17 @@ export function generateYesProof(
   return { a0, a1, b0, b1, c0, c1, f0, f1 }
 }
 
-// Generates a proof for an encrypted no vote.
+// generate a proof for an encrypted no vote
+// steps:
+// 1. generate fake values c1,f1 for m=1 (random values in Z_q = Z_n)
+// 2. compute fake b_ = b/g
+// 3. compute fake (a1,b1) = (g^f1 / a^c1, h^f1 / (b/g)^c1)
+// 4. generate proof for m=0
+//    4.1 generate a random value x in Z_q = Z_n
+//    4.2 compute (a0,b0) =  (g^x, h^x)
+// 5. generate the challenge c
+// 6. compute c0 = c - c1
+// 7. compute f0 = x + c0 * r (NOTE: mod q!)
 export function generateNoProof(
   encryptedVote: Cipher,
   params: SystemParameters | SystemParametersSerialized,
@@ -117,32 +127,21 @@ export function generateNoProof(
     throw new Error('value r is undefined')
   }
 
-  // generate fake values for m=0 part
-  const c1: BN = ECelGamal.Helper.getSecureRandomValue(n)
-  const f1: BN = ECelGamal.Helper.getSecureRandomValue(n)
+  const c1: BN = Helper.getSecureRandomValue(n)
+  const f1: BN = Helper.getSecureRandomValue(n)
 
-  // compute fake b: b/g
   const b_ = ECdiv(b, g)
-
-  // compute fake a0. g^f1/a^c1
   const a1 = ECdiv(ECpow(g, f1), ECpow(a, c1))
-
-  // compute fake b0. h^f1/b^(b/g)
   const b1 = ECdiv(ECpow(h, f1), ECpow(b_, c1))
 
-  // generate proof for m=1 part
-  const x: BN = ECelGamal.Helper.getSecureRandomValue(n)
-
+  const x: BN = Helper.getSecureRandomValue(n)
   const a0 = ECpow(g, x)
   const b0 = ECpow(h, x)
 
-  // generate the challenge
   const c = generateChallenge(n, id, a, b, a0, b0, a1, b1)
   const c0 = BNadd(n, BNsub(c, c1, n), n)
 
-  // compute f0 = x + c0 * r (NOTE: mod q!) => in the EC case this is (mod n) instead of (mod p)
-  const c0r = BNmul(c0, r, n)
-  const f0 = BNadd(x, c0r, n)
+  const f0 = BNadd(x, BNmul(c0, r, n), n)
 
   printConsole && console.log('a1 is on the curve?\t', activeCurve.curve.validate(a1))
   printConsole && console.log('b1 is on the curve?\t', activeCurve.curve.validate(b1))
@@ -160,6 +159,11 @@ export function generateNoProof(
   return { a0, a1, b0, b1, c0, c1, f0, f1 }
 }
 
+// verification g^f0 == a0*a^c0
+// verification g^f1 == a1*a^c1
+// verification h^f0 == b0 * b^c0
+// verification h^f1 == b1 * (b/g)^c1
+// recompute the hash and verify
 export function verifyZKP(
   encryptedVote: Cipher,
   proof: ValidVoteProof,
@@ -172,31 +176,11 @@ export function verifyZKP(
   const h = deserializeCurvePoint(publicKey)
   const { a, b } = encryptedVote
 
-  // verification g^f0 == a0*a^c0
-  const l1 = ECpow(g, f0)
-  const r1 = ECmul(a0, ECpow(a, c0))
-  const v1 = l1.eq(r1)
-
-  // verification g^f1 == a1*a^c1
-  const l2 = ECpow(g, f1)
-  const r2 = ECmul(a1, ECpow(a, c1))
-  const v2 = l2.eq(r2)
-
-  // verification h^f0 == b0 * b^c0
-  const l3 = ECpow(h, f0)
-  const r3 = ECmul(b0, ECpow(b, c0))
-  printConsole && console.log('r3 == l3?\t\t', l3.eq(r3), '\n')
-  const v3 = l3.eq(r3)
-
-  // verification h^f1 == b1 * (b/g)^c1
-  const l4 = ECpow(h, f1)
-  const r4 = ECmul(b1, ECpow(ECdiv(b, g), c1))
-  const v4 = l4.eq(r4)
-
-  // recompute the hash and verify
-  const lc = BNadd(c0, c1, n)
-  const rc = generateChallenge(n, id, a, b, a0, b0, a1, b1)
-  const v5 = lc.eq(rc)
+  const v1 = ECpow(g, f0).eq(ECmul(a0, ECpow(a, c0)))
+  const v2 = ECpow(g, f1).eq(ECmul(a1, ECpow(a, c1)))
+  const v3 = ECpow(h, f0).eq(ECmul(b0, ECpow(b, c0)))
+  const v4 = ECpow(h, f1).eq(ECmul(b1, ECpow(ECdiv(b, g), c1)))
+  const v5 = BNadd(c0, c1, n).eq(generateChallenge(n, id, a, b, a0, b0, a1, b1))
 
   printConsole && console.log('g^f0 == a0*a^c0:\t', v1)
   printConsole && console.log('g^f1 == a1*a^c1\t\t', v2)
