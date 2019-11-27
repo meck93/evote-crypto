@@ -1,4 +1,3 @@
-export {}
 import { assert } from 'chai'
 import { ECelGamal } from '../../src/index'
 

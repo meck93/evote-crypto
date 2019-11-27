@@ -1,4 +1,3 @@
-export {}
 import BN = require('bn.js')
 import { expect } from 'chai'
 import { FFelGamal } from '../../src/index'
