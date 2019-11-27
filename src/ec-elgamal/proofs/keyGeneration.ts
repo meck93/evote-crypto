@@ -1,10 +1,11 @@
-import { ECelGamal } from '..'
-import { ECpow, ECdiv, ECmul, BNmul, BNadd, curvePointsToString } from './helper'
 import BN = require('bn.js')
 import { ec as EC } from 'elliptic'
+import { ECelGamal } from '../..'
+import { ECpow, ECdiv, ECmul, BNmul, BNadd, curvePointsToString } from '../helper'
 
-import { activeCurve } from './activeCurve'
-import { CurvePoint, KeyShareProof, Cipher } from './models'
+import { activeCurve } from '../activeCurve'
+import { CurvePoint, KeyShareProof } from '../models'
+
 const web3 = require('web3')
 
 export const generateChallenge = (n: BN, uniqueID: string, h_: CurvePoint, b: CurvePoint): BN => {
@@ -15,7 +16,10 @@ export const generateChallenge = (n: BN, uniqueID: string, h_: CurvePoint, b: Cu
   return c
 }
 
-export const generateKeyGenerationProof = (
+// 1. generate a "second" key pair (a,b)
+// 2. compute challenge
+// 3. compute d = a + c*sk
+export const generate = (
   params: ECelGamal.SystemParameters,
   share: ECelGamal.KeyPair,
   id: string
@@ -23,21 +27,21 @@ export const generateKeyGenerationProof = (
   const { n } = params
   const { h, sk } = share
 
-  // generate a second key pair (a,b)
   const keyPair: EC.KeyPair = activeCurve.genKeyPair()
   const a: BN = keyPair.getPrivate()
   const b: CurvePoint = keyPair.getPublic() as CurvePoint
 
-  // compute challenge hash(h_, b)
   const c: BN = generateChallenge(n, id, h, b)
-
-  // compute d = a + c*sk_
   const d: BN = BNadd(a, BNmul(c, sk, n), n)
 
   return { c: c, d: d }
 }
 
-export const verifyKeyGenerationProof = (
+// 1. recompute b = g^d / h^c
+// 2. recompute the challenge c
+// 3. verify that the challenge is correct
+// 4. verify that: g^d == b * h^c
+export const verify = (
   params: ECelGamal.SystemParameters,
   proof: KeyShareProof,
   h_: CurvePoint,
@@ -47,15 +51,11 @@ export const verifyKeyGenerationProof = (
   const { n, g } = params
   const { c, d } = proof
 
-  // recompute b = g^d/h_^c
-  // const b: BN = BNdiv(BNpow(g, d, p), BNpow(h_, c, p), p)
   const b: CurvePoint = ECdiv(ECpow(g, d), ECpow(h_, c))
 
-  // recompute the challenge c = hash(id, h_, b)
   const c_: BN = generateChallenge(n, id, h_, b)
   const hashCheck: boolean = c.eq(c_)
 
-  // verify that: g^d == b * h_^c
   const gPowd: CurvePoint = ECpow(g, d)
   const bhPowC: CurvePoint = ECmul(b, ECpow(h_, c))
   const dCheck: boolean = gPowd.eq(bhPowC)
