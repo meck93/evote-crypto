@@ -4,7 +4,8 @@ import { ECelGamal } from '../..'
 import { ECpow, ECdiv, ECmul, BNmul, BNadd, curvePointsToString } from '../helper'
 
 import { activeCurve } from '../activeCurve'
-import { CurvePoint, KeyShareProof } from '../models'
+import { CurvePoint } from '../models'
+import { KeyGenerationProof } from './models'
 
 const web3 = require('web3')
 
@@ -23,7 +24,7 @@ export const generate = (
   params: ECelGamal.SystemParameters,
   share: ECelGamal.KeyPair,
   id: string
-): KeyShareProof => {
+): KeyGenerationProof => {
   const { n } = params
   const { h, sk } = share
 
@@ -43,7 +44,7 @@ export const generate = (
 // 4. verify that: g^d == b * h^c
 export const verify = (
   params: ECelGamal.SystemParameters,
-  proof: KeyShareProof,
+  proof: KeyGenerationProof,
   h_: CurvePoint,
   id: string
 ): boolean => {

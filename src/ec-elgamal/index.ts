@@ -9,8 +9,6 @@ export { Encryption, Voting, Helper, Curve, SystemSetup, Proof }
 import {
   Cipher,
   SystemParameters,
-  KeyShareProof,
-  ValidVoteProof,
   KeyPair,
   CurvePoint,
   SystemParametersSerialized,
@@ -18,8 +16,6 @@ import {
 export {
   Cipher,
   SystemParameters,
-  KeyShareProof,
-  ValidVoteProof,
   KeyPair,
   CurvePoint,
   SystemParametersSerialized,

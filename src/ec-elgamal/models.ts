@@ -27,26 +27,6 @@ export interface Cipher {
   r?: BN
 }
 
-export interface ValidVoteProof {
-  a0: CurvePoint
-  a1: CurvePoint
-  b0: CurvePoint
-  b1: CurvePoint
-  c0: BN
-  c1: BN
-  f0: BN
-  f1: BN
-}
-
-export interface KeyShareProof {
-  c: BN
-  d: BN
-}
-
-interface A {
-  member: string
-}
-
 export const instanceOfSystemParametersSerialized = (
   object: any
 ): object is SystemParametersSerialized => {

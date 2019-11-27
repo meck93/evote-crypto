@@ -4,7 +4,7 @@ import { ECpow, ECmul } from '../../../src/ec-elgamal/helper'
 
 import { expect } from 'chai'
 import { activeCurve } from '../../../src/ec-elgamal/activeCurve'
-import { CurvePoint, KeyShareProof } from '../../../src/ec-elgamal/models'
+import { CurvePoint } from '../../../src/ec-elgamal/models'
 
 const generateKeyPairs = (n: number): ECelGamal.KeyPair[] => {
   const res: ECelGamal.KeyPair[] = []
@@ -36,7 +36,7 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
 
       // generate the key share generation proof
       const uniqueId = 'IamReallyUnique;-)'
-      const proof: KeyShareProof = ECelGamal.Proof.KeyGeneration.generate(
+      const proof: ECelGamal.Proof.KeyGenerationProof = ECelGamal.Proof.KeyGeneration.generate(
         params,
         share,
         uniqueId
@@ -89,7 +89,7 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
     // generate the public and private key share and the key generation proof
     const share1: ECelGamal.KeyPair = ECelGamal.SystemSetup.generateKeyPair()
     const uniqueId1 = 'IamReallyUnique;-)'
-    const proof1: KeyShareProof = ECelGamal.Proof.KeyGeneration.generate(
+    const proof1: ECelGamal.Proof.KeyGenerationProof = ECelGamal.Proof.KeyGeneration.generate(
       params,
       share1,
       uniqueId1
@@ -106,7 +106,7 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
     // generate the public and private key share and the key generation proof
     const share2: ECelGamal.KeyPair = ECelGamal.SystemSetup.generateKeyPair()
     const uniqueId2 = 'IamMuchMoreUnique_o.o'
-    const proof2: KeyShareProof = ECelGamal.Proof.KeyGeneration.generate(
+    const proof2: ECelGamal.Proof.KeyGenerationProof = ECelGamal.Proof.KeyGeneration.generate(
       params,
       share2,
       uniqueId2

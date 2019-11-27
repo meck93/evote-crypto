@@ -2,7 +2,6 @@ import { Helper } from '../index'
 import {
   Cipher,
   CurvePoint,
-  ValidVoteProof,
   SystemParameters,
   SystemParametersSerialized,
 } from '../models'
@@ -20,6 +19,7 @@ import {
 
 import BN = require('bn.js')
 import { activeCurve } from '../activeCurve'
+import { MembershipProof } from './models'
 
 const printConsole = false
 
@@ -62,7 +62,7 @@ export function generateYesProof(
   params: SystemParameters | SystemParametersSerialized,
   publicKey: CurvePoint | string,
   id: string
-): ValidVoteProof {
+): MembershipProof {
   const { a, b, r } = encryptedVote
   const { g, n } = deserializeParams(params)
   const h = deserializeCurvePoint(publicKey)
@@ -118,7 +118,7 @@ export function generateNoProof(
   params: SystemParameters | SystemParametersSerialized,
   publicKey: CurvePoint | string,
   id: string
-): ValidVoteProof {
+): MembershipProof {
   const { a, b, r } = encryptedVote
   const { g, n } = deserializeParams(params)
   const h = deserializeCurvePoint(publicKey)
@@ -166,7 +166,7 @@ export function generateNoProof(
 // recompute the hash and verify
 export function verifyZKP(
   encryptedVote: Cipher,
-  proof: ValidVoteProof,
+  proof: MembershipProof,
   params: SystemParameters | SystemParametersSerialized,
   publicKey: CurvePoint | string,
   id: string

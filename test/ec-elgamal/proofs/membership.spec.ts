@@ -3,7 +3,7 @@ import { ECelGamal } from '../../../src/index'
 import { ec } from 'elliptic'
 
 import { expect, assert } from 'chai'
-import { Cipher, CurvePoint, ValidVoteProof } from '../../../src/ec-elgamal/models'
+import { Cipher, CurvePoint } from '../../../src/ec-elgamal/models'
 
 import { activeCurve } from '../../../src/ec-elgamal/activeCurve'
 
@@ -32,7 +32,7 @@ describe('Elliptic Curve ElGamal Vote ZKP', () => {
     // encrypted yes vote + generate proof
     log && console.log('YES PROOF\n')
     const encryptedYesVote: Cipher = ECelGamal.Encryption.encrypt(yesVoteOnCurve, publicKey)
-    const yesProof: ValidVoteProof = ECelGamal.Proof.Membership.generateYesProof(
+    const yesProof: ECelGamal.Proof.MembershipProof = ECelGamal.Proof.Membership.generateYesProof(
       encryptedYesVote,
       params,
       publicKey,
