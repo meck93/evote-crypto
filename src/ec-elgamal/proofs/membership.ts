@@ -1,23 +1,13 @@
-import { Helper, Curve } from '../index'
+import BN = require('bn.js')
+
 import {
   Cipher,
+  Curve,
   CurvePoint,
+  Helper,
   SystemParameters,
   SystemParametersSerialized,
-} from '../models'
-import {
-  ECmul,
-  ECdiv,
-  ECpow,
-  BNmul,
-  BNadd,
-  BNsub,
-  curvePointsToString,
-  deserializeParams,
-  deserializeCurvePoint,
-} from '../helper'
-
-import BN = require('bn.js')
+} from '../index'
 import { MembershipProof } from './models'
 import { curveDefinition } from '../curve'
 
@@ -33,7 +23,7 @@ export function generateChallenge(
   b1: CurvePoint,
   b2: CurvePoint
 ): BN {
-  const pointsAsString = curvePointsToString([c1, c2, a1, a2, b1, b2])
+  const pointsAsString = Helper.curvePointsToString([c1, c2, a1, a2, b1, b2])
   const input = id + pointsAsString
 
   let c = curveDefinition
@@ -64,8 +54,8 @@ export function generateYesProof(
   id: string
 ): MembershipProof {
   const { a, b, r } = encryptedVote
-  const { g, n } = deserializeParams(params)
-  const h = deserializeCurvePoint(publicKey)
+  const { g, n } = Helper.deserializeParams(params)
+  const h = Helper.deserializeCurvePoint(publicKey)
 
   if (r === undefined || r === null) {
     throw new Error('value r is undefined')
@@ -74,17 +64,17 @@ export function generateYesProof(
   const c0: BN = Helper.getSecureRandomValue(n)
   const f0: BN = Helper.getSecureRandomValue(n)
 
-  const a0 = ECdiv(ECpow(g, f0), ECpow(a, c0))
-  const b0 = ECdiv(ECpow(h, f0), ECpow(b, c0))
+  const a0 = Helper.ECdiv(Helper.ECpow(g, f0), Helper.ECpow(a, c0))
+  const b0 = Helper.ECdiv(Helper.ECpow(h, f0), Helper.ECpow(b, c0))
 
   const x: BN = Helper.getSecureRandomValue(n)
-  const a1 = ECpow(g, x)
-  const b1 = ECpow(h, x)
+  const a1 = Helper.ECpow(g, x)
+  const b1 = Helper.ECpow(h, x)
 
   const c = generateChallenge(n, id, a, b, a0, b0, a1, b1)
-  const c1 = BNadd(n, BNsub(c, c0, n), n)
+  const c1 = Helper.BNadd(n, Helper.BNsub(c, c0, n), n)
 
-  const f1 = BNadd(x, BNmul(c1, r, n), n)
+  const f1 = Helper.BNadd(x, Helper.BNmul(c1, r, n), n)
 
   printConsole && console.log('a0 is on the curve?\t', Curve.validate(a0))
   printConsole && console.log('b0 is on the curve?\t', Curve.validate(b0))
@@ -120,8 +110,8 @@ export function generateNoProof(
   id: string
 ): MembershipProof {
   const { a, b, r } = encryptedVote
-  const { g, n } = deserializeParams(params)
-  const h = deserializeCurvePoint(publicKey)
+  const { g, n } = Helper.deserializeParams(params)
+  const h = Helper.deserializeCurvePoint(publicKey)
 
   if (r === undefined || r === null) {
     throw new Error('value r is undefined')
@@ -130,18 +120,18 @@ export function generateNoProof(
   const c1: BN = Helper.getSecureRandomValue(n)
   const f1: BN = Helper.getSecureRandomValue(n)
 
-  const b_ = ECdiv(b, g)
-  const a1 = ECdiv(ECpow(g, f1), ECpow(a, c1))
-  const b1 = ECdiv(ECpow(h, f1), ECpow(b_, c1))
+  const b_ = Helper.ECdiv(b, g)
+  const a1 = Helper.ECdiv(Helper.ECpow(g, f1), Helper.ECpow(a, c1))
+  const b1 = Helper.ECdiv(Helper.ECpow(h, f1), Helper.ECpow(b_, c1))
 
   const x: BN = Helper.getSecureRandomValue(n)
-  const a0 = ECpow(g, x)
-  const b0 = ECpow(h, x)
+  const a0 = Helper.ECpow(g, x)
+  const b0 = Helper.ECpow(h, x)
 
   const c = generateChallenge(n, id, a, b, a0, b0, a1, b1)
-  const c0 = BNadd(n, BNsub(c, c1, n), n)
+  const c0 = Helper.BNadd(n, Helper.BNsub(c, c1, n), n)
 
-  const f0 = BNadd(x, BNmul(c0, r, n), n)
+  const f0 = Helper.BNadd(x, Helper.BNmul(c0, r, n), n)
 
   printConsole && console.log('a1 is on the curve?\t', Curve.validate(a1))
   printConsole && console.log('b1 is on the curve?\t', Curve.validate(b1))
@@ -172,15 +162,15 @@ export function verifyZKP(
   id: string
 ): boolean {
   const { a0, a1, b0, b1, c0, c1, f0, f1 } = proof
-  const { g, n } = deserializeParams(params)
-  const h = deserializeCurvePoint(publicKey)
+  const { g, n } = Helper.deserializeParams(params)
+  const h = Helper.deserializeCurvePoint(publicKey)
   const { a, b } = encryptedVote
 
-  const v1 = ECpow(g, f0).eq(ECmul(a0, ECpow(a, c0)))
-  const v2 = ECpow(g, f1).eq(ECmul(a1, ECpow(a, c1)))
-  const v3 = ECpow(h, f0).eq(ECmul(b0, ECpow(b, c0)))
-  const v4 = ECpow(h, f1).eq(ECmul(b1, ECpow(ECdiv(b, g), c1)))
-  const v5 = BNadd(c0, c1, n).eq(generateChallenge(n, id, a, b, a0, b0, a1, b1))
+  const v1 = Helper.ECpow(g, f0).eq(Helper.ECmul(a0, Helper.ECpow(a, c0)))
+  const v2 = Helper.ECpow(g, f1).eq(Helper.ECmul(a1, Helper.ECpow(a, c1)))
+  const v3 = Helper.ECpow(h, f0).eq(Helper.ECmul(b0, Helper.ECpow(b, c0)))
+  const v4 = Helper.ECpow(h, f1).eq(Helper.ECmul(b1, Helper.ECpow(Helper.ECdiv(b, g), c1)))
+  const v5 = Helper.BNadd(c0, c1, n).eq(generateChallenge(n, id, a, b, a0, b0, a1, b1))
 
   printConsole && console.log('g^f0 == a0*a^c0:\t', v1)
   printConsole && console.log('g^f1 == a1*a^c1\t\t', v2)

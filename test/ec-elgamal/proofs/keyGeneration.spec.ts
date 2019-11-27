@@ -1,9 +1,6 @@
 export {}
-import { ECelGamal } from '../../../src/index'
-import { ECpow, ECmul } from '../../../src/ec-elgamal/helper'
-
 import { expect } from 'chai'
-import { CurvePoint } from '../../../src/ec-elgamal/models'
+import { ECelGamal } from '../../../src/index'
 
 const generateKeyPairs = (n: number): ECelGamal.KeyPair[] => {
   const res: ECelGamal.KeyPair[] = []
@@ -26,7 +23,7 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
       const share: ECelGamal.KeyPair = ECelGamal.SystemSetup.generateKeyPair()
       const { h: h1, sk: sk1 } = share
 
-      expect(h1).to.eql(ECpow(g, sk1))
+      expect(h1).to.eql(ECelGamal.Helper.ECpow(g, sk1))
 
       log && console.log('Key Parts')
       log && console.log('h_:\t', h1.toString())
@@ -62,20 +59,20 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
   it('combine public keys', () => {
     // generate one share
     let keyPairs: ECelGamal.KeyPair[] = generateKeyPairs(1)
-    let shares: CurvePoint[] = [keyPairs[0].h]
-    let product: CurvePoint = shares[0]
+    let shares: ECelGamal.CurvePoint[] = [keyPairs[0].h]
+    let product: ECelGamal.CurvePoint = shares[0]
     expect(ECelGamal.SystemSetup.combinePublicKeys(shares)).to.eql(product)
 
     // generate two shares + combine them
     keyPairs = generateKeyPairs(2)
     shares = [keyPairs[0].h, keyPairs[1].h]
-    product = ECmul(shares[0], shares[1])
+    product = ECelGamal.Helper.ECmul(shares[0], shares[1])
     expect(ECelGamal.SystemSetup.combinePublicKeys(shares)).to.eql(product)
 
     // generate three shares + combine them
     keyPairs = generateKeyPairs(3)
     shares = [keyPairs[0].h, keyPairs[1].h, keyPairs[2].h]
-    product = ECmul(ECmul(shares[0], shares[1]), shares[2])
+    product = ECelGamal.Helper.ECmul(ECelGamal.Helper.ECmul(shares[0], shares[1]), shares[2])
     expect(ECelGamal.SystemSetup.combinePublicKeys(shares)).to.eql(product)
   })
 

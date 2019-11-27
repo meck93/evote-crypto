@@ -1,6 +1,6 @@
 export {}
-import { ECelGamal } from '../../src/index'
 import { assert } from 'chai'
+import { ECelGamal } from '../../src/index'
 
 describe('Elliptic Curve ElGamal Voting', () => {
   it('Voting works correctly in various scenarii', () => {

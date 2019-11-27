@@ -1,23 +1,21 @@
-import { encrypt, decrypt } from './encryption'
-import { Encryption, Helper, Curve } from './'
-import { CurvePoint, Cipher } from './models'
-
 import BN = require('bn.js')
-import { Summary } from '../models'
+
+import { Summary } from '../index'
+import { Cipher, Curve, CurvePoint, Encryption, Helper } from './index'
 
 const startingPoint = Curve.g
 const infinityPoint = startingPoint.add(startingPoint.neg())
 
 export const generateYesVote = (pk: string | CurvePoint): Cipher => {
-  return encrypt(startingPoint, Helper.deserializeCurvePoint(pk))
+  return Encryption.encrypt(startingPoint, Helper.deserializeCurvePoint(pk))
 }
 
 export const generateNoVote = (pk: string | CurvePoint): Cipher => {
-  return encrypt(startingPoint.neg(), Helper.deserializeCurvePoint(pk))
+  return Encryption.encrypt(startingPoint.neg(), Helper.deserializeCurvePoint(pk))
 }
 
 export const generateBaseVote = (pk: string | CurvePoint): Cipher => {
-  return encrypt(infinityPoint, Helper.deserializeCurvePoint(pk))
+  return Encryption.encrypt(infinityPoint, Helper.deserializeCurvePoint(pk))
 }
 
 export const addVotes = (votes: Cipher[], pk: string | CurvePoint): Cipher => {
@@ -49,7 +47,7 @@ export const tallyVotes = (pk: string, sk: BN, votes: Cipher[]): number => {
   // Fix: Serialize the key in the fronend and extract the public key from the passed hex-string
   const publicKey = Helper.deserializeCurvePoint(pk)
 
-  const sum = decrypt(addVotes(votes, publicKey), sk)
+  const sum = Encryption.decrypt(addVotes(votes, publicKey), sk)
   return checkDecrypedSum(sum)
 }
 
@@ -75,4 +73,3 @@ export const getSummary = (total: number, tallyResult: number): Summary => {
   }
   return { total, yes, no } as Summary
 }
-

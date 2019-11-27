@@ -1,10 +1,12 @@
 import { curve as Curve } from './curve'
-import * as Encryption from './encryption'
-import * as Voting from './voting'
-import * as Helper from './helper'
-import * as SystemSetup from './systemSetup'
-import * as Proof from './proofs'
-export { Encryption, Voting, Helper, Curve, SystemSetup, Proof }
+export { Curve }
 
-import { Cipher, SystemParameters, KeyPair, CurvePoint, SystemParametersSerialized } from './models'
-export { Cipher, SystemParameters, KeyPair, CurvePoint, SystemParametersSerialized }
+import * as Encryption from './encryption'
+import * as Helper from './helper'
+import * as Proof from './proofs'
+import * as SystemSetup from './systemSetup'
+import * as Voting from './voting'
+export { Encryption, Helper, Proof, SystemSetup, Voting }
+
+import { Cipher, CurvePoint, KeyPair, SystemParameters, SystemParametersSerialized } from './models'
+export { Cipher, CurvePoint, KeyPair, SystemParameters, SystemParametersSerialized }

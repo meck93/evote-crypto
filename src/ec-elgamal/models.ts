@@ -27,6 +27,7 @@ export interface Cipher {
   r?: BN
 }
 
+// TODO: test me
 export const instanceOfSystemParametersSerialized = (
   object: any
 ): object is SystemParametersSerialized => {

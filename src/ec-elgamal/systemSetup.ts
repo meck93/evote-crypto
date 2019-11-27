@@ -1,9 +1,8 @@
 import BN = require('bn.js')
 import { ec as EC } from 'elliptic'
 
-import { SystemParameters, CurvePoint, KeyPair } from './models'
-import { Helper, Curve } from './index'
 import { curveDefinition } from './curve'
+import { Curve, CurvePoint, Helper, KeyPair, SystemParameters } from './index'
 
 export const generateSystemParameters = (): SystemParameters => {
   return { p: Curve.p, n: Curve.n, g: Curve.g }

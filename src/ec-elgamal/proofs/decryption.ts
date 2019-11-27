@@ -1,9 +1,14 @@
 import BN = require('bn.js')
-import { CurvePoint, Cipher, SystemParameters, SystemParametersSerialized } from '../models'
-import { ECmul, ECpow, BNmul, BNadd, deserializeParams, deserializeCurvePoint } from '../helper'
 
+import {
+  Cipher,
+  Curve,
+  CurvePoint,
+  Helper,
+  SystemParameters,
+  SystemParametersSerialized,
+} from '../index'
 import { DecryptionProof } from './models'
-import { Helper, Curve } from '../index'
 import { curveDefinition } from '../curve'
 
 export function generateChallenge(
@@ -43,16 +48,16 @@ export const generate = (
   log = false
 ): DecryptionProof => {
   const { a, b } = cipher
-  const { g, n } = deserializeParams(params)
+  const { g, n } = Helper.deserializeParams(params)
 
   const x: BN = Helper.getSecureRandomValue(n)
 
-  const a1 = ECpow(a, x)
-  const b1 = ECpow(g, x)
+  const a1 = Helper.ECpow(a, x)
+  const b1 = Helper.ECpow(g, x)
 
   const c = generateChallenge(n, id, a, b, a1, b1)
-  const f = BNadd(x, BNmul(c, sk, n), n)
-  const d = ECpow(a, sk)
+  const f = Helper.BNadd(x, Helper.BNmul(c, sk, n), n)
+  const d = Helper.ECpow(a, sk)
 
   log && console.log('a1 is on the curve?\t', Curve.validate(a1))
   log && console.log('b1 is on the curve?\t', Curve.validate(b1))
@@ -81,18 +86,18 @@ export const verify = (
   log = false
 ): boolean => {
   const { a, b } = encryptedSum
-  const { g, n } = deserializeParams(params)
-  pk = deserializeCurvePoint(pk)
+  const { g, n } = Helper.deserializeParams(params)
+  pk = Helper.deserializeCurvePoint(pk)
   const { a1, b1, f, d } = proof
 
   const c = generateChallenge(n, id, a, b, a1, b1)
 
-  const l1 = ECpow(a, f)
-  const r1 = ECmul(a1, ECpow(d, c))
+  const l1 = Helper.ECpow(a, f)
+  const r1 = Helper.ECmul(a1, Helper.ECpow(d, c))
   const v1 = l1.eq(r1)
 
-  const l2 = ECpow(g, f)
-  const r2 = ECmul(b1, ECpow(pk, c))
+  const l2 = Helper.ECpow(g, f)
+  const r2 = Helper.ECmul(b1, Helper.ECpow(pk, c))
   const v2 = l2.eq(r2)
 
   log && console.log('a^f == a1*d^c:\t\t', v1)

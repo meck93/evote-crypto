@@ -1,3 +1,6 @@
+import BN = require('bn.js')
+import crypto = require('crypto')
+
 // check if a given number is prime
 export const isPrime = (num: number): boolean => {
   for (let i = 2; i <= Math.sqrt(num); i++) {
@@ -61,9 +64,6 @@ export const getGCandidates = (p: number): number[] =>
   getPrimitiveRoots(getQofP(p)).reduce((previous: number[], current: number) => {
     return isGValid(current, p) ? [...previous, current] : previous
   }, [])
-
-import crypto = require('crypto')
-import BN = require('bn.js')
 
 // Computes the required number of bytes to store a decimal
 export const getByteSizeForDecimalNumber = (q: BN): number => {

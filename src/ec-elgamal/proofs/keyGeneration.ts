@@ -1,16 +1,12 @@
 import BN = require('bn.js')
-import { ec as EC } from 'elliptic'
-import { ECelGamal } from '../..'
-import { ECpow, ECdiv, ECmul, BNmul, BNadd, curvePointsToString } from '../helper'
 
-import { CurvePoint } from '../models'
-import { KeyGenerationProof } from './models'
-import { SystemSetup, KeyPair } from '..'
+import { CurvePoint, Helper, KeyPair, SystemSetup, SystemParameters } from '../index'
+import { KeyGenerationProof } from './index'
 
 const web3 = require('web3')
 
 export const generateChallenge = (n: BN, uniqueID: string, h_: CurvePoint, b: CurvePoint): BN => {
-  const pointsAsString = curvePointsToString([h_, b])
+  const pointsAsString = Helper.curvePointsToString([h_, b])
   const hashString: string = web3.utils.soliditySha3(uniqueID, pointsAsString)
   let c: BN = web3.utils.toBN(hashString)
   c = c.mod(n)
@@ -21,8 +17,8 @@ export const generateChallenge = (n: BN, uniqueID: string, h_: CurvePoint, b: Cu
 // 2. compute challenge
 // 3. compute d = a + c*sk
 export const generate = (
-  params: ECelGamal.SystemParameters,
-  share: ECelGamal.KeyPair,
+  params: SystemParameters,
+  share: KeyPair,
   id: string
 ): KeyGenerationProof => {
   const { n } = params
@@ -33,7 +29,7 @@ export const generate = (
   const b: CurvePoint = keyPair.h
 
   const c: BN = generateChallenge(n, id, h, b)
-  const d: BN = BNadd(a, BNmul(c, sk, n), n)
+  const d: BN = Helper.BNadd(a, Helper.BNmul(c, sk, n), n)
 
   return { c: c, d: d }
 }
@@ -43,7 +39,7 @@ export const generate = (
 // 3. verify that the challenge is correct
 // 4. verify that: g^d == b * h^c
 export const verify = (
-  params: ECelGamal.SystemParameters,
+  params: SystemParameters,
   proof: KeyGenerationProof,
   h_: CurvePoint,
   id: string
@@ -52,13 +48,13 @@ export const verify = (
   const { n, g } = params
   const { c, d } = proof
 
-  const b: CurvePoint = ECdiv(ECpow(g, d), ECpow(h_, c))
+  const b: CurvePoint = Helper.ECdiv(Helper.ECpow(g, d), Helper.ECpow(h_, c))
 
   const c_: BN = generateChallenge(n, id, h_, b)
   const hashCheck: boolean = c.eq(c_)
 
-  const gPowd: CurvePoint = ECpow(g, d)
-  const bhPowC: CurvePoint = ECmul(b, ECpow(h_, c))
+  const gPowd: CurvePoint = Helper.ECpow(g, d)
+  const bhPowC: CurvePoint = Helper.ECmul(b, Helper.ECpow(h_, c))
   const dCheck: boolean = gPowd.eq(bhPowC)
 
   log && console.log('do the hashes match?\t', hashCheck)

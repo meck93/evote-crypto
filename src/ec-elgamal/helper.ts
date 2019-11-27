@@ -1,12 +1,8 @@
-import crypto = require('crypto')
 import BN = require('bn.js')
-import {
-  CurvePoint,
-  SystemParameters,
-  SystemParametersSerialized,
-  instanceOfSystemParametersSerialized,
-} from './models'
-import { Curve } from './index'
+import crypto = require('crypto')
+
+import { Curve, CurvePoint, SystemParameters, SystemParametersSerialized } from './index'
+import { instanceOfSystemParametersSerialized } from './models'
 
 export const getSecureRandomValue = (n: BN): BN => {
   const byteSize = 32

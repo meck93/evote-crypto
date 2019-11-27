@@ -1,8 +1,6 @@
 export {}
+import { assert, expect } from 'chai'
 import { ECelGamal } from '../../../src/index'
-import { CurvePoint, Cipher } from '../../../src/ec-elgamal/models'
-
-import { expect, assert } from 'chai'
 
 // fixed constants for values 1 -> generator and 0 -> generator^-1
 const yesVoteOnCurve = ECelGamal.Curve.g
@@ -15,7 +13,7 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
 
   it('Should generate a valid sum proof for a number of votes', () => {
     const log = false
-    const {h: publicKey, sk: privateKey} = ECelGamal.SystemSetup.generateKeyPair()
+    const { h: publicKey, sk: privateKey } = ECelGamal.SystemSetup.generateKeyPair()
 
     const params: ECelGamal.SystemParameters = {
       p: ECelGamal.Curve.p,
@@ -25,7 +23,7 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
     const uniqueID = '0xAd4E7D8f03904b175a1F8AE0D88154f329ac9329'
 
     const generateAndVerifySum = (_votes: number[], _result: number): void => {
-      const votes: Cipher[] = []
+      const votes: ECelGamal.Cipher[] = []
 
       for (const vote of _votes) {
         vote === 1 && votes.push(ECelGamal.Encryption.encrypt(yesVoteOnCurve, publicKey))
@@ -33,7 +31,7 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
       }
 
       // homomorphically add votes + generate sum proof
-      const encryptedSum: Cipher = ECelGamal.Voting.addVotes(votes, publicKey)
+      const encryptedSum: ECelGamal.Cipher = ECelGamal.Voting.addVotes(votes, publicKey)
       const sumProof: ECelGamal.Proof.DecryptionProof = ECelGamal.Proof.Decryption.generate(
         encryptedSum,
         params,
@@ -52,7 +50,7 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
       expect(verifiedSumProof).to.be.true
 
       // decrypt sum
-      const decryptedSum: CurvePoint = ECelGamal.Encryption.decrypt(encryptedSum, privateKey)
+      const decryptedSum: ECelGamal.CurvePoint = ECelGamal.Encryption.decrypt(encryptedSum, privateKey)
       const result = ECelGamal.Voting.checkDecrypedSum(decryptedSum)
 
       const summary = ECelGamal.Voting.getSummary(votes.length, result)

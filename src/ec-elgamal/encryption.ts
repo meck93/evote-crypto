@@ -1,5 +1,5 @@
 import BN = require('bn.js')
-import { Cipher, CurvePoint, Helper, Curve } from './index'
+import { Cipher, Curve, CurvePoint, Helper } from './index'
 
 // Elliptic Curve ElGamal Encryption
 //

@@ -1,7 +1,6 @@
 export {}
+import { assert } from 'chai'
 import { ECelGamal } from '../../src/index'
-
-const { assert } = require('chai')
 
 // Fixed values for testing purposes
 // NO Vote:  mapped to integer 3
@@ -19,7 +18,7 @@ describe('Elliptic Curve ElGamal Encryption', function() {
   })
 
   it('Decrypted value is the same as the original message', function() {
-    const {h: publicKey, sk: privateKey} = ECelGamal.SystemSetup.generateKeyPair()
+    const { h: publicKey, sk: privateKey } = ECelGamal.SystemSetup.generateKeyPair()
 
     const messageToEncrypt = noVoteOnCurve
     const cipherText = ECelGamal.Encryption.encrypt(noVoteOnCurve, publicKey)
@@ -29,7 +28,7 @@ describe('Elliptic Curve ElGamal Encryption', function() {
   })
 
   it('Two added ciphertexts should be the same as adding two plain texts', function() {
-    const {h: publicKey, sk: privateKey} = ECelGamal.SystemSetup.generateKeyPair()
+    const { h: publicKey, sk: privateKey } = ECelGamal.SystemSetup.generateKeyPair()
 
     const voteToEncrypt0 = noVoteOnCurve
     const voteToEncrypt1 = yesVoteOnCurve

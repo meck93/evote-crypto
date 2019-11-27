@@ -1,9 +1,6 @@
 export {}
+import { assert, expect } from 'chai'
 import { ECelGamal } from '../../../src/index'
-import { ec } from 'elliptic'
-
-import { expect, assert } from 'chai'
-import { Cipher, CurvePoint } from '../../../src/ec-elgamal/models'
 
 const log = false
 
@@ -28,7 +25,10 @@ describe('Elliptic Curve ElGamal Vote ZKP', () => {
 
     // encrypted yes vote + generate proof
     log && console.log('YES PROOF\n')
-    const encryptedYesVote: Cipher = ECelGamal.Encryption.encrypt(yesVoteOnCurve, publicKey)
+    const encryptedYesVote: ECelGamal.Cipher = ECelGamal.Encryption.encrypt(
+      yesVoteOnCurve,
+      publicKey
+    )
     const yesProof: ECelGamal.Proof.MembershipProof = ECelGamal.Proof.Membership.generateYesProof(
       encryptedYesVote,
       params,
@@ -59,7 +59,7 @@ describe('Elliptic Curve ElGamal Vote ZKP', () => {
 
     // encrypt no vote + generate proof
     log && console.log('NO PROOF\n')
-    const encryptedNoVote: Cipher = ECelGamal.Encryption.encrypt(noVoteOnCurve, publicKey)
+    const encryptedNoVote: ECelGamal.Cipher = ECelGamal.Encryption.encrypt(noVoteOnCurve, publicKey)
     const noProof = ECelGamal.Proof.Membership.generateNoProof(
       encryptedNoVote,
       params,
