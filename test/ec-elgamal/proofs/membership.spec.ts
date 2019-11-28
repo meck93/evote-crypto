@@ -36,7 +36,7 @@ describe('Elliptic Curve ElGamal Vote ZKP', () => {
     )
 
     // verify yes vote proof
-    const verifiedYesProof: boolean = ECelGamal.Proof.Membership.verifyZKP(
+    const verifiedYesProof: boolean = ECelGamal.Proof.Membership.verify(
       encryptedYesVote,
       yesProof,
       params,
@@ -67,7 +67,7 @@ describe('Elliptic Curve ElGamal Vote ZKP', () => {
     )
 
     // verify no vote proof
-    const verifiedNoProof: boolean = ECelGamal.Proof.Membership.verifyZKP(
+    const verifiedNoProof: boolean = ECelGamal.Proof.Membership.verify(
       encryptedNoVote,
       noProof,
       params,
