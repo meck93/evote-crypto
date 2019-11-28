@@ -154,7 +154,7 @@ export function generateNoProof(
 // verification h^f0 == b0 * b^c0
 // verification h^f1 == b1 * (b/g)^c1
 // recompute the hash and verify
-export function verifyZKP(
+export function verify(
   encryptedVote: Cipher,
   proof: MembershipProof,
   params: SystemParameters | SystemParametersSerialized,
