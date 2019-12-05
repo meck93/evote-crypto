@@ -15,12 +15,9 @@ export const generateNoVote = (pk: string | CurvePoint): Cipher => {
   return Encryption.encrypt(noVote, Helper.deserializeCurvePoint(pk))
 }
 
-// FIXME: adjust so that there is no random number involved so that
-// each decrypting party gets the same base vote and thus the same
-// sum
 export const generateBaseVote = (pk: string | CurvePoint): Cipher => {
-  return Encryption.encrypt(infinityPoint, Helper.deserializeCurvePoint(pk))
-}
+  return { a: Curve.g, b: Helper.deserializeCurvePoint(pk) }
+} // encrypt with m=noVote, r=1
 
 export const addVotes = (votes: Cipher[], pk: string | CurvePoint): Cipher => {
   return votes.reduce(
