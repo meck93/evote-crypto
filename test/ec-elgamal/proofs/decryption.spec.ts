@@ -1,13 +1,10 @@
 import { assert, expect } from 'chai'
 import { ECelGamal } from '../../../src/index'
 
-// fixed constants for values 1 -> generator and 0 -> generator^-1
-const yesVoteOnCurve = ECelGamal.Curve.g
-const noVoteOnCurve = ECelGamal.Curve.g.neg()
-
 describe('Elliptic Curve ElGamal Sum ZKP', () => {
   it('Points that encode the plaintexts should lie on the curve', function() {
-    assert(ECelGamal.Curve.validate(noVoteOnCurve) && ECelGamal.Curve.validate(yesVoteOnCurve))
+    assert(ECelGamal.Curve.validate(ECelGamal.Voting.yesVote))
+    assert(ECelGamal.Curve.validate(ECelGamal.Voting.noVote))
   })
 
   it('Should generate a valid sum proof for a number of votes', () => {
@@ -25,8 +22,8 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
       const votes: ECelGamal.Cipher[] = []
 
       for (const vote of _votes) {
-        vote === 1 && votes.push(ECelGamal.Encryption.encrypt(yesVoteOnCurve, publicKey))
-        vote === 0 && votes.push(ECelGamal.Encryption.encrypt(noVoteOnCurve, publicKey))
+        vote === 1 && votes.push(ECelGamal.Encryption.encrypt(ECelGamal.Voting.yesVote, publicKey))
+        vote === 0 && votes.push(ECelGamal.Encryption.encrypt(ECelGamal.Voting.noVote, publicKey))
       }
 
       // homomorphically add votes + generate sum proof
@@ -74,10 +71,10 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
       expect(summary.no).to.equal(_votes.filter(v => v === 0).length)
     }
 
-    // Yes: 3, No: 2 -> Result: 1
-    generateAndVerifySum([1, 1, 1, 0, 0], 1)
+    // Yes: 3, No: 2 -> Result: 3
+    generateAndVerifySum([1, 1, 1, 0, 0], 3)
 
-    // Yes: 8, No: 10 -> Result: -2
-    generateAndVerifySum([0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0], -2)
+    // Yes: 8, No: 10 -> Result: 8
+    generateAndVerifySum([0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0], 8)
   })
 })

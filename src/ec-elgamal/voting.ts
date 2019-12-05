@@ -3,17 +3,21 @@ import BN = require('bn.js')
 import { Summary } from '../index'
 import { Cipher, Curve, CurvePoint, Encryption, Helper } from './index'
 
-const startingPoint = Curve.g
-const infinityPoint = startingPoint.add(startingPoint.neg())
+export const yesVote = Curve.g
+export const noVote = Curve.point(null, null)
+const infinityPoint = yesVote.add(yesVote.neg())
 
 export const generateYesVote = (pk: string | CurvePoint): Cipher => {
-  return Encryption.encrypt(startingPoint, Helper.deserializeCurvePoint(pk))
+  return Encryption.encrypt(yesVote, Helper.deserializeCurvePoint(pk))
 }
 
 export const generateNoVote = (pk: string | CurvePoint): Cipher => {
-  return Encryption.encrypt(startingPoint.neg(), Helper.deserializeCurvePoint(pk))
+  return Encryption.encrypt(noVote, Helper.deserializeCurvePoint(pk))
 }
 
+// FIXME: adjust so that there is no random number involved so that
+// each decrypting party gets the same base vote and thus the same
+// sum
 export const generateBaseVote = (pk: string | CurvePoint): Cipher => {
   return Encryption.encrypt(infinityPoint, Helper.deserializeCurvePoint(pk))
 }
@@ -26,17 +30,15 @@ export const addVotes = (votes: Cipher[], pk: string | CurvePoint): Cipher => {
 }
 
 export const findPoint = (point: CurvePoint): number => {
-  let pointPositive = startingPoint
-  let pointNegative = startingPoint.neg()
-  let counter = 1
+  let sumPoint = noVote
+  let counter = 0
 
-  while (!(point.eq(pointPositive) || point.eq(pointNegative))) {
-    pointPositive = pointPositive.add(startingPoint)
-    pointNegative = pointNegative.add(startingPoint.neg())
+  while (!point.eq(sumPoint)) {
+    sumPoint = sumPoint.add(yesVote)
     counter += 1
   }
 
-  return point.eq(pointNegative) ? -counter : counter
+  return counter
 }
 
 export const tallyVotes = (pk: string, sk: BN, votes: Cipher[]): number => {
@@ -56,20 +58,7 @@ export const checkDecrypedSum = (decryptedSum: CurvePoint): number => {
 }
 
 export const getSummary = (total: number, tallyResult: number): Summary => {
-  let yes = 0
-  let no = 0
-  if (tallyResult === 0) {
-    // total % 2 = 0
-    yes = total / 2
-    no = total / 2
-  } else if (tallyResult < 0) {
-    const diff = (total + tallyResult) / 2
-    no = -1 * tallyResult + diff
-    yes = total - no
-  } else if (tallyResult > 0) {
-    const diff = (total - tallyResult) / 2
-    yes = tallyResult + diff
-    no = total - yes
-  }
+  const yes = tallyResult - 0
+  const no = total - yes
   return { total, yes, no } as Summary
 }

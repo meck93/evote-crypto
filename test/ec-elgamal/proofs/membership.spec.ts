@@ -3,13 +3,10 @@ import { ECelGamal } from '../../../src/index'
 
 const log = false
 
-// fixed constants for values 1 -> generator and 0 -> generator^-1
-const yesVoteOnCurve = ECelGamal.Curve.g
-const noVoteOnCurve = ECelGamal.Curve.g.neg()
-
 describe('Elliptic Curve ElGamal Vote ZKP', () => {
   it('Points that encode the plaintexts should lie on the curve', function() {
-    assert(ECelGamal.Curve.validate(noVoteOnCurve) && ECelGamal.Curve.validate(yesVoteOnCurve))
+    assert(ECelGamal.Curve.validate(ECelGamal.Voting.yesVote))
+    assert(ECelGamal.Curve.validate(ECelGamal.Voting.noVote))
   })
 
   it('Should generate an elliptic curve valid YES vote proof', () => {
@@ -25,7 +22,7 @@ describe('Elliptic Curve ElGamal Vote ZKP', () => {
     // encrypted yes vote + generate proof
     log && console.log('YES PROOF\n')
     const encryptedYesVote: ECelGamal.Cipher = ECelGamal.Encryption.encrypt(
-      yesVoteOnCurve,
+      ECelGamal.Voting.yesVote,
       publicKey
     )
     const yesProof: ECelGamal.Proof.MembershipProof = ECelGamal.Proof.Membership.generateYesProof(
@@ -58,7 +55,10 @@ describe('Elliptic Curve ElGamal Vote ZKP', () => {
 
     // encrypt no vote + generate proof
     log && console.log('NO PROOF\n')
-    const encryptedNoVote: ECelGamal.Cipher = ECelGamal.Encryption.encrypt(noVoteOnCurve, publicKey)
+    const encryptedNoVote: ECelGamal.Cipher = ECelGamal.Encryption.encrypt(
+      ECelGamal.Voting.noVote,
+      publicKey
+    )
     const noProof = ECelGamal.Proof.Membership.generateNoProof(
       encryptedNoVote,
       params,
