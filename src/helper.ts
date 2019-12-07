@@ -17,6 +17,7 @@ export const getByteSizeForDecimalNumber = (n: BN): BN => {
   return smallerHalf ? result.add(new BN(1, 10)) : result
 }
 
+// get a secure random value x: 0 < x < n
 export const getSecureRandomValue = (n: BN): BN => {
   const ONE: BN = new BN(1, 10)
   const UPPER_BOUND_RANDOM: BN = n.sub(ONE)
