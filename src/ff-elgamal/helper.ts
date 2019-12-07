@@ -1,5 +1,7 @@
 import BN = require('bn.js')
 
+import { GlobalHelper } from '../index'
+
 // check if a given number is prime
 export const isPrime = (num: number): boolean => {
   for (let i = 2; i <= Math.sqrt(num); i++) {
@@ -64,10 +66,10 @@ export const getGCandidates = (p: number): number[] =>
     return isGValid(current, p) ? [...previous, current] : previous
   }, [])
 
-export const BNmul = (a: BN, b: BN, modulus: BN): BN => a.mul(b).mod(modulus)
 export const BNpow = (a: BN, b: BN, modulus: BN): BN => a.pow(b).mod(modulus)
 export const BNinvm = (a: BN, modulus: BN): BN => a.invm(modulus)
-export const BNdiv = (a: BN, b: BN, modulus: BN): BN => BNmul(a, BNinvm(b, modulus), modulus)
+export const BNdiv = (a: BN, b: BN, modulus: BN): BN =>
+  GlobalHelper.mulBN(a, BNinvm(b, modulus), modulus)
 
 export const timingSafeEqual = (a: Buffer, b: Buffer): boolean => {
   if (!Buffer.isBuffer(a)) {

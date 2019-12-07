@@ -40,7 +40,7 @@ export const generate = (
   const b: BN = Helper.BNpow(g, a, p) // commitment
 
   const c: BN = generateChallenge(q, id, h, b) // challenge
-  const d: BN = GlobalHelper.addBN(a, Helper.BNmul(c, sk, q), q) // response
+  const d: BN = GlobalHelper.addBN(a, GlobalHelper.mulBN(c, sk, q), q) // response
 
   return { c, d }
 }
@@ -64,7 +64,7 @@ export const verify = (
   const hashCheck: boolean = c.eq(c_)
 
   const gPowD: BN = Helper.BNpow(g, d, p)
-  const bhPowC: BN = Helper.BNmul(b, Helper.BNpow(h, c, p), p)
+  const bhPowC: BN = GlobalHelper.mulBN(b, Helper.BNpow(h, c, p), p)
   const dCheck: boolean = gPowD.eq(bhPowC)
 
   log && console.log('do the hashes match?\t', hashCheck)

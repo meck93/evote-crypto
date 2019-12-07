@@ -30,7 +30,7 @@ export const generate = (
   const b: CurvePoint = keyPair.h
 
   const c: BN = generateChallenge(n, id, h, b)
-  const d: BN = GlobalHelper.addBN(a, Helper.BNmul(c, sk, n), n)
+  const d: BN = GlobalHelper.addBN(a, GlobalHelper.mulBN(c, sk, n), n)
 
   return { c: c, d: d }
 }

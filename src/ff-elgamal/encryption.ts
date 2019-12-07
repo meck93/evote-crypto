@@ -60,7 +60,7 @@ export const encrypt = (
   const c1 = Helper.BNpow(sysParams.g, r, sysParams.p)
   const s = Helper.BNpow(publicKey, r, sysParams.p)
   const mh = encodeMessage(m, sysParams)
-  const c2 = Helper.BNmul(s, mh, sysParams.p)
+  const c2 = GlobalHelper.mulBN(s, mh, sysParams.p)
 
   log && console.log('enc secret   (r)', r)
   log && console.log('a\t\t', c1)
@@ -95,7 +95,7 @@ export const decrypt1 = (
 
   const s = Helper.BNpow(c1, sk, sysParams.p)
   const sInverse = Helper.BNinvm(s, sysParams.p)
-  const mh = Helper.BNmul(c2, sInverse, sysParams.p)
+  const mh = GlobalHelper.mulBN(c2, sInverse, sysParams.p)
   const m = decodeMessage(mh, sysParams)
 
   log && console.log('s\t\t', s)
@@ -131,7 +131,7 @@ export const decrypt2 = (
 
   const s = Helper.BNpow(c1, sk, sysParams.p)
   const sPowPMinus2 = Helper.BNpow(s, sysParams.p.sub(GlobalHelper.newBN(2)), sysParams.p)
-  const mh = Helper.BNmul(c2, sPowPMinus2, sysParams.p)
+  const mh = GlobalHelper.mulBN(c2, sPowPMinus2, sysParams.p)
   const m = decodeMessage(mh, sysParams)
 
   log && console.log('s\t\t', s)
@@ -146,8 +146,8 @@ export const decrypt2 = (
 // homomorphic addition
 export const add = (em1: Cipher, em2: Cipher, sysParams: SystemParameters): Cipher => {
   return {
-    a: Helper.BNmul(em1.a, em2.a, sysParams.p),
-    b: Helper.BNmul(em1.b, em2.b, sysParams.p),
+    a: GlobalHelper.mulBN(em1.a, em2.a, sysParams.p),
+    b: GlobalHelper.mulBN(em1.b, em2.b, sysParams.p),
   }
 }
 
@@ -164,7 +164,7 @@ export const combineDecryptedShares = (
 ): BN => {
   const mh = Helper.BNdiv(
     cipher.b,
-    decryptedShares.reduce((product, share) => Helper.BNmul(product, share, params.p)),
+    decryptedShares.reduce((product, share) => GlobalHelper.mulBN(product, share, params.p)),
     params.p
   )
 

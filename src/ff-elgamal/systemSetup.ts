@@ -72,7 +72,7 @@ export const generateSystemParametersAndKeysZKP = (
 
 // combines multiple public key shares to one public key
 export const combinePublicKeys = (params: SystemParameters, publicKeyShares: BN[]): BN => {
-  return publicKeyShares.reduce((product, share) => Helper.BNmul(product, share, params.p))
+  return publicKeyShares.reduce((product, share) => GlobalHelper.mulBN(product, share, params.p))
 }
 
 // combines multiple private key shares to one private key

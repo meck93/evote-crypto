@@ -75,7 +75,7 @@ export const generateYesProof = (
   const c = generateChallenge(n, id, a, b, a0, b0, a1, b1)
   const c1 = GlobalHelper.addBN(n, GlobalHelper.subBN(c, c0, n), n)
 
-  const f1 = GlobalHelper.addBN(x, Helper.BNmul(c1, r, n), n)
+  const f1 = GlobalHelper.addBN(x, GlobalHelper.mulBN(c1, r, n), n)
 
   printConsole && console.log('a0 is on the curve?\t', Curve.validate(a0))
   printConsole && console.log('b0 is on the curve?\t', Curve.validate(b0))
@@ -132,7 +132,7 @@ export const generateNoProof = (
   const c = generateChallenge(n, id, a, b, a0, b0, a1, b1)
   const c0 = GlobalHelper.addBN(n, GlobalHelper.subBN(c, c1, n), n)
 
-  const f0 = GlobalHelper.addBN(x, Helper.BNmul(c0, r, n), n)
+  const f0 = GlobalHelper.addBN(x, GlobalHelper.mulBN(c0, r, n), n)
 
   printConsole && console.log('a1 is on the curve?\t', Curve.validate(a1))
   printConsole && console.log('b1 is on the curve?\t', Curve.validate(b1))
