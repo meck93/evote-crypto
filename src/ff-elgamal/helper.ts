@@ -65,20 +65,3 @@ export const getGCandidates = (p: number): number[] =>
   getPrimitiveRoots(getQofP(p)).reduce((previous: number[], current: number) => {
     return isGValid(current, p) ? [...previous, current] : previous
   }, [])
-
-export const timingSafeEqual = (a: Buffer, b: Buffer): boolean => {
-  if (!Buffer.isBuffer(a)) {
-    throw new TypeError('First argument must be a buffer')
-  }
-  if (!Buffer.isBuffer(b)) {
-    throw new TypeError('Second argument must be a buffer')
-  }
-  if (a.length !== b.length) {
-    throw new TypeError('Input buffers must have the same length')
-  }
-  let out = 0
-  for (let i = 0; i < a.length; i++) {
-    out |= a[i] ^ b[i]
-  }
-  return out === 0
-}
