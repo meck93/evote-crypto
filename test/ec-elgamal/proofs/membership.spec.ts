@@ -4,7 +4,7 @@ import { ECelGamal } from '../../../src/index'
 const log = false
 
 describe('Elliptic Curve ElGamal Vote ZKP', () => {
-  it('Points that encode the plaintexts should lie on the curve', function() {
+  it('Points that encode the plaintexts should lie on the curve', () => {
     assert(ECelGamal.Curve.validate(ECelGamal.Voting.yesVote))
     assert(ECelGamal.Curve.validate(ECelGamal.Voting.noVote))
   })

@@ -11,14 +11,14 @@ import {
 import { DecryptionProof } from './models'
 import { curveDefinition } from '../curve'
 
-export function generateChallenge(
+export const generateChallenge = (
   n: BN,
   id: string,
   a: CurvePoint,
   b: CurvePoint,
   a1: CurvePoint,
   b1: CurvePoint
-): BN {
+): BN => {
   const pointsAsString: string = Helper.curvePointsToString([a, b, a1, b1])
   const input = id + pointsAsString
 

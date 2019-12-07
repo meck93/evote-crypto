@@ -24,7 +24,7 @@ const div = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNdiv(a, b, sp.p)
 const pow = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNpow(a, b, sp.p)
 
 // TODO: check paper https://eprint.iacr.org/2016/771.pdf why we should not hash a and b
-function generateChallenge(
+const generateChallenge = (
   q: BN,
   uniqueID: string,
   a: BN,
@@ -33,7 +33,7 @@ function generateChallenge(
   b0: BN,
   a1: BN,
   b1: BN
-): BN {
+): BN => {
   let c = web3.utils.soliditySha3(uniqueID, a, b, a0, b0, a1, b1)
   c = web3.utils.toBN(c)
   c = c.mod(q)
@@ -54,12 +54,12 @@ function generateChallenge(
 // 4. generate the challenge c
 // 5. compute c1 = c - c0
 // 6. compute f1 = x + c1 * r (NOTE: mod q!)
-export function generateYesProof(
+export const generateYesProof = (
   cipher: Cipher,
   sp: SystemParameters,
   pk: BN,
   uniqueID: string
-): MembershipProof {
+): MembershipProof => {
   const { a, b, r } = cipher
 
   const c0 = Helper.getSecureRandomValue(sp.q)
@@ -107,12 +107,12 @@ export function generateYesProof(
 // 5. generate the challenge c
 // 6. compute c0 = c - c1
 // 7. compute f0 = x + c0 * r (NOTE: mod q! = mod n!)
-export function generateNoProof(
+export const generateNoProof = (
   cipher: Cipher,
   sp: SystemParameters,
   pk: BN,
   uniqueID: string
-): MembershipProof {
+): MembershipProof => {
   const { a, b, r } = cipher
 
   const c1 = Helper.getSecureRandomValue(sp.q)
@@ -152,13 +152,13 @@ export function generateNoProof(
 // verification h^f0 == b0 * b^c0
 // verification h^f1 == b1 * (b/g)^c1
 // recompute the hash and verify
-export function verify(
+export const verify = (
   cipher: Cipher,
   proof: MembershipProof,
   sp: SystemParameters,
   pk: BN,
   uniqueID: string
-): boolean {
+): boolean => {
   const { a, b } = cipher
   const { a0, a1, b0, b1, c0, c1, f0, f1 } = proof
 

@@ -11,12 +11,12 @@ const yesVoteInt = 6
 const noVoteOnCurve = ECelGamal.Curve.pointFromX(noVoteInt)
 const yesVoteOnCurve = ECelGamal.Curve.pointFromX(yesVoteInt)
 
-describe('Elliptic Curve ElGamal Encryption', function() {
-  it('Points that encode the plaintexts should lie on the curve', function() {
+describe('Elliptic Curve ElGamal Encryption', () => {
+  it('Points that encode the plaintexts should lie on the curve', () => {
     assert(ECelGamal.Curve.validate(yesVoteOnCurve) && ECelGamal.Curve.validate(noVoteOnCurve))
   })
 
-  it('Decrypted value is the same as the original message', function() {
+  it('Decrypted value is the same as the original message', () => {
     const { h: publicKey, sk: privateKey } = ECelGamal.SystemSetup.generateKeyPair()
 
     const messageToEncrypt = noVoteOnCurve
@@ -26,7 +26,7 @@ describe('Elliptic Curve ElGamal Encryption', function() {
     assert(decryptedCipherText.eq(messageToEncrypt))
   })
 
-  it('Two added ciphertexts should be the same as adding two plain texts', function() {
+  it('Two added ciphertexts should be the same as adding two plain texts', () => {
     const { h: publicKey, sk: privateKey } = ECelGamal.SystemSetup.generateKeyPair()
 
     const voteToEncrypt0 = noVoteOnCurve

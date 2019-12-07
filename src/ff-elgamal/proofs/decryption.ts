@@ -23,7 +23,7 @@ const mul = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNmul(a, b, sp.p)
 const pow = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNpow(a, b, sp.p)
 
 // TODO: check paper https://eprint.iacr.org/2016/771.pdf why we should not hash a and b
-function generateChallenge(q: BN, uniqueID: string, a: BN, b: BN, a1: BN, b1: BN): BN {
+const generateChallenge = (q: BN, uniqueID: string, a: BN, b: BN, a1: BN, b1: BN): BN => {
   let c = web3.utils.soliditySha3(uniqueID, a, b, a1, b1)
   c = web3.utils.toBN(c)
   c = c.mod(q)
@@ -39,12 +39,12 @@ function generateChallenge(q: BN, uniqueID: string, a: BN, b: BN, a1: BN, b1: BN
 // 3. generate the challenge
 // 3. compute f = x + c * sk (NOTE: mod q!)
 // 4. compute the decryption factor d = a^r
-export function generate(
+export const generate = (
   cipher: Cipher,
   sp: SystemParameters,
   sk: BN,
   uniqueID: string
-): DecryptionProof {
+): DecryptionProof => {
   const { a, b }: Cipher = cipher
 
   const x: BN = Helper.getSecureRandomValue(sp.q)
@@ -70,13 +70,13 @@ export function generate(
 // 1. recompute the challenge
 // 2. verification a^f == a1 * d^c
 // 3. verification g^f == b1 * h^c
-export function verify(
+export const verify = (
   cipher: Cipher,
   proof: DecryptionProof,
   sp: SystemParameters,
   pk: BN,
   uniqueID: string
-): boolean {
+): boolean => {
   const { a, b }: Cipher = cipher
   const { a1, b1, f, d }: DecryptionProof = proof
 

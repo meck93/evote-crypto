@@ -30,14 +30,14 @@ export const ECpow = (a: CurvePoint, b: BN): CurvePoint => a.mul(b) as CurvePoin
 export const ECmul = (a: CurvePoint, b: CurvePoint): CurvePoint => a.add(b) as CurvePoint
 export const ECdiv = (a: CurvePoint, b: CurvePoint): CurvePoint => a.add(b.neg()) as CurvePoint
 
-export function curvePointToString(point: CurvePoint): string {
+export const curvePointToString = (point: CurvePoint): string => {
   const pointAsJSON = point.toJSON()
   const Px = (pointAsJSON[0] as BN).toString('hex')
   const Py = (pointAsJSON[1] as BN).toString('hex')
   return Px + Py
 }
 
-export function curvePointsToString(points: CurvePoint[]): string {
+export const curvePointsToString = (points: CurvePoint[]): string => {
   let asString = ''
   for (const point of points) {
     asString += curvePointToString(point)

@@ -2,7 +2,7 @@ import { assert, expect } from 'chai'
 import { ECelGamal } from '../../../src/index'
 
 describe('Elliptic Curve ElGamal Sum ZKP', () => {
-  it('Points that encode the plaintexts should lie on the curve', function() {
+  it('Points that encode the plaintexts should lie on the curve', () => {
     assert(ECelGamal.Curve.validate(ECelGamal.Voting.yesVote))
     assert(ECelGamal.Curve.validate(ECelGamal.Voting.noVote))
   })

@@ -13,7 +13,7 @@ import { curveDefinition } from '../curve'
 
 const printConsole = false
 
-export function generateChallenge(
+export const generateChallenge = (
   n: BN,
   id: string,
   c1: CurvePoint,
@@ -22,7 +22,7 @@ export function generateChallenge(
   a2: CurvePoint,
   b1: CurvePoint,
   b2: CurvePoint
-): BN {
+): BN => {
   const pointsAsString = Helper.curvePointsToString([c1, c2, a1, a2, b1, b2])
   const input = id + pointsAsString
 
@@ -47,12 +47,12 @@ export function generateChallenge(
 // 4. generate the challenge c
 // 5. compute c1 = c - c0
 // 6. compute f1 = x + c1 * r (NOTE: mod q! = mod n!)
-export function generateYesProof(
+export const generateYesProof = (
   encryptedVote: Cipher,
   params: SystemParameters | SystemParametersSerialized,
   publicKey: CurvePoint | string,
   id: string
-): MembershipProof {
+): MembershipProof => {
   const { a, b, r } = encryptedVote
   const { g, n } = Helper.deserializeParams(params)
   const h = Helper.deserializeCurvePoint(publicKey)
@@ -103,12 +103,12 @@ export function generateYesProof(
 // 5. generate the challenge c
 // 6. compute c0 = c - c1
 // 7. compute f0 = x + c0 * r (NOTE: mod q!)
-export function generateNoProof(
+export const generateNoProof = (
   encryptedVote: Cipher,
   params: SystemParameters | SystemParametersSerialized,
   publicKey: CurvePoint | string,
   id: string
-): MembershipProof {
+): MembershipProof => {
   const { a, b, r } = encryptedVote
   const { g, n } = Helper.deserializeParams(params)
   const h = Helper.deserializeCurvePoint(publicKey)
@@ -154,13 +154,13 @@ export function generateNoProof(
 // verification h^f0 == b0 * b^c0
 // verification h^f1 == b1 * (b/g)^c1
 // recompute the hash and verify
-export function verify(
+export const verify = (
   encryptedVote: Cipher,
   proof: MembershipProof,
   params: SystemParameters | SystemParametersSerialized,
   publicKey: CurvePoint | string,
   id: string
-): boolean {
+): boolean => {
   const { a0, a1, b0, b1, c0, c1, f0, f1 } = proof
   const { g, n } = Helper.deserializeParams(params)
   const h = Helper.deserializeCurvePoint(publicKey)
