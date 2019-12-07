@@ -403,7 +403,7 @@ describe('Finite Field ElGamal Helper', () => {
   // least 50 times larger than the mean. This prevents the tests from failing
   // due to the standard deviation increase when a function unexpectedly takes
   // a very long time to execute.
-  const filterOutliers = (array: number[]) => {
+  const filterOutliers = (array: number[]): number[] => {
     const arrMean = mean(array)
     return array.filter(value => value / arrMean < 50)
   }
