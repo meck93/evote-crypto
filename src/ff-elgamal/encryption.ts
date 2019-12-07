@@ -15,18 +15,18 @@ import { Cipher, Helper, SystemParameters } from './index'
 
 // encode a message m to g^m
 export const encodeMessage = (m: number | BN, sysParams: SystemParameters): BN => {
-  m = typeof m === 'number' ? Helper.newBN(m) : m
+  m = typeof m === 'number' ? GlobalHelper.newBN(m) : m
   return Helper.BNpow(sysParams.g, m, sysParams.p)
 }
 
 // decode a message g^m to m
 // TODO: use baby-step giant-step instead of brute force
 export const decodeMessage = (mh: number | BN, sysParams: SystemParameters): BN => {
-  mh = typeof mh === 'number' ? Helper.newBN(mh) : mh
+  mh = typeof mh === 'number' ? GlobalHelper.newBN(mh) : mh
 
-  let m = Helper.newBN(0)
+  let m = GlobalHelper.newBN(0)
   while (!encodeMessage(m, sysParams).eq(mh)) {
-    m = m.add(Helper.newBN(1))
+    m = m.add(GlobalHelper.newBN(1))
   }
   return m
 }
@@ -54,7 +54,7 @@ export const encrypt = (
   publicKey: BN,
   log = false
 ): Cipher => {
-  const m = typeof message === 'number' ? Helper.newBN(message) : message
+  const m = typeof message === 'number' ? GlobalHelper.newBN(message) : message
 
   const r = GlobalHelper.getSecureRandomValue(sysParams.q)
   const c1 = Helper.BNpow(sysParams.g, r, sysParams.p)
@@ -130,7 +130,7 @@ export const decrypt2 = (
   const { a: c1, b: c2 } = cipherText
 
   const s = Helper.BNpow(c1, sk, sysParams.p)
-  const sPowPMinus2 = Helper.BNpow(s, sysParams.p.sub(Helper.newBN(2)), sysParams.p)
+  const sPowPMinus2 = Helper.BNpow(s, sysParams.p.sub(GlobalHelper.newBN(2)), sysParams.p)
   const mh = Helper.BNmul(c2, sPowPMinus2, sysParams.p)
   const m = decodeMessage(mh, sysParams)
 

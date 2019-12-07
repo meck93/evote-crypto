@@ -64,7 +64,6 @@ export const getGCandidates = (p: number): number[] =>
     return isGValid(current, p) ? [...previous, current] : previous
   }, [])
 
-export const newBN = (num: number, base = 10): BN => new BN(num, base)
 export const BNadd = (a: BN, b: BN, modulus: BN): BN => a.add(b).mod(modulus)
 export const BNsub = (a: BN, b: BN, modulus: BN): BN => a.sub(b).mod(modulus)
 export const BNmul = (a: BN, b: BN, modulus: BN): BN => a.mul(b).mod(modulus)

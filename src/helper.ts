@@ -1,6 +1,8 @@
 import BN = require('bn.js')
 import crypto = require('crypto')
 
+export const newBN = (n: number, base = 10): BN => new BN(n, base)
+
 // compute the required number of bytes to store a decimal
 export const getByteSizeForDecimalNumber = (n: BN): BN => {
   const modulus: BN = n.mod(new BN(256, 10))

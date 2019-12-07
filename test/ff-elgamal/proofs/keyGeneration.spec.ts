@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { FFelGamal } from '../../../src/index'
+import { FFelGamal, GlobalHelper } from '../../../src/index'
 
 describe('ElGamal Finite Field NIZKP for Key Generation', () => {
   it('generate and verify (distributed) key share', () => {
@@ -83,7 +83,7 @@ describe('ElGamal Finite Field NIZKP for Key Generation', () => {
     log && console.log('sk', privateKey.toNumber())
 
     // encrypt some message
-    const plaintext = FFelGamal.Helper.newBN(3)
+    const plaintext = GlobalHelper.newBN(3)
     const cipherText = FFelGamal.Encryption.encrypt(plaintext, sp, publicKey)
 
     log && console.log('plaintext', plaintext.toNumber())
