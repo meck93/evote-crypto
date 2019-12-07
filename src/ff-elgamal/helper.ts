@@ -67,8 +67,6 @@ export const getGCandidates = (p: number): number[] =>
   }, [])
 
 export const BNpow = (a: BN, b: BN, modulus: BN): BN => a.pow(b).mod(modulus)
-export const BNdiv = (a: BN, b: BN, modulus: BN): BN =>
-  GlobalHelper.mulBN(a, GlobalHelper.invmBN(b, modulus), modulus)
 
 export const timingSafeEqual = (a: Buffer, b: Buffer): boolean => {
   if (!Buffer.isBuffer(a)) {

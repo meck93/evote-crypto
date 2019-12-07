@@ -162,7 +162,7 @@ export const combineDecryptedShares = (
   cipher: Cipher,
   decryptedShares: BN[]
 ): BN => {
-  const mh = Helper.BNdiv(
+  const mh = GlobalHelper.divBN(
     cipher.b,
     decryptedShares.reduce((product, share) => GlobalHelper.mulBN(product, share, params.p)),
     params.p

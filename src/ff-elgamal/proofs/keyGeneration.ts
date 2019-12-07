@@ -58,7 +58,7 @@ export const verify = (
   const { p, q, g } = params
   const { c, d } = proof
 
-  const b: BN = Helper.BNdiv(Helper.BNpow(g, d, p), Helper.BNpow(h, c, p), p)
+  const b: BN = GlobalHelper.divBN(Helper.BNpow(g, d, p), Helper.BNpow(h, c, p), p)
 
   const c_: BN = generateChallenge(q, id, h, b)
   const hashCheck: boolean = c.eq(c_)
