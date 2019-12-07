@@ -38,11 +38,6 @@ export const findPoint = (point: CurvePoint): number => {
   return counter
 }
 
-// TODO: as there is a new noVotePoint, check if this is still needed
-export const checkDecrypedSum = (decryptedSum: CurvePoint): number => {
-  return decryptedSum.eq(infinityPoint) ? 0 : findPoint(decryptedSum)
-}
-
 export const tallyVotes = (pk: string, sk: BN, votes: Cipher[]): number => {
   // This function is called in the fronend and did not work with
   // passing a CurvePoint directly before. It failed in
@@ -52,7 +47,7 @@ export const tallyVotes = (pk: string, sk: BN, votes: Cipher[]): number => {
   const publicKey = Helper.deserializeCurvePoint(pk)
 
   const sum = Encryption.decrypt(addVotes(votes, publicKey), sk)
-  return checkDecrypedSum(sum)
+  return findPoint(sum)
 }
 
 export const getSummary = (total: number, tallyResult: number): Summary => {

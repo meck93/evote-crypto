@@ -50,7 +50,7 @@ describe('Elliptic Curve ElGamal Sum ZKP', () => {
         encryptedSum,
         privateKey
       )
-      const result = ECelGamal.Voting.checkDecrypedSum(decryptedSum)
+      const result = ECelGamal.Voting.findPoint(decryptedSum)
 
       const summary = ECelGamal.Voting.getSummary(votes.length, result)
       log &&

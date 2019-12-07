@@ -143,11 +143,11 @@ describe('Elliptic Curve ElGamal Distributed Key Generation', () => {
       share1Decrypted,
       share2Decrypted,
     ])
-    const result1 = ECelGamal.Voting.checkDecrypedSum(distributedDecrypted)
+    const result1 = ECelGamal.Voting.findPoint(distributedDecrypted)
 
     // decrypt with combined private key
     const combinedDecryption = ECelGamal.Encryption.decrypt(cipherText, privateKey)
-    const result2 = ECelGamal.Voting.checkDecrypedSum(combinedDecryption)
+    const result2 = ECelGamal.Voting.findPoint(combinedDecryption)
 
     log && console.log('distributed decryption\t', distributedDecrypted.toString())
     log && console.log('combined decryption\t', combinedDecryption.toString())
