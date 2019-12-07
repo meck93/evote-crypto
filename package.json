@@ -11,7 +11,7 @@
     "test:timeout": "nyc --reporter=text ts-mocha ./**/*.spec.ts --timeout 10000",
     "test:watch": "ts-mocha ./**/*.spec.ts -w --watch-extensions ts ",
     "test:report": "nyc --reporter=lcov ts-mocha ./**/*.spec.ts",
-    "format": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|css|md)\"",
+    "format": "prettier --write \"**/*.+(js|ts|json|md)\"",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "ts-mocha": "./node_modules/.bin/ts-mocha",
@@ -58,7 +58,7 @@
       "eslint --fix",
       "git add"
     ],
-    "*.+(js|ts|json)": [
+    "*.+(js|ts|json|md)": [
       "prettier --write",
       "git add"
     ]

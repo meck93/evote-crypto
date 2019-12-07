@@ -1,0 +1,5 @@
+# ignore everything:
+/.nyc_output
+/.vscode
+/dist
+/node_modules
