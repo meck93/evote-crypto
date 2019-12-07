@@ -2,6 +2,7 @@ import BN = require('bn.js')
 import crypto = require('crypto')
 
 export const newBN = (n: number, base = 10): BN => new BN(n, base)
+export const invmBN = (a: BN, modulus: BN): BN => a.invm(modulus)
 export const addBN = (a: BN, b: BN, modulus: BN): BN => a.add(b).mod(modulus)
 export const subBN = (a: BN, b: BN, modulus: BN): BN => a.sub(b).mod(modulus)
 export const mulBN = (a: BN, b: BN, modulus: BN): BN => a.mul(b).mod(modulus)

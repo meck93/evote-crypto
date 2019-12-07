@@ -10,6 +10,35 @@ describe('Global Helper Test', () => {
     expect(GlobalHelper.newBN(5).eq(new BN(5, 10))).to.be.true
   })
 
+  it('should invert BNs', () => {
+    const base = 10
+    const modulus = 4
+
+    // inverse a mod modulus = c
+    const tests = [
+      { a: 0, c: 0 }, // none
+      { a: 1, c: 1 },
+      { a: 2, c: 1 }, // none
+      { a: 3, c: 3 },
+      { a: 4, c: 0 }, // none
+      { a: 5, c: 1 },
+      { a: 6, c: 1 }, // none
+      { a: 7, c: 3 },
+      { a: 8, c: 0 }, // none
+      { a: 9, c: 1 },
+    ]
+
+    for (const test of tests) {
+      const a = new BN(test.a, base)
+      const c = new BN(test.c, base)
+      const result = GlobalHelper.invmBN(a, new BN(modulus, base))
+
+      const log = false
+      log && console.log('a:', a.toNumber(), ', c:', c.toNumber(), 'res:', result.toNumber())
+      expect(result.eq(c)).to.be.true
+    }
+  })
+
   it('should add BNs', () => {
     const base = 10
     const modulus = 4

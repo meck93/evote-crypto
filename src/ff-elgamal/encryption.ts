@@ -94,7 +94,7 @@ export const decrypt1 = (
   const { a: c1, b: c2 } = cipherText
 
   const s = Helper.BNpow(c1, sk, sysParams.p)
-  const sInverse = Helper.BNinvm(s, sysParams.p)
+  const sInverse = GlobalHelper.invmBN(s, sysParams.p)
   const mh = GlobalHelper.mulBN(c2, sInverse, sysParams.p)
   const m = decodeMessage(mh, sysParams)
 
