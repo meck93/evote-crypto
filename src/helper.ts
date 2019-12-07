@@ -3,6 +3,7 @@ import crypto = require('crypto')
 
 export const newBN = (n: number, base = 10): BN => new BN(n, base)
 export const addBN = (a: BN, b: BN, modulus: BN): BN => a.add(b).mod(modulus)
+export const subBN = (a: BN, b: BN, modulus: BN): BN => a.sub(b).mod(modulus)
 
 // compute the required number of bytes to store a decimal
 export const getByteSizeForDecimalNumber = (n: BN): BN => {

@@ -73,7 +73,7 @@ export const generateYesProof = (
   const b1 = Helper.ECpow(h, x)
 
   const c = generateChallenge(n, id, a, b, a0, b0, a1, b1)
-  const c1 = GlobalHelper.addBN(n, Helper.BNsub(c, c0, n), n)
+  const c1 = GlobalHelper.addBN(n, GlobalHelper.subBN(c, c0, n), n)
 
   const f1 = GlobalHelper.addBN(x, Helper.BNmul(c1, r, n), n)
 
@@ -130,7 +130,7 @@ export const generateNoProof = (
   const b0 = Helper.ECpow(h, x)
 
   const c = generateChallenge(n, id, a, b, a0, b0, a1, b1)
-  const c0 = GlobalHelper.addBN(n, Helper.BNsub(c, c1, n), n)
+  const c0 = GlobalHelper.addBN(n, GlobalHelper.subBN(c, c1, n), n)
 
   const f0 = GlobalHelper.addBN(x, Helper.BNmul(c0, r, n), n)
 

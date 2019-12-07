@@ -19,7 +19,7 @@ const printConsole = false
 
 // modulo operations
 const add = (a: BN, b: BN, sp: SystemParameters): BN => GlobalHelper.addBN(a, b, sp.q)
-const sub = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNsub(a, b, sp.q)
+const sub = (a: BN, b: BN, sp: SystemParameters): BN => GlobalHelper.subBN(a, b, sp.q)
 const mul = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNmul(a, b, sp.p)
 const div = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNdiv(a, b, sp.p)
 const pow = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNpow(a, b, sp.p)
