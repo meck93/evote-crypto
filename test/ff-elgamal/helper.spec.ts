@@ -362,24 +362,6 @@ describe('Finite Field ElGamal Helper', () => {
     console.log('g candidates', Helper.getGCandidates(prime).toString())
   })
 
-  it('should generate random values', () => {
-    for (let a = 0; a < 100; a++) {
-      const rnd = Helper.getSecureRandomValue(Helper.newBN(5)).toNumber()
-      expect(rnd).to.be.at.least(1)
-      expect(rnd).to.be.at.most(4)
-    }
-  })
-
-  it('should convert decimals to required byte size', () => {
-    const numbers: number[] = [31, 32, 254, 255, 256, 511, 512]
-    const results: number[] = [1, 1, 1, 1, 2, 2, 3]
-
-    numbers.forEach((nr, ind) => {
-      const convertedNumber = Helper.getByteSizeForDecimalNumber(new BN(nr, 10))
-      expect(convertedNumber).to.equal(results[ind])
-    })
-  })
-
   // Returns the mean of an array
   const mean = (array: number[]): number => {
     return array.reduce((sum, val) => sum + val, 0) / array.length

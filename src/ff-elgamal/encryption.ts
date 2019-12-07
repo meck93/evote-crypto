@@ -10,6 +10,7 @@
  */
 
 import BN = require('bn.js')
+import { GlobalHelper } from '../index'
 import { Cipher, Helper, SystemParameters } from './index'
 
 // encode a message m to g^m
@@ -55,7 +56,7 @@ export const encrypt = (
 ): Cipher => {
   const m = typeof message === 'number' ? Helper.newBN(message) : message
 
-  const r = Helper.getSecureRandomValue(sysParams.q)
+  const r = GlobalHelper.getSecureRandomValue(sysParams.q)
   const c1 = Helper.BNpow(sysParams.g, r, sysParams.p)
   const s = Helper.BNpow(publicKey, r, sysParams.p)
   const mh = encodeMessage(m, sysParams)

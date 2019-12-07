@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { FFelGamal } from '../../src/index'
+import { GlobalHelper, FFelGamal } from '../../src/index'
 
 describe('Finite Field ElGamal Encryption', () => {
   it('should encode a message', () => {
@@ -57,7 +57,7 @@ describe('Finite Field ElGamal Encryption', () => {
     const log = false
     const [sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(11, 3)
 
-    const message = FFelGamal.Helper.getSecureRandomValue(sp.q)
+    const message = GlobalHelper.getSecureRandomValue(sp.q)
     for (let i = 0; i < 10; i++) {
       log && console.log(i)
       log && console.log('prime      (p)\t', sp.p)
@@ -83,8 +83,8 @@ describe('Finite Field ElGamal Encryption', () => {
 
       // generate random messages of max size q = (p - 1)/2
       // so that the sum is max p-1
-      const m1 = FFelGamal.Helper.getSecureRandomValue(sp.q)
-      const m2 = FFelGamal.Helper.getSecureRandomValue(sp.q)
+      const m1 = GlobalHelper.getSecureRandomValue(sp.q)
+      const m2 = GlobalHelper.getSecureRandomValue(sp.q)
 
       const eM1 = FFelGamal.Encryption.encrypt(m1, sp, pk)
       const eM2 = FFelGamal.Encryption.encrypt(m2, sp, pk)

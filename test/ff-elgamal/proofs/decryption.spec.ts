@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { FFelGamal } from '../../../src/index'
+import { GlobalHelper, FFelGamal } from '../../../src/index'
 
 describe('ElGamal Finite Field NIZKP for Decryption', () => {
   it('create and verify sum proof', () => {
@@ -19,7 +19,7 @@ describe('ElGamal Finite Field NIZKP for Decryption', () => {
         }
 
         // sum
-        const sum = FFelGamal.Helper.getSecureRandomValue(sp.q)
+        const sum = GlobalHelper.getSecureRandomValue(sp.q)
         log && console.log(`Sum Proof for Message: ${sum}`)
 
         const sumEnc = FFelGamal.Encryption.encrypt(sum, sp, pk, log)

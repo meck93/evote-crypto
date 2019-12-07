@@ -7,9 +7,9 @@
   "scripts": {
     "build": "rm -rf dist && tsc",
     "pre-commit": "lint-staged",
-    "test": "nyc --reporter=text ts-mocha ./**/*.spec.ts",
-    "test:timeout": "nyc --reporter=text ts-mocha ./**/*.spec.ts --timeout 10000",
-    "test:watch": "ts-mocha ./**/*.spec.ts -w --watch-extensions ts ",
+    "test": "nyc --reporter=text ts-mocha \"./test/**/*.spec.ts\"",
+    "test:timeout": "nyc --reporter=text ts-mocha \"./test/**/*.spec.ts\" --timeout 10000",
+    "test:watch": "ts-mocha \"./test/**/*.spec.ts\" -w --watch-extensions ts",
     "test:report": "nyc --reporter=lcov ts-mocha ./**/*.spec.ts",
     "format": "prettier --write \"**/*.+(js|ts|json|md)\"",
     "lint": "eslint . --ext .ts",

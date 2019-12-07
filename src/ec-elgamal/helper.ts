@@ -1,24 +1,7 @@
 import BN = require('bn.js')
-import crypto = require('crypto')
 
 import { Curve, CurvePoint, SystemParameters, SystemParametersSerialized } from './index'
 import { instanceOfSystemParametersSerialized } from './models'
-
-export const getSecureRandomValue = (n: BN): BN => {
-  const byteSize = 32
-  const one = new BN(1, 10)
-  const UPPER_BOUND_RANDOM: BN = n.sub(one)
-
-  let randomBytes: Buffer = crypto.randomBytes(byteSize)
-  let randomValue: BN = new BN(randomBytes)
-
-  // ensure that the random value is in range [1,n-1]
-  while (!(randomValue.lte(UPPER_BOUND_RANDOM) && randomValue.gte(one))) {
-    randomBytes = crypto.randomBytes(byteSize)
-    randomValue = new BN(randomBytes)
-  }
-  return randomValue
-}
 
 export const newBN = (n: number, base = 10): BN => new BN(n, base)
 

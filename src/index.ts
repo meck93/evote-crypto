@@ -1,6 +1,7 @@
-// general models
+// global helpers models
+import * as GlobalHelper from './helper'
 import { Summary } from './models'
-export { Summary }
+export { GlobalHelper, Summary }
 
 // finite field elgamal
 import * as FFelGamal from './ff-elgamal'

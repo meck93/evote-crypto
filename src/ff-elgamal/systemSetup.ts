@@ -7,6 +7,7 @@
  */
 
 import BN = require('bn.js')
+import { GlobalHelper } from '../index'
 import { Helper, KeyPair, SystemParameters } from './index'
 
 // generate system parameters p,q,g given p,g
@@ -20,7 +21,7 @@ export const generateSystemParameters = (p: number, g: number): SystemParameters
 
 // randomly generate a key pair h,sk given the system parameters p,q,g
 export const generateKeyPair = (sp: SystemParameters): KeyPair => {
-  const sk = Helper.getSecureRandomValue(sp.q) // pick a random value in Z_q
+  const sk = GlobalHelper.getSecureRandomValue(sp.q) // pick a random value in Z_q
   const h = Helper.BNpow(sp.g, sk, sp.p) // compute public key h: g^sk mod p
   return { h, sk }
 }

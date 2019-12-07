@@ -10,6 +10,7 @@
  */
 
 import BN = require('bn.js')
+import { GlobalHelper } from '../../index'
 import { Cipher, Helper, SystemParameters } from '../index'
 import { MembershipProof } from './models'
 
@@ -62,13 +63,13 @@ export const generateYesProof = (
 ): MembershipProof => {
   const { a, b, r } = cipher
 
-  const c0 = Helper.getSecureRandomValue(sp.q)
-  const f0 = Helper.getSecureRandomValue(sp.q)
+  const c0 = GlobalHelper.getSecureRandomValue(sp.q)
+  const f0 = GlobalHelper.getSecureRandomValue(sp.q)
 
   const a0 = div(pow(sp.g, f0, sp), pow(a, c0, sp), sp)
   const b0 = div(pow(pk, f0, sp), pow(b, c0, sp), sp)
 
-  const x = Helper.getSecureRandomValue(sp.q)
+  const x = GlobalHelper.getSecureRandomValue(sp.q)
   const a1 = pow(sp.g, x, sp)
   const b1 = pow(pk, x, sp)
 
@@ -115,15 +116,15 @@ export const generateNoProof = (
 ): MembershipProof => {
   const { a, b, r } = cipher
 
-  const c1 = Helper.getSecureRandomValue(sp.q)
-  const f1 = Helper.getSecureRandomValue(sp.q)
+  const c1 = GlobalHelper.getSecureRandomValue(sp.q)
+  const f1 = GlobalHelper.getSecureRandomValue(sp.q)
 
   const b_ = div(b, sp.g, sp)
 
   const a1 = div(pow(sp.g, f1, sp), pow(a, c1, sp), sp)
   const b1 = div(pow(pk, f1, sp), pow(b_, c1, sp), sp)
 
-  const x = Helper.getSecureRandomValue(sp.q)
+  const x = GlobalHelper.getSecureRandomValue(sp.q)
   const a0 = pow(sp.g, x, sp)
   const b0 = pow(pk, x, sp)
 

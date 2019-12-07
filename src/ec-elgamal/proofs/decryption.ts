@@ -1,5 +1,6 @@
 import BN = require('bn.js')
 
+import { GlobalHelper } from '../../index'
 import {
   Cipher,
   Curve,
@@ -50,7 +51,7 @@ export const generate = (
   const { a, b } = cipher
   const { g, n } = Helper.deserializeParams(params)
 
-  const x: BN = Helper.getSecureRandomValue(n)
+  const x: BN = GlobalHelper.getSecureRandomValue(n)
 
   const a1 = Helper.ECpow(a, x)
   const b1 = Helper.ECpow(g, x)

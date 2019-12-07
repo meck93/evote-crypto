@@ -11,6 +11,7 @@
  */
 
 import BN = require('bn.js')
+import { GlobalHelper } from '../../index'
 import { Helper, KeyPair, SystemParameters } from '../index'
 import { KeyGenerationProof } from './index'
 
@@ -35,7 +36,7 @@ export const generate = (
   const { p, q, g } = params
   const { h, sk } = keyPair
 
-  const a: BN = Helper.getSecureRandomValue(q)
+  const a: BN = GlobalHelper.getSecureRandomValue(q)
   const b: BN = Helper.BNpow(g, a, p) // commitment
 
   const c: BN = generateChallenge(q, id, h, b) // challenge

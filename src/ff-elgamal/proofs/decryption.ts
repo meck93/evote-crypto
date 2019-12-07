@@ -11,6 +11,7 @@
  */
 
 import BN = require('bn.js')
+import { GlobalHelper } from '../../index'
 import { Cipher, Helper, SystemParameters } from '../index'
 import { DecryptionProof } from './models'
 
@@ -47,7 +48,7 @@ export const generate = (
 ): DecryptionProof => {
   const { a, b }: Cipher = cipher
 
-  const x: BN = Helper.getSecureRandomValue(sp.q)
+  const x: BN = GlobalHelper.getSecureRandomValue(sp.q)
 
   const a1: BN = pow(a, x, sp)
   const b1: BN = pow(sp.g, x, sp)

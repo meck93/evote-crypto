@@ -1,5 +1,6 @@
 import BN = require('bn.js')
 
+import { GlobalHelper } from '../../index'
 import {
   Cipher,
   Curve,
@@ -61,13 +62,13 @@ export const generateYesProof = (
     throw new Error('value r is undefined')
   }
 
-  const c0: BN = Helper.getSecureRandomValue(n)
-  const f0: BN = Helper.getSecureRandomValue(n)
+  const c0: BN = GlobalHelper.getSecureRandomValue(n)
+  const f0: BN = GlobalHelper.getSecureRandomValue(n)
 
   const a0 = Helper.ECdiv(Helper.ECpow(g, f0), Helper.ECpow(a, c0))
   const b0 = Helper.ECdiv(Helper.ECpow(h, f0), Helper.ECpow(b, c0))
 
-  const x: BN = Helper.getSecureRandomValue(n)
+  const x: BN = GlobalHelper.getSecureRandomValue(n)
   const a1 = Helper.ECpow(g, x)
   const b1 = Helper.ECpow(h, x)
 
@@ -117,14 +118,14 @@ export const generateNoProof = (
     throw new Error('value r is undefined')
   }
 
-  const c1: BN = Helper.getSecureRandomValue(n)
-  const f1: BN = Helper.getSecureRandomValue(n)
+  const c1: BN = GlobalHelper.getSecureRandomValue(n)
+  const f1: BN = GlobalHelper.getSecureRandomValue(n)
 
   const b_ = Helper.ECdiv(b, g)
   const a1 = Helper.ECdiv(Helper.ECpow(g, f1), Helper.ECpow(a, c1))
   const b1 = Helper.ECdiv(Helper.ECpow(h, f1), Helper.ECpow(b_, c1))
 
-  const x: BN = Helper.getSecureRandomValue(n)
+  const x: BN = GlobalHelper.getSecureRandomValue(n)
   const a0 = Helper.ECpow(g, x)
   const b0 = Helper.ECpow(h, x)
 

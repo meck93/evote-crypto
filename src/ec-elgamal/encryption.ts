@@ -1,4 +1,5 @@
 import BN = require('bn.js')
+import { GlobalHelper } from '../index'
 import { Cipher, Curve, CurvePoint, Helper } from './index'
 
 // Elliptic Curve ElGamal Encryption
@@ -14,7 +15,7 @@ import { Cipher, Curve, CurvePoint, Helper } from './index'
 // 3. compute s = h^r (ec-multiplication)
 // 4. compute c2 = s*m
 export const encrypt = (message: CurvePoint, publicKey: CurvePoint, log = false): Cipher => {
-  const r = Helper.getSecureRandomValue(Curve.n)
+  const r = GlobalHelper.getSecureRandomValue(Curve.n)
 
   const c1 = Curve.g.mul(r) as CurvePoint
   const s = publicKey.mul(r)

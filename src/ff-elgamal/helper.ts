@@ -1,5 +1,4 @@
 import BN = require('bn.js')
-import crypto = require('crypto')
 
 // check if a given number is prime
 export const isPrime = (num: number): boolean => {
@@ -64,30 +63,6 @@ export const getGCandidates = (p: number): number[] =>
   getPrimitiveRoots(getQofP(p)).reduce((previous: number[], current: number) => {
     return isGValid(current, p) ? [...previous, current] : previous
   }, [])
-
-// Computes the required number of bytes to store a decimal
-export const getByteSizeForDecimalNumber = (q: BN): number => {
-  const modulus: BN = q.mod(new BN(256, 10))
-  const smallerHalf: boolean = modulus.lt(new BN(128, 10))
-  const result: number = q.divRound(new BN(256, 10)).toNumber()
-  return smallerHalf ? result + 1 : result
-}
-
-export const getSecureRandomValue = (q: BN): BN => {
-  const one = new BN(1, 10)
-  const UPPER_BOUND_RANDOM: BN = q.sub(one)
-  const byteSize = getByteSizeForDecimalNumber(q)
-
-  let randomBytes: Buffer = crypto.randomBytes(byteSize)
-  let randomValue: BN = new BN(randomBytes)
-
-  // ensure that the random value is in range [1,n-1]
-  while (!(randomValue.lte(UPPER_BOUND_RANDOM) && randomValue.gte(one))) {
-    randomBytes = crypto.randomBytes(byteSize)
-    randomValue = new BN(randomBytes)
-  }
-  return randomValue
-}
 
 export const newBN = (num: number, base = 10): BN => new BN(num, base)
 export const BNadd = (a: BN, b: BN, modulus: BN): BN => a.add(b).mod(modulus)
