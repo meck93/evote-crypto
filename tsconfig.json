@@ -11,5 +11,5 @@
     "sourceMap": true,
     "target": "es5"
   },
-  "exclude": ["node_modules", "test"]
+  "include": ["src"]
 }
