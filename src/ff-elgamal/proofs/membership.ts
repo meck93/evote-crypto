@@ -18,7 +18,7 @@ const web3 = require('web3')
 const printConsole = false
 
 // modulo operations
-const add = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNadd(a, b, sp.q)
+const add = (a: BN, b: BN, sp: SystemParameters): BN => GlobalHelper.addBN(a, b, sp.q)
 const sub = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNsub(a, b, sp.q)
 const mul = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNmul(a, b, sp.p)
 const div = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNdiv(a, b, sp.p)

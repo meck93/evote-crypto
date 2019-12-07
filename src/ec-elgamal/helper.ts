@@ -3,7 +3,6 @@ import BN = require('bn.js')
 import { Curve, CurvePoint, SystemParameters, SystemParametersSerialized } from './index'
 import { instanceOfSystemParametersSerialized } from './models'
 
-export const BNadd = (a: BN, b: BN, mod: BN): BN => a.add(b).mod(mod)
 export const BNsub = (a: BN, b: BN, mod: BN): BN => a.sub(b).mod(mod)
 export const BNmul = (a: BN, b: BN, mod: BN): BN => a.mul(b).mod(mod)
 

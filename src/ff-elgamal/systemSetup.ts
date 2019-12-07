@@ -79,5 +79,5 @@ export const combinePublicKeys = (params: SystemParameters, publicKeyShares: BN[
 // NOTE: this should not be used as the distributed secret keys will become "useless"
 //       it is only used for testing purpose
 export const combinePrivateKeys = (params: SystemParameters, privateKeyShares: BN[]): BN => {
-  return privateKeyShares.reduce((sum, share) => Helper.BNadd(sum, share, params.q))
+  return privateKeyShares.reduce((sum, share) => GlobalHelper.addBN(sum, share, params.q))
 }

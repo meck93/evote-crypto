@@ -1,5 +1,6 @@
 import BN = require('bn.js')
 
+import { GlobalHelper } from '../../index'
 import { CurvePoint, Helper, KeyPair, SystemSetup, SystemParameters } from '../index'
 import { KeyGenerationProof } from './index'
 
@@ -29,7 +30,7 @@ export const generate = (
   const b: CurvePoint = keyPair.h
 
   const c: BN = generateChallenge(n, id, h, b)
-  const d: BN = Helper.BNadd(a, Helper.BNmul(c, sk, n), n)
+  const d: BN = GlobalHelper.addBN(a, Helper.BNmul(c, sk, n), n)
 
   return { c: c, d: d }
 }

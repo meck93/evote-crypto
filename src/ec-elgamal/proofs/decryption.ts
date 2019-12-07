@@ -57,7 +57,7 @@ export const generate = (
   const b1 = Helper.ECpow(g, x)
 
   const c = generateChallenge(n, id, a, b, a1, b1)
-  const f = Helper.BNadd(x, Helper.BNmul(c, sk, n), n)
+  const f = GlobalHelper.addBN(x, Helper.BNmul(c, sk, n), n)
   const d = Helper.ECpow(a, sk)
 
   log && console.log('a1 is on the curve?\t', Curve.validate(a1))

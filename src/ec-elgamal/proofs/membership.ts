@@ -73,9 +73,9 @@ export const generateYesProof = (
   const b1 = Helper.ECpow(h, x)
 
   const c = generateChallenge(n, id, a, b, a0, b0, a1, b1)
-  const c1 = Helper.BNadd(n, Helper.BNsub(c, c0, n), n)
+  const c1 = GlobalHelper.addBN(n, Helper.BNsub(c, c0, n), n)
 
-  const f1 = Helper.BNadd(x, Helper.BNmul(c1, r, n), n)
+  const f1 = GlobalHelper.addBN(x, Helper.BNmul(c1, r, n), n)
 
   printConsole && console.log('a0 is on the curve?\t', Curve.validate(a0))
   printConsole && console.log('b0 is on the curve?\t', Curve.validate(b0))
@@ -130,9 +130,9 @@ export const generateNoProof = (
   const b0 = Helper.ECpow(h, x)
 
   const c = generateChallenge(n, id, a, b, a0, b0, a1, b1)
-  const c0 = Helper.BNadd(n, Helper.BNsub(c, c1, n), n)
+  const c0 = GlobalHelper.addBN(n, Helper.BNsub(c, c1, n), n)
 
-  const f0 = Helper.BNadd(x, Helper.BNmul(c0, r, n), n)
+  const f0 = GlobalHelper.addBN(x, Helper.BNmul(c0, r, n), n)
 
   printConsole && console.log('a1 is on the curve?\t', Curve.validate(a1))
   printConsole && console.log('b1 is on the curve?\t', Curve.validate(b1))
@@ -171,7 +171,7 @@ export const verify = (
   const v2 = Helper.ECpow(g, f1).eq(Helper.ECmul(a1, Helper.ECpow(a, c1)))
   const v3 = Helper.ECpow(h, f0).eq(Helper.ECmul(b0, Helper.ECpow(b, c0)))
   const v4 = Helper.ECpow(h, f1).eq(Helper.ECmul(b1, Helper.ECpow(Helper.ECdiv(b, g), c1)))
-  const v5 = Helper.BNadd(c0, c1, n).eq(generateChallenge(n, id, a, b, a0, b0, a1, b1))
+  const v5 = GlobalHelper.addBN(c0, c1, n).eq(generateChallenge(n, id, a, b, a0, b0, a1, b1))
 
   printConsole && console.log('g^f0 == a0*a^c0:\t', v1)
   printConsole && console.log('g^f1 == a1*a^c1\t\t', v2)
