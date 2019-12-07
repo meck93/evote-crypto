@@ -5,7 +5,6 @@ import { Cipher, Curve, CurvePoint, Encryption, Helper } from './index'
 
 export const yesVote = Curve.g
 export const noVote = Curve.point(null, null)
-const infinityPoint = yesVote.add(yesVote.neg())
 
 export const generateYesVote = (pk: string | CurvePoint): Cipher => {
   return Encryption.encrypt(yesVote, Helper.deserializeCurvePoint(pk))

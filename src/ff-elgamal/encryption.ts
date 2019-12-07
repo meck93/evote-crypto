@@ -11,7 +11,7 @@
 
 import BN = require('bn.js')
 import { GlobalHelper } from '../index'
-import { Cipher, Helper, SystemParameters } from './index'
+import { Cipher, SystemParameters } from './index'
 
 // encode a message m to g^m
 export const encodeMessage = (m: number | BN, sysParams: SystemParameters): BN => {

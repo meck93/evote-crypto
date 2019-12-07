@@ -11,7 +11,7 @@
 
 import BN = require('bn.js')
 import { GlobalHelper } from '../../index'
-import { Cipher, Helper, SystemParameters } from '../index'
+import { Cipher, SystemParameters } from '../index'
 import { MembershipProof } from './models'
 
 const web3 = require('web3')

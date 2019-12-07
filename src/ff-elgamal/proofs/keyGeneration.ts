@@ -12,7 +12,7 @@
 
 import BN = require('bn.js')
 import { GlobalHelper } from '../../index'
-import { Helper, KeyPair, SystemParameters } from '../index'
+import { KeyPair, SystemParameters } from '../index'
 import { KeyGenerationProof } from './index'
 
 const web3 = require('web3')

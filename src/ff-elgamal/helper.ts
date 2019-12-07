@@ -1,5 +1,3 @@
-import BN = require('bn.js')
-
 // check if a given number is prime
 export const isPrime = (num: number): boolean => {
   for (let i = 2; i <= Math.sqrt(num); i++) {
