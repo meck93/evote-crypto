@@ -16,7 +16,7 @@ import { Cipher, Helper, SystemParameters } from './index'
 // encode a message m to g^m
 export const encodeMessage = (m: number | BN, sysParams: SystemParameters): BN => {
   m = typeof m === 'number' ? GlobalHelper.newBN(m) : m
-  return Helper.BNpow(sysParams.g, m, sysParams.p)
+  return GlobalHelper.powBN(sysParams.g, m, sysParams.p)
 }
 
 // decode a message g^m to m
@@ -57,8 +57,8 @@ export const encrypt = (
   const m = typeof message === 'number' ? GlobalHelper.newBN(message) : message
 
   const r = GlobalHelper.getSecureRandomValue(sysParams.q)
-  const c1 = Helper.BNpow(sysParams.g, r, sysParams.p)
-  const s = Helper.BNpow(publicKey, r, sysParams.p)
+  const c1 = GlobalHelper.powBN(sysParams.g, r, sysParams.p)
+  const s = GlobalHelper.powBN(publicKey, r, sysParams.p)
   const mh = encodeMessage(m, sysParams)
   const c2 = GlobalHelper.mulBN(s, mh, sysParams.p)
 
@@ -93,7 +93,7 @@ export const decrypt1 = (
 ): BN => {
   const { a: c1, b: c2 } = cipherText
 
-  const s = Helper.BNpow(c1, sk, sysParams.p)
+  const s = GlobalHelper.powBN(c1, sk, sysParams.p)
   const sInverse = GlobalHelper.invmBN(s, sysParams.p)
   const mh = GlobalHelper.mulBN(c2, sInverse, sysParams.p)
   const m = decodeMessage(mh, sysParams)
@@ -129,8 +129,8 @@ export const decrypt2 = (
 ): BN => {
   const { a: c1, b: c2 } = cipherText
 
-  const s = Helper.BNpow(c1, sk, sysParams.p)
-  const sPowPMinus2 = Helper.BNpow(s, sysParams.p.sub(GlobalHelper.newBN(2)), sysParams.p)
+  const s = GlobalHelper.powBN(c1, sk, sysParams.p)
+  const sPowPMinus2 = GlobalHelper.powBN(s, sysParams.p.sub(GlobalHelper.newBN(2)), sysParams.p)
   const mh = GlobalHelper.mulBN(c2, sPowPMinus2, sysParams.p)
   const m = decodeMessage(mh, sysParams)
 
@@ -153,7 +153,7 @@ export const add = (em1: Cipher, em2: Cipher, sysParams: SystemParameters): Ciph
 
 // decrypt a cipher text with a private key share
 export const decryptShare = (params: SystemParameters, cipher: Cipher, secretKeyShare: BN): BN => {
-  return Helper.BNpow(cipher.a, secretKeyShare, params.p)
+  return GlobalHelper.powBN(cipher.a, secretKeyShare, params.p)
 }
 
 // combine decrypted shares

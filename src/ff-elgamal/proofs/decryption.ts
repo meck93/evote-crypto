@@ -21,7 +21,7 @@ const printConsole = false
 // modulo operations
 const add = (a: BN, b: BN, sp: SystemParameters): BN => GlobalHelper.addBN(a, b, sp.q)
 const mul = (a: BN, b: BN, sp: SystemParameters): BN => GlobalHelper.mulBN(a, b, sp.p)
-const pow = (a: BN, b: BN, sp: SystemParameters): BN => Helper.BNpow(a, b, sp.p)
+const pow = (a: BN, b: BN, sp: SystemParameters): BN => GlobalHelper.powBN(a, b, sp.p)
 
 // TODO: check paper https://eprint.iacr.org/2016/771.pdf why we should not hash a and b
 const generateChallenge = (q: BN, uniqueID: string, a: BN, b: BN, a1: BN, b1: BN): BN => {

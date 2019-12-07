@@ -7,6 +7,7 @@ export const addBN = (a: BN, b: BN, modulus: BN): BN => a.add(b).mod(modulus)
 export const subBN = (a: BN, b: BN, modulus: BN): BN => a.sub(b).mod(modulus)
 export const mulBN = (a: BN, b: BN, modulus: BN): BN => a.mul(b).mod(modulus)
 export const divBN = (a: BN, b: BN, modulus: BN): BN => mulBN(a, invmBN(b, modulus), modulus)
+export const powBN = (a: BN, b: BN, modulus: BN): BN => a.pow(b).mod(modulus)
 
 // compute the required number of bytes to store a decimal
 export const getByteSizeForDecimalNumber = (n: BN): BN => {

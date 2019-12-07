@@ -22,7 +22,7 @@ export const generateSystemParameters = (p: number, g: number): SystemParameters
 // randomly generate a key pair h,sk given the system parameters p,q,g
 export const generateKeyPair = (sp: SystemParameters): KeyPair => {
   const sk = GlobalHelper.getSecureRandomValue(sp.q) // pick a random value in Z_q
-  const h = Helper.BNpow(sp.g, sk, sp.p) // compute public key h: g^sk mod p
+  const h = GlobalHelper.powBN(sp.g, sk, sp.p) // compute public key h: g^sk mod p
   return { h, sk }
 }
 
@@ -46,7 +46,7 @@ export const generateSystemParametersAndKeysZKP = (
   const keyPair = generateKeyPair(sysParams)
 
   // verify that g^q mod p == 1 (this means: gcd(q,p) == 1)
-  const test1 = Helper.BNpow(sysParams.g, sysParams.q, sysParams.p)
+  const test1 = GlobalHelper.powBN(sysParams.g, sysParams.q, sysParams.p)
   if (!test1.eq(GlobalHelper.newBN(1))) {
     throw new Error(
       `g^q mod p != 1 (== ${test1.toNumber()}. for p: ${p}, q: ${sysParams.q.toNumber()} and g: ${g}`
@@ -54,7 +54,7 @@ export const generateSystemParametersAndKeysZKP = (
   }
 
   // verify that h^q mod p == 1 (this means: gcd(h,p) == 1)
-  const test2 = Helper.BNpow(keyPair.h, sysParams.q, sysParams.p)
+  const test2 = GlobalHelper.powBN(keyPair.h, sysParams.q, sysParams.p)
   if (!test2.eq(GlobalHelper.newBN(1))) {
     throw new Error(
       `h^q mod p != 1 (== ${test2.toNumber()}. for p: ${p}, q: ${sysParams.q.toNumber()} and g: ${g}`

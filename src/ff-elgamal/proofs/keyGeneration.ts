@@ -37,7 +37,7 @@ export const generate = (
   const { h, sk } = keyPair
 
   const a: BN = GlobalHelper.getSecureRandomValue(q)
-  const b: BN = Helper.BNpow(g, a, p) // commitment
+  const b: BN = GlobalHelper.powBN(g, a, p) // commitment
 
   const c: BN = generateChallenge(q, id, h, b) // challenge
   const d: BN = GlobalHelper.addBN(a, GlobalHelper.mulBN(c, sk, q), q) // response
@@ -58,13 +58,13 @@ export const verify = (
   const { p, q, g } = params
   const { c, d } = proof
 
-  const b: BN = GlobalHelper.divBN(Helper.BNpow(g, d, p), Helper.BNpow(h, c, p), p)
+  const b: BN = GlobalHelper.divBN(GlobalHelper.powBN(g, d, p), GlobalHelper.powBN(h, c, p), p)
 
   const c_: BN = generateChallenge(q, id, h, b)
   const hashCheck: boolean = c.eq(c_)
 
-  const gPowD: BN = Helper.BNpow(g, d, p)
-  const bhPowC: BN = GlobalHelper.mulBN(b, Helper.BNpow(h, c, p), p)
+  const gPowD: BN = GlobalHelper.powBN(g, d, p)
+  const bhPowC: BN = GlobalHelper.mulBN(b, GlobalHelper.powBN(h, c, p), p)
   const dCheck: boolean = gPowD.eq(bhPowC)
 
   log && console.log('do the hashes match?\t', hashCheck)

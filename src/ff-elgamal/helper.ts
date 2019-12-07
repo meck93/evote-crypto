@@ -66,8 +66,6 @@ export const getGCandidates = (p: number): number[] =>
     return isGValid(current, p) ? [...previous, current] : previous
   }, [])
 
-export const BNpow = (a: BN, b: BN, modulus: BN): BN => a.pow(b).mod(modulus)
-
 export const timingSafeEqual = (a: Buffer, b: Buffer): boolean => {
   if (!Buffer.isBuffer(a)) {
     throw new TypeError('First argument must be a buffer')
