@@ -1,11 +1,8 @@
-# Adding curve25519 (in Weierstrass form) to Elliptic Library
+# curve25519 (in Weierstrass form)
 
-We need to add curve25519 in Weierstrass form manually to the elliptic library since the required pull request has not been merged yet.
+For more details about this curve, please see the `README` in the root folder.
 
-To add the curve, do the following:
-
-- copy the configuration code below in to the file: `/node_modules/elliptic/lib/elliptic/curves.js`
-- now, `curve25519-weier` can be instantiated via:
+In any case, this curve can be used like any other curve in the elliptic package. See the examples below.
 
 ```javascript
 const curve = new EC('curve25519-weier')
