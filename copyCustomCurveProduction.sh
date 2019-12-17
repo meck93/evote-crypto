@@ -12,7 +12,9 @@ readonly parentDir="$(dirname "$dir")"
 readonly parentParentDir="$(dirname "$parentDir")"
 
 fileToCopy=$dir/curves.js
-copyDestination=$dir/node_modules/elliptic/lib/elliptic/curves.js
+copyDestination=$parentParentDir/elliptic/lib/elliptic/curves.js
 
 # replace curve file inside elliptic package
+# this adds the elliptic curve. curve25519 in weierstrass form to the elliptic library
+# since this pull request is not merged yet: https://github.com/indutny/elliptic/pull/113
 cp $fileToCopy $copyDestination

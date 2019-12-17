@@ -1,13 +1,19 @@
 {
   "name": "@meck93/evote-crypto",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "description": "",
-  "repository": "git@github.com:meck93/evote-crypto.git",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com:meck93/evote-crypto.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
-    "postinstall": "./copyCustomCurve.sh",
-    "prebuild": "rm -rf dist",
+    "postinstall": "./copyCustomCurveProduction.sh",
+    "prebuild": "rm -rf lib",
     "build": "tsc",
     "pre-commit": "lint-staged",
     "test": "nyc --reporter=text ts-mocha \"./test/**/*.spec.ts\"",
@@ -33,8 +39,8 @@
     "@types/chai": "^4.2.7",
     "@types/elliptic": "^6.4.10",
     "@types/mocha": "^5.2.7",
-    "@typescript-eslint/eslint-plugin": "^2.11.0",
-    "@typescript-eslint/parser": "^2.11.0",
+    "@typescript-eslint/eslint-plugin": "^2.12.0",
+    "@typescript-eslint/parser": "^2.12.0",
     "chai": "^4.2.0",
     "eslint": "^6.7.1",
     "eslint-config-prettier": "^6.7.0",
@@ -42,7 +48,7 @@
     "eslint-plugin-import": "^2.19.1",
     "eslint-plugin-json": "^2.0.1",
     "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-prettier": "^3.1.2",
     "lint-staged": "^9.5.0",
     "mocha": "^6.2.2",
     "nyc": "^14.1.1",
