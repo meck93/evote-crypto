@@ -1,4 +1,5 @@
 node_modules/
 dist/
+lib/
 .nyc_output
 coverage/

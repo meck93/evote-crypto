@@ -1,0 +1,9 @@
+test
+dist
+src
+node_modules
+.eslintignore
+.eslintrc.js
+.prettierignore
+.prettierrc
+tsconfig.json
