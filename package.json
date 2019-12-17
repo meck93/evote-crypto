@@ -1,12 +1,14 @@
 {
-  "name": "mp-crypto",
-  "version": "1.0.0",
+  "name": "@meck93/evote-crypto",
+  "version": "0.1.0",
   "description": "",
+  "repository": "git@github.com:meck93/evote-crypto.git",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "postinstall": "./copyCustomCurve.sh",
-    "build": "rm -rf dist && tsc",
+    "prebuild": "rm -rf dist",
+    "build": "tsc",
     "pre-commit": "lint-staged",
     "test": "nyc --reporter=text ts-mocha \"./test/**/*.spec.ts\"",
     "test:timeout": "nyc --reporter=text ts-mocha \"./test/**/*.spec.ts\" --timeout 10000",
