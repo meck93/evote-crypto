@@ -1,6 +1,6 @@
 {
   "name": "@meck93/evote-crypto",
-  "version": "0.1.5",
+  "version": "0.1.7",
   "description": "",
   "repository": {
     "type": "git",
@@ -12,7 +12,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "postinstall": "./copyCustomCurve.sh",
+    "postinstall": "./addCurveToEllipticLibrary.sh",
     "prebuild": "rm -rf lib",
     "build": "tsc",
     "pre-commit": "lint-staged",
