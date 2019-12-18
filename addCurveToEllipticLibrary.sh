@@ -27,7 +27,6 @@ if [ -f "$topLevelDest" ]; then
     echo "$topLevelDest exist."
     cp -f $fileToCopy $topLevelDest
     echo "$fileToCopy patched."
-    exit
 fi
 
 # check if the top level destination exist -> if yes, copy the custom curve file
@@ -35,5 +34,4 @@ if [ -f "$dependencyDest" ]; then
     echo "$dependencyDest exist."
     cp -f $fileToCopy $dependencyDest
     echo "$fileToCopy patched."
-    exit
 fi
