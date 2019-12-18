@@ -60,16 +60,6 @@
     "ts-node": "^8.5.4",
     "typescript": "^3.7.3"
   },
-  "lint-staged": {
-    "*.+(ts)": [
-      "eslint --fix",
-      "git add"
-    ],
-    "*.+(js|ts|json|md)": [
-      "prettier --write",
-      "git add"
-    ]
-  },
   "nyc": {
     "extension": [
       ".ts"

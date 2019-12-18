@@ -1,9 +1,11 @@
-test
-dist
-src
+.vscode
+lib
 node_modules
+src
+test
 .eslintignore
-.eslintrc.js
+.eslintrc.json
+.lintstagedrc.json
 .prettierignore
 .prettierrc
 tsconfig.json
