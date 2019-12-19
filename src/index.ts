@@ -1,4 +1,4 @@
-// global helpers models
+// global helpers and models
 import * as GlobalHelper from './helper'
 import { Summary } from './models'
 export { GlobalHelper, Summary }
