@@ -45,7 +45,7 @@ export const decodeMessage = (mh: number | BN, sysParams: SystemParameters): BN 
 // - m: message
 //
 // steps:
-// 1. pick random value r: 0 < r < p
+// 1. pick random value r: 0 < r < q
 // 2. compute c1 = g^r
 // 3. compute s = h^r
 // 4. compute mh = g^message (encode it to make it "homomorphic")
