@@ -37,7 +37,7 @@ TODO: link to final report for detailed introduction
 
 ### ElGamal
 
-The ElGamal cryptosystem [1] is a public key cryptosystem defined over cyclic groups and is based on the difficulty of solving the discrete logarithm. This library uses cyclic groups and their modulo operations. To make the system safe, it uses a multiplicative prime-order group Z<sub>P</sub><sup>*</sup> where `p = 2*q + 1` and `q` are both prime numbers and `p` needs to be chosen very large.
+The ElGamal cryptosystem [1] is a public key cryptosystem defined over cyclic groups and is based on the difficulty of finding the discrete logarithm. This library uses cyclic groups and their modulo operations. To make the system safe, it uses a multiplicative prime-order group Z<sub>P</sub><sup>*</sup> where `p = 2*q + 1` and `q` are both prime numbers and `p` needs to be chosen very large.
 
 The following values are used within the system:
 
