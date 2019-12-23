@@ -58,7 +58,7 @@
     "prettier": "^1.19.1",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.5.4",
-    "typescript": "^3.7.3"
+    "typescript": "^3.7.4"
   },
   "nyc": {
     "extension": [
