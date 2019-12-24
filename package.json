@@ -32,7 +32,7 @@
     "elliptic"
   ],
   "dependencies": {
-    "bn.js": "^5.0.0",
+    "bn.js": "^5.1.0",
     "elliptic": "6.5.2",
     "hash.js": "^1.1.7",
     "random": "^2.1.1",
