@@ -6,13 +6,17 @@ describe('Model Typechecking Test', () => {
   it('SystemParameters Type Test', () => {
     // invalid systemsparameter object: incorrect variables, correct types
     const testObject0 = { a: new BN(23), b: new BN(11), c: new BN(3) }
-    const check0 = Models.isSystemParameters(testObject0)
-    expect(check0).to.be.false
+    expect(() => Models.isSystemParameters(testObject0)).to.throw(
+      TypeError,
+      `The provided input for type: SystemParameters is not of the required type.`
+    )
 
     // invalid systemsparameter object: correct variables, incorrect types
     const testObject1 = { p: 23, q: 11, g: 3 }
-    const check1 = Models.isSystemParameters(testObject1)
-    expect(check1).to.be.false
+    expect(() => Models.isSystemParameters(testObject1)).to.throw(
+      TypeError,
+      `The provided input for type: SystemParameters is not of the required type.`
+    )
 
     // valid creation of systems parameter object
     const testObject2 = { p: new BN(23), q: new BN(11), g: new BN(3) }
@@ -23,13 +27,17 @@ describe('Model Typechecking Test', () => {
   it('KeyPair Type Test', () => {
     // invalid keypair object: correct variables, wrong type
     const testObject1 = { h: new BN(3), sk: 2 }
-    const check1 = Models.isKeyPair(testObject1)
-    expect(check1).to.be.false
+    expect(() => Models.isKeyPair(testObject1)).to.throw(
+      TypeError,
+      `The provided input for type: KeyPair is not of the required type.`
+    )
 
     // invalid keypair object: incorrect variables, correct type
     const testObject2 = { h: new BN(3), p: new BN(2) }
-    const check2 = Models.isKeyPair(testObject2)
-    expect(check2).to.be.false
+    expect(() => Models.isKeyPair(testObject2)).to.throw(
+      TypeError,
+      `The provided input for type: KeyPair is not of the required type.`
+    )
 
     // valid creation of keypair object
     const testObject3 = { h: new BN(3), sk: new BN(2) }
@@ -40,13 +48,17 @@ describe('Model Typechecking Test', () => {
   it('Cipher Type Test', () => {
     // invalid cipher object: correct variables, wrong type
     const testObject1 = { a: 3, b: 2 }
-    const check1 = Models.isCipher(testObject1)
-    expect(check1).to.be.false
+    expect(() => Models.isCipher(testObject1)).to.throw(
+      TypeError,
+      `The provided input for type: Cipher is not of the required type.`
+    )
 
     // invalid cipher object: incorrect variables, correct type
     const testObject2 = { h: new BN(3), p: new BN(2) }
-    const check2 = Models.isCipher(testObject2)
-    expect(check2).to.be.false
+    expect(() => Models.isCipher(testObject2)).to.throw(
+      TypeError,
+      `The provided input for type: Cipher is not of the required type.`
+    )
 
     // valid creation of cipher object
     const testObject3 = { a: new BN(3), b: new BN(2) }
@@ -60,7 +72,9 @@ describe('Model Typechecking Test', () => {
 
     // invalid cipher object: a,b correct -> r wrong
     const testObject5 = { a: new BN(3), b: new BN(2), r: 1 }
-    const check5 = Models.isCipher(testObject5)
-    expect(check5).to.be.false
+    expect(() => Models.isCipher(testObject5)).to.throw(
+      TypeError,
+      `The provided input for type: Cipher is not of the required type.`
+    )
   })
 })
