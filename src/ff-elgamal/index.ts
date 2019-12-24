@@ -5,5 +5,12 @@ import * as SystemSetup from './systemSetup'
 import * as Voting from './voting'
 export { Encryption, Helper, Proof, SystemSetup, Voting }
 
-import { Cipher, KeyPair, SystemParameters } from './models'
-export { Cipher, KeyPair, SystemParameters }
+import {
+  Cipher,
+  KeyPair,
+  SystemParameters,
+  isCipher,
+  isKeyPair,
+  isSystemParameters,
+} from './models'
+export { Cipher, KeyPair, SystemParameters, isCipher, isKeyPair, isSystemParameters }
