@@ -59,3 +59,15 @@ export const timingSafeEqual = (a: Buffer, b: Buffer): boolean => {
   }
   return out === 0
 }
+
+export const timingSafeEqualBN = (a: BN, b: BN): boolean => {
+  if (!BN.isBN(a)) {
+    throw new TypeError('First argument must be of type: BN')
+  }
+  if (!BN.isBN(b)) {
+    throw new TypeError('Second argument must be of type: BN')
+  }
+  const a_ = new Buffer(a.toArray())
+  const b_ = new Buffer(b.toArray())
+  return timingSafeEqual(a_, b_)
+}
