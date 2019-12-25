@@ -25,7 +25,7 @@ export const decodeMessage = (mh: number | BN, sysParams: SystemParameters): BN 
   mh = typeof mh === 'number' ? GlobalHelper.newBN(mh) : mh
 
   let m = GlobalHelper.newBN(0)
-  while (!encodeMessage(m, sysParams).eq(mh)) {
+  while (!GlobalHelper.timingSafeEqualBN(encodeMessage(m, sysParams), mh)) {
     m = m.add(GlobalHelper.newBN(1))
   }
   return m

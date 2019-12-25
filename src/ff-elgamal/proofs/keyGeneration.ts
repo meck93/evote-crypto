@@ -61,11 +61,11 @@ export const verify = (
   const b: BN = GlobalHelper.divBN(GlobalHelper.powBN(g, d, p), GlobalHelper.powBN(h, c, p), p)
 
   const c_: BN = generateChallenge(q, id, h, b)
-  const hashCheck: boolean = c.eq(c_)
+  const hashCheck: boolean = GlobalHelper.timingSafeEqualBN(c, c_)
 
   const gPowD: BN = GlobalHelper.powBN(g, d, p)
   const bhPowC: BN = GlobalHelper.mulBN(b, GlobalHelper.powBN(h, c, p), p)
-  const dCheck: boolean = gPowD.eq(bhPowC)
+  const dCheck: boolean = GlobalHelper.timingSafeEqualBN(gPowD, bhPowC)
 
   log && console.log('do the hashes match?\t', hashCheck)
   log && console.log('g^d == b * h^c?\t', dCheck)
