@@ -40,4 +40,10 @@ By default, GitHub Packages publishes a package in the GitHub repository you spe
 
    2.2. SSH: `"repository": "https://github.com/meck93/evote-crypto.git"`
 
-3. Publish the package: `npm publish`
+3. Create a new version using `npm version [<newversion> | major | minor | patch] -m "Upgarde to %s for...`
+
+- The `%s` will be automatically replace with the new version.
+- A git commit and tag for the new version will be created automatically.
+- **Note.** The command will only work if the repository is clean. No uncommited changes.
+
+4. Publish the package: `npm publish`

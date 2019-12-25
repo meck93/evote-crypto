@@ -25,7 +25,8 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "ts-mocha": "./node_modules/.bin/ts-mocha",
     "ts-node": "./node_modules/.bin/ts-node",
-    "tsc": "./node_modules/.bin/tsc"
+    "tsc": "./node_modules/.bin/tsc",
+    "preversion": "build"
   },
   "license": "MIT",
   "bundledDependencies": [
