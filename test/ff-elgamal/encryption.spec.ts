@@ -55,10 +55,12 @@ describe('Finite Field ElGamal Encryption', () => {
 
   it('compare decryption implementations', () => {
     const log = false
-    const [sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(11, 3)
+    const [sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(1319, 2)
 
-    const message = GlobalHelper.getSecureRandomValue(sp.q)
     for (let i = 0; i < 10; i++) {
+      // generate random messages of max size 10
+      const message = GlobalHelper.getSecureRandomValue(GlobalHelper.newBN(10, 10))
+
       log && console.log(i)
       log && console.log('prime      (p)\t', sp.p)
       log && console.log('generator  (g)\t', sp.g)
@@ -78,18 +80,23 @@ describe('Finite Field ElGamal Encryption', () => {
   })
 
   it('homomorphic addition', () => {
+    const log = false
+    const [sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(1319, 2)
+
     for (let i = 0; i < 10; i++) {
-      const [sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(137, 51)
+      // generate random messages of max size 10
+      const m1 = GlobalHelper.getSecureRandomValue(GlobalHelper.newBN(10, 10))
+      const m2 = GlobalHelper.getSecureRandomValue(GlobalHelper.newBN(10, 10))
 
-      // generate random messages of max size q = (p - 1)/2
-      // so that the sum is max p-1
-      const m1 = GlobalHelper.getSecureRandomValue(sp.q)
-      const m2 = GlobalHelper.getSecureRandomValue(sp.q)
+      const eM1 = FFelGamal.Encryption.encrypt(m1, sp, pk, log)
+      const eM2 = FFelGamal.Encryption.encrypt(m2, sp, pk, log)
 
-      const eM1 = FFelGamal.Encryption.encrypt(m1, sp, pk)
-      const eM2 = FFelGamal.Encryption.encrypt(m2, sp, pk)
-
-      const dSum = FFelGamal.Encryption.decrypt1(FFelGamal.Encryption.add(eM1, eM2, sp), sk, sp)
+      const dSum = FFelGamal.Encryption.decrypt1(
+        FFelGamal.Encryption.add(eM1, eM2, sp),
+        sk,
+        sp,
+        log
+      )
 
       expect(dSum.eq(m1.add(m2))).to.be.true
     }
