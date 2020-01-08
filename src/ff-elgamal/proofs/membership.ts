@@ -11,7 +11,7 @@
 
 import BN = require('bn.js')
 import { GlobalHelper } from '../../index'
-import { Cipher, SystemParameters } from '../index'
+import { Cipher, SystemParameters, isCipher, isSystemParameters } from '../index'
 import { MembershipProof } from './models'
 
 const web3 = require('web3')
@@ -61,6 +61,9 @@ export const generateYesProof = (
   pk: BN,
   uniqueID: string
 ): MembershipProof => {
+  isCipher(cipher)
+  isSystemParameters(sp)
+
   const { a, b, r } = cipher
 
   const c0 = GlobalHelper.getSecureRandomValue(sp.q)
@@ -114,6 +117,9 @@ export const generateNoProof = (
   pk: BN,
   uniqueID: string
 ): MembershipProof => {
+  isCipher(cipher)
+  isSystemParameters(sp)
+
   const { a, b, r } = cipher
 
   const c1 = GlobalHelper.getSecureRandomValue(sp.q)
@@ -160,6 +166,9 @@ export const verify = (
   pk: BN,
   uniqueID: string
 ): boolean => {
+  isCipher(cipher)
+  isSystemParameters(sp)
+
   const { a, b } = cipher
   const { a0, a1, b0, b1, c0, c1, f0, f1 } = proof
 

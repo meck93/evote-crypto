@@ -12,7 +12,7 @@
 
 import BN = require('bn.js')
 import { GlobalHelper } from '../../index'
-import { KeyPair, SystemParameters } from '../index'
+import { KeyPair, SystemParameters, isKeyPair, isSystemParameters } from '../index'
 import { KeyGenerationProof } from './index'
 
 const web3 = require('web3')
@@ -33,6 +33,9 @@ export const generate = (
   keyPair: KeyPair, // share
   id: string
 ): KeyGenerationProof => {
+  isSystemParameters(params)
+  isKeyPair(keyPair)
+
   const { p, q, g } = params
   const { h, sk } = keyPair
 
@@ -55,6 +58,8 @@ export const verify = (
   h: BN,
   id: string
 ): boolean => {
+  isSystemParameters(params)
+
   const { p, q, g } = params
   const { c, d } = proof
 

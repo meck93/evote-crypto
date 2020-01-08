@@ -8,7 +8,7 @@
 
 import BN = require('bn.js')
 import { GlobalHelper } from '../index'
-import { Helper, KeyPair, SystemParameters } from './index'
+import { Helper, KeyPair, SystemParameters, isSystemParameters } from './index'
 
 // generate system parameters p,q,g given p,g
 export const generateSystemParameters = (p: number, g: number): SystemParameters => {
@@ -21,6 +21,7 @@ export const generateSystemParameters = (p: number, g: number): SystemParameters
 
 // randomly generate a key pair h,sk given the system parameters p,q,g
 export const generateKeyPair = (sp: SystemParameters): KeyPair => {
+  isSystemParameters(sp)
   const sk = GlobalHelper.getSecureRandomValue(sp.q) // pick a random value in Z_q
   const h = GlobalHelper.powBN(sp.g, sk, sp.p) // compute public key h: g^sk mod p
   return { h, sk }
@@ -72,6 +73,7 @@ export const generateSystemParametersAndKeysZKP = (
 
 // combines multiple public key shares to one public key
 export const combinePublicKeys = (params: SystemParameters, publicKeyShares: BN[]): BN => {
+  isSystemParameters(params)
   return publicKeyShares.reduce((product, share) => GlobalHelper.mulBN(product, share, params.p))
 }
 
@@ -79,5 +81,6 @@ export const combinePublicKeys = (params: SystemParameters, publicKeyShares: BN[
 // NOTE: this should not be used as the distributed secret keys will become "useless"
 //       it is only used for testing purpose
 export const combinePrivateKeys = (params: SystemParameters, privateKeyShares: BN[]): BN => {
+  isSystemParameters(params)
   return privateKeyShares.reduce((sum, share) => GlobalHelper.addBN(sum, share, params.q))
 }

@@ -12,7 +12,7 @@
 
 import BN = require('bn.js')
 import { GlobalHelper } from '../../index'
-import { Cipher, SystemParameters } from '../index'
+import { Cipher, SystemParameters, isCipher, isSystemParameters } from '../index'
 import { DecryptionProof } from './models'
 
 const web3 = require('web3')
@@ -46,6 +46,9 @@ export const generate = (
   sk: BN,
   uniqueID: string
 ): DecryptionProof => {
+  isCipher(cipher)
+  isSystemParameters(sp)
+
   const { a, b }: Cipher = cipher
 
   const x: BN = GlobalHelper.getSecureRandomValue(sp.q)
@@ -78,6 +81,9 @@ export const verify = (
   pk: BN,
   uniqueID: string
 ): boolean => {
+  isCipher(cipher)
+  isSystemParameters(sp)
+
   const { a, b }: Cipher = cipher
   const { a1, b1, f, d }: DecryptionProof = proof
 

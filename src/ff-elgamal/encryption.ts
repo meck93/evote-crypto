@@ -11,10 +11,11 @@
 
 import BN = require('bn.js')
 import { GlobalHelper } from '../index'
-import { Cipher, SystemParameters } from './index'
+import { Cipher, SystemParameters, isCipher, isSystemParameters } from './index'
 
 // encode a message m to g^m
 export const encodeMessage = (m: number | BN, sysParams: SystemParameters): BN => {
+  isSystemParameters(sysParams)
   m = typeof m === 'number' ? GlobalHelper.newBN(m) : m
   return GlobalHelper.powBN(sysParams.g, m, sysParams.p)
 }
@@ -22,6 +23,7 @@ export const encodeMessage = (m: number | BN, sysParams: SystemParameters): BN =
 // decode a message g^m to m
 // TODO: use baby-step giant-step instead of brute force
 export const decodeMessage = (mh: number | BN, sysParams: SystemParameters): BN => {
+  isSystemParameters(sysParams)
   mh = typeof mh === 'number' ? GlobalHelper.newBN(mh) : mh
 
   let m = GlobalHelper.newBN(0)
@@ -54,6 +56,7 @@ export const encrypt = (
   publicKey: BN,
   log = false
 ): Cipher => {
+  isSystemParameters(sysParams)
   const m = typeof message === 'number' ? GlobalHelper.newBN(message) : message
 
   const r = GlobalHelper.getSecureRandomValue(sysParams.q)
@@ -91,6 +94,9 @@ export const decrypt1 = (
   sysParams: SystemParameters,
   log = false
 ): BN => {
+  isCipher(cipherText)
+  isSystemParameters(sysParams)
+
   const { a: c1, b: c2 } = cipherText
 
   const s = GlobalHelper.powBN(c1, sk, sysParams.p)
@@ -127,6 +133,9 @@ export const decrypt2 = (
   sysParams: SystemParameters,
   log = false
 ): BN => {
+  isCipher(cipherText)
+  isSystemParameters(sysParams)
+
   const { a: c1, b: c2 } = cipherText
 
   const s = GlobalHelper.powBN(c1, sk, sysParams.p)
@@ -145,6 +154,9 @@ export const decrypt2 = (
 
 // homomorphic addition
 export const add = (em1: Cipher, em2: Cipher, sysParams: SystemParameters): Cipher => {
+  isCipher(em1)
+  isCipher(em2)
+  isSystemParameters(sysParams)
   return {
     a: GlobalHelper.mulBN(em1.a, em2.a, sysParams.p),
     b: GlobalHelper.mulBN(em1.b, em2.b, sysParams.p),
@@ -153,6 +165,8 @@ export const add = (em1: Cipher, em2: Cipher, sysParams: SystemParameters): Ciph
 
 // decrypt a cipher text with a private key share
 export const decryptShare = (params: SystemParameters, cipher: Cipher, secretKeyShare: BN): BN => {
+  isSystemParameters(params)
+  isCipher(cipher)
   return GlobalHelper.powBN(cipher.a, secretKeyShare, params.p)
 }
 
@@ -162,6 +176,8 @@ export const combineDecryptedShares = (
   cipher: Cipher,
   decryptedShares: BN[]
 ): BN => {
+  isSystemParameters(params)
+  isCipher(cipher)
   const mh = GlobalHelper.divBN(
     cipher.b,
     decryptedShares.reduce((product, share) => GlobalHelper.mulBN(product, share, params.p)),
