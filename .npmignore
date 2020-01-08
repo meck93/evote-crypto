@@ -1,5 +1,4 @@
 .vscode
-lib
 node_modules
 src
 test
@@ -9,3 +8,5 @@ test
 .prettierignore
 .prettierrc
 tsconfig.json
+.nyc_output
+.github
