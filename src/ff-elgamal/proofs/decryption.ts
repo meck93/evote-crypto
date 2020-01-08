@@ -85,11 +85,11 @@ export const verify = (
 
   const l1: BN = pow(a, f, sp)
   const r1: BN = mul(a1, pow(d, c, sp), sp)
-  const v1: boolean = l1.eq(r1)
+  const v1: boolean = GlobalHelper.timingSafeEqualBN(l1, r1)
 
   const l2: BN = pow(sp.g, f, sp)
   const r2: BN = mul(b1, pow(pk, c, sp), sp)
-  const v2: boolean = l2.eq(r2)
+  const v2: boolean = GlobalHelper.timingSafeEqualBN(l2, r2)
 
   printConsole && console.log('a^f == a1*d^c:\t\t', v1, l1.toNumber(), r1.toNumber())
   printConsole && console.log('g^f == b1*h^c\t\t', v2, l2.toNumber(), r2.toNumber())

@@ -50,12 +50,30 @@ export const timingSafeEqual = (a: Buffer, b: Buffer): boolean => {
   if (!Buffer.isBuffer(b)) {
     throw new TypeError('Second argument must be a buffer')
   }
-  if (a.length !== b.length) {
-    throw new TypeError('Input buffers must have the same length')
+
+  // check if both buffers have the same length but don't leak any information about it
+  // if buffers don't have the same length -> therefore, compare buffer a with itself and always return false
+  // if buffers have the same length -> XOR every position in the Buffer
+  let mismatch = a.length === b.length ? 0 : 1
+
+  if (mismatch) {
+    b = a
   }
-  let out = 0
-  for (let i = 0; i < a.length; i++) {
-    out |= a[i] ^ b[i]
+
+  for (let i = 0, len = a.length; i < len; i++) {
+    mismatch |= a[i] ^ b[i]
   }
-  return out === 0
+  return mismatch === 0
+}
+
+export const timingSafeEqualBN = (a: BN, b: BN): boolean => {
+  if (!BN.isBN(a)) {
+    throw new TypeError('First argument must be of type: BN')
+  }
+  if (!BN.isBN(b)) {
+    throw new TypeError('Second argument must be of type: BN')
+  }
+  const a_ = new Buffer(a.toArray())
+  const b_ = new Buffer(b.toArray())
+  return timingSafeEqual(a_, b_)
 }

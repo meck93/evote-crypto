@@ -163,14 +163,17 @@ export const verify = (
   const { a, b } = cipher
   const { a0, a1, b0, b1, c0, c1, f0, f1 } = proof
 
-  const v1 = pow(sp.g, f0, sp).eq(mul(a0, pow(a, c0, sp), sp))
-  const v2 = pow(sp.g, f1, sp).eq(mul(a1, pow(a, c1, sp), sp))
-  const v3 = pow(pk, f0, sp).eq(mul(b0, pow(b, c0, sp), sp))
-  const v4 = pow(pk, f1, sp).eq(mul(b1, pow(div(b, sp.g, sp), c1, sp), sp))
-  const v5 = c1
-    .add(c0)
-    .mod(sp.q)
-    .eq(generateChallenge(sp.q, uniqueID, a, b, a0, b0, a1, b1))
+  const v1 = GlobalHelper.timingSafeEqualBN(pow(sp.g, f0, sp), mul(a0, pow(a, c0, sp), sp))
+  const v2 = GlobalHelper.timingSafeEqualBN(pow(sp.g, f1, sp), mul(a1, pow(a, c1, sp), sp))
+  const v3 = GlobalHelper.timingSafeEqualBN(pow(pk, f0, sp), mul(b0, pow(b, c0, sp), sp))
+  const v4 = GlobalHelper.timingSafeEqualBN(
+    pow(pk, f1, sp),
+    mul(b1, pow(div(b, sp.g, sp), c1, sp), sp)
+  )
+  const v5 = GlobalHelper.timingSafeEqualBN(
+    c1.add(c0).mod(sp.q),
+    generateChallenge(sp.q, uniqueID, a, b, a0, b0, a1, b1)
+  )
 
   printConsole && console.log('g^f0 == a0*a^c0:\t', v1)
   printConsole && console.log('g^f1 == a1*a^c1\t', v2)

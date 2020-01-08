@@ -444,4 +444,18 @@ describe('Global Helper Test', () => {
     const tValueUnsafe = benchmark(unsafeEqualityCheck)
     timingLog && console.log('Unsafe T-Value:\t', Math.abs(tValueUnsafe))
   })
+
+  it('should perform timing safe BN equality checks', () => {
+    // check that it is the same
+    const a1 = new BN('abcd12345abcdabcd12345abcdabcd12345abcd', 'hex')
+    const b1 = new BN('abcd12345abcdabcd12345abcdabcd12345abcd', 'hex')
+    const isEqual1 = GlobalHelper.timingSafeEqualBN(a1, b1)
+    expect(isEqual1).to.be.true
+
+    // check that it is not the same
+    const a2 = new BN('abcd12345abcdabcd12345abcdabcd12345abcd', 'hex')
+    const b2 = new BN('abcd12345abcdabcd12345abcdabcd12345abc1', 'hex')
+    const isEqual2 = GlobalHelper.timingSafeEqualBN(a2, b2)
+    expect(isEqual2).to.be.false
+  })
 })
