@@ -17,7 +17,7 @@
     "build": "tsc",
     "pre-commit": "lint-staged",
     "test": "nyc --reporter=text ts-mocha \"./test/**/*.spec.ts\"",
-    "test:timeout": "nyc --reporter=text ts-mocha \"./test/**/*.spec.ts\" --timeout 10000",
+    "test:timeout": "nyc --reporter=text ts-mocha \"./test/**/*.spec.ts\" --timeout 100000",
     "test:watch": "ts-mocha \"./test/**/*.spec.ts\" -w --watch-extensions ts",
     "test:report": "nyc --reporter=html ts-mocha \"./test/**/*.spec.ts\"",
     "format": "prettier --write \"**/*.+(js|ts|json|md)\"",

@@ -4,7 +4,7 @@ import { FFelGamal } from '../../src/index'
 describe('Finite Field ElGamal Voting', () => {
   it('vote', () => {
     const vote = (_result: number, _votes: number[]): void => {
-      const [sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(137, 51)
+      const [sp, { h: pk, sk }] = FFelGamal.SystemSetup.generateSystemParametersAndKeys(1319, 2)
 
       const log = false
 
