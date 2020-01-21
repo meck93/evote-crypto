@@ -13,7 +13,7 @@ The library uses the following concepts to achieve the listed system properties:
 - **Distributed Key Generation**: Multi-party asymmetric key generation
 - **Non-Interactive Zero-Knowledge Proofs of Knowledge**: Proof of secret key knowledge and vote and decryption correctness
 
-The library is divided into two parts: `src/ff-elgamal` and `src/ec-elgamal`. Both parts mainly consist of the following modules:
+The library is divided into two parts: [Finite Fields](src/ff-elgamal) and [Elliptic Curves](src/ec-elgamal). Both parts mainly consist of the following modules:
 
 - `SystemSetup`:
   - Key pair generation
@@ -31,11 +31,13 @@ The library is divided into two parts: `src/ff-elgamal` and `src/ec-elgamal`. Bo
   - `Membership`: Proof of membership of a vote (0 or 1)
   - `Decryption`: Proof of correct decryption of the sum
 
+TODO: link to final report for detailed introduction
+
 ## Cryptographic Building Blocks
 
 ### ElGamal
 
-The ElGamal cryptosystem [1] is a public key cryptosystem defined over cyclic groups and is based on the difficulty of finding the discrete logarithm. This library uses cyclic groups and their modulo operations. To make the system safe, it uses a multiplicative prime-order group Z<sub>P</sub><sup>*</sup> where `p = 2*q + 1` and `q` are both prime numbers and `p` needs to be chosen very large.
+The ElGamal cryptosystem [1] is a public key cryptosystem defined over cyclic groups and is based on the difficulty of solving the discrete logarithm. This library uses cyclic groups and their modulo operations. To make the system safe, it uses a multiplicative prime-order group Z<sub>P</sub><sup>*</sup> where `p = 2*q + 1` and `q` are both prime numbers and `p` needs to be chosen very large.
 
 The following values are used within the system:
 
@@ -44,7 +46,7 @@ The following values are used within the system:
   - a prime number `q = (p - 1) / 2` (order of the group)
   - a group's generator `g`
 - `KeyPair`:
-  - a secret key `sk`
+  - a secret key `sk`: `0 < r < q`
   - a public key `h = g^sk mod p`
 - `Cipher`: formed of `a` and `b`
 
@@ -94,23 +96,27 @@ To convince a verifier that a prover knows some secret without revealing the act
 
 Such interactive proof systems can be made non-interactive by applying the Fiat-Shamir heuristic [2] by using a cryptographic hash function as a random oracle for computing the challenge of the verifier. According to [3], the Fiat-Shamir transformation is "weak" (e.g., under certain circumstances, a proof might be verified correctly even the initial commitment was tapered with) when only the commitment is hashed (as described in [4]). However, it is considered "strong" [3], if the statement to be proved is also hashed (as suggested in [5, 6]). Thus, this library hashes both the statement to be proved and the commitment when generating the challenge.
 
-The Fiat-Shamir transformation is applied to the Schnorr [7], Chaum Pederson [8], and Disjuntive Chaum-Pederson protocols as depicted in the following sections.
+The Fiat-Shamir transformation is applied to the Schnorr [7], Chaum Pedersen [8], and Disjuntive Chaum-Pedersen protocols as depicted in the following sections.
 
 #### Key Generation: Schnorr Proof
 
 After the (distributed) key generation as described above, the Schnorr Proof [9] is used to prove that a party knows the corresponding secret key `sk` to the published public key `h = g^sk`. It is a proof of knowledge of a discrete logarithm of `sk = log_g(g^sk)`.
 
-#### Decryption: Chaum-Pederson Proof
+#### Decryption: Chaum-Pedersen Proof
 
-The Chaum-Pederson Proof [8] is used for proving that the decryption (`m = a^sk` with cipher (`a`, `b`)) was done using the corresponding private key `sk` to the public key `h = g^sk` used for the encryption. It is a proof of discrete logarithm equality of `sk = log_g(g^sk) = log_a(b)`.
+The Chaum-Pedersen Proof [8] is used for proving that the decryption (`m = (a^sk)^-1 * b` with cipher (`a`, `b`)) was done using the corresponding private key `sk` to the public key `h = g^sk` used for the encryption. It is a proof of discrete logarithm equality of `log_g(g^sk) = log_h(h^r)`.
 
-#### Membership: Disjunctive Chaum-Pederson Proof
+#### Membership: Disjunctive Chaum-Pedersen Proof
 
-The Disjunctive Chaum-Pederson Proof is used for proving that one out of two statements is true without revealing which one is correct. Here, this proof is used to prove that an encrypted vote (0 or 1) is either 0 or 1 while not revealing the vote's actual value.
+The Disjunctive Chaum-Pedersen Proof is used for proving that one out of two statements is true without revealing which one is correct. Here, this proof is used to prove that an encrypted vote (0 or 1) is either 0 or 1 while not revealing the vote's actual value.
 
-## Elliptic Curve ElGamal (`src/ec-elgamal`)
+## Implementation
 
-**Important**: `src/ec-elgamal` uses the **curve25519** in Weierstrass form, which is not yet supported by the `elliptic` package. Since the required pull request has not been merged yet, this curve is manually added to the elliptic library.
+The respective implementations of the homomorphic ElGamal cryptosystem using distributed keys and non-interactive zero-knowledge proofs of knowledge can be found here: [Finite Fields](src/ff-elgamal) and [Elliptic Curves](src/ec-elgamal)
+
+**Important for the Elliptic Curve Implementation**:
+
+`src/ec-elgamal` uses the **curve25519** in Weierstrass form, which is not yet supported by the `elliptic` package used in this project to operate on elliptic curves. Since the required pull request has not been merged yet, this curve is manually added to the elliptic library.
 
 This is done via the script `copyCustomCurve.sh`. **You should not have to run this manually**.
 
