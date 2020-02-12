@@ -83,7 +83,7 @@ The encrypted message is created as before (see 1). Due to 2, encrypted messages
 
 As shown above, the library can be used with a single key pair `(sk, h)`. To use the system with not only one but multiple parties (each party `i` having its own key pair `(sk_i, h_i)`), the key generation and decryption algorithms need to be adjusted. The encryption step however stays the same.
 
-This library uses a setting where `n` out of `n` keys need to be present for decrypting a cipher [11]. To create a key pair, each party `1 <= i <= n` individually picks a secret key and generates the public key as shown before (see 1). All the public keys are then combined to one public key used for encryption (see 2). To decrypt a cipher, two steps are needed. First, each party uses its private key `sk_i` to create a decrypted share `d_i` (see 3). Then, these shares are combined to get the plaintext `m` (see 4).
+This library uses a setting where `n` out of `n` keys need to be present for decrypting a cipher [8]. To create a key pair, each party `1 <= i <= n` individually picks a secret key and generates the public key as shown before (see 1). All the public keys are then combined to one public key used for encryption (see 2). To decrypt a cipher, two steps are needed. First, each party uses its private key `sk_i` to create a decrypted share `d_i` (see 3). Then, these shares are combined to get the plaintext `m` (see 4).
 
 1. `(sk_i, h_i = g^sk_i mod p)`
 2. `h = h_1 * ... * h_i * ... * h_n mod p`
@@ -96,15 +96,15 @@ To convince a verifier that a prover knows some secret without revealing the act
 
 Such interactive proof systems can be made non-interactive by applying the Fiat-Shamir heuristic [2] by using a cryptographic hash function as a random oracle for computing the challenge of the verifier. According to [3], the Fiat-Shamir transformation is "weak" (e.g., under certain circumstances, a proof might be verified correctly even the initial commitment was tapered with) when only the commitment is hashed (as described in [4]). However, it is considered "strong" [3], if the statement to be proved is also hashed (as suggested in [5, 6]). Thus, this library hashes both the statement to be proved and the commitment when generating the challenge.
 
-The Fiat-Shamir transformation is applied to the Schnorr [7], Chaum Pedersen [8], and Disjuntive Chaum-Pedersen protocols as depicted in the following sections.
+The Fiat-Shamir transformation is applied to the Schnorr [5], Chaum Pedersen [6], and Disjuntive Chaum-Pedersen protocols as depicted in the following sections.
 
 #### Key Generation: Schnorr Proof
 
-After the (distributed) key generation as described above, the Schnorr Proof [9] is used to prove that a party knows the corresponding secret key `sk` to the published public key `h = g^sk`. It is a proof of knowledge of a discrete logarithm of `sk = log_g(g^sk)`.
+After the (distributed) key generation as described above, the Schnorr Proof [7] is used to prove that a party knows the corresponding secret key `sk` to the published public key `h = g^sk`. It is a proof of knowledge of a discrete logarithm of `sk = log_g(g^sk)`.
 
 #### Decryption: Chaum-Pedersen Proof
 
-The Chaum-Pedersen Proof [8] is used for proving that the decryption (`m = (a^sk)^-1 * b` with cipher (`a`, `b`)) was done using the corresponding private key `sk` to the public key `h = g^sk` used for the encryption. It is a proof of discrete logarithm equality of `log_g(g^sk) = log_h(h^r)`.
+The Chaum-Pedersen Proof [6] is used for proving that the decryption (`m = (a^sk)^-1 * b` with cipher (`a`, `b`)) was done using the corresponding private key `sk` to the public key `h = g^sk` used for the encryption. It is a proof of discrete logarithm equality of `log_g(g^sk) = log_h(h^r)`.
 
 #### Membership: Disjunctive Chaum-Pedersen Proof
 
@@ -168,19 +168,13 @@ By default, GitHub Packages publishes a package in the GitHub repository you spe
 
 [4] Mihir Bellare, Phillip Rogaway: **Random Oracles are Practical: A Paradigm for Designing Efficient Protocols.** ACM Conference on Computer and Communications Security 1993: 62-73 - [PDF](https://cseweb.ucsd.edu/~mihir/papers/ro.pdf), [dblp](    https://dblp.org/rec/conf/ccs/BellareR93)
 
-[5] Pierre-Alain Fouque, David Pointcheval: **Threshold Cryptosystems Secure against Chosen-Ciphertext Attacks.** ASIACRYPT 2001: 351-368 - [PDF](https://www.iacr.org/archive/asiacrypt2001/22480353.pdf), [dblp](https://dblp.org/rec/conf/asiacrypt/FouqueP01)
+[5] Claus-Peter Schnorr: **Efficient Signature Generation by Smart Cards.** J. Cryptology 4(3): 161-174 (1991) - [PDF](https://www.researchgate.net/profile/Claus_Schnorr/publication/227088517_Efficient_signature_generation_by_smart_cards/links/0046353849579ce09c000000/Efficient-signature-generation-by-smart-cards.pdf), [dblp](ttps://dblp.org/rec/journals/joc/Schnorr91)
 
-[6] Jens Groth: **Evaluating Security of Voting Schemes in the Universal Composability Framework.** ACNS 2004: 46-60 - [PDF](http://www0.cs.ucl.ac.uk/staff/J.Groth/VotingSecurityFull.pdf), [dblp](https://dblp.org/rec/conf/acns/Groth04)
+[6] David Chaum, Torben P. Pedersen: **Wallet Databases with Observers.** CRYPTO 1992: 89-105 - [PDF](https://www.chaum.com/publications/Wallet_Databases.pdf), [dblp](https://dblp.org/rec/conf/crypto/ChaumP92)
 
-[7] Claus-Peter Schnorr: **Efficient Signature Generation by Smart Cards.** J. Cryptology 4(3): 161-174 (1991) - [PDF](https://www.researchgate.net/profile/Claus_Schnorr/publication/227088517_Efficient_signature_generation_by_smart_cards/links/0046353849579ce09c000000/Efficient-signature-generation-by-smart-cards.pdf), [dblp](ttps://dblp.org/rec/journals/joc/Schnorr91)
+[7] Feng Hao: **Schnorr Non-interactive Zero-Knowledge Proof.** RFC 8235: 1-13 (2017) - [RFC](https://tools.ietf.org/html/rfc8235), [PDF](https://tools.ietf.org/pdf/rfc8235.pdf), [dblp](https://dblp.org/rec/journals/rfc/rfc8235)
 
-[8] David Chaum, Torben P. Pedersen: **Wallet Databases with Observers.** CRYPTO 1992: 89-105 - [PDF](https://www.chaum.com/publications/Wallet_Databases.pdf), [dblp](https://dblp.org/rec/conf/crypto/ChaumP92)
-
-[9] Feng Hao: **Schnorr Non-interactive Zero-Knowledge Proof.** RFC 8235: 1-13 (2017) - [RFC](https://tools.ietf.org/html/rfc8235), [PDF](https://tools.ietf.org/pdf/rfc8235.pdf), [dblp](https://dblp.org/rec/journals/rfc/rfc8235)
-
-[10] David Pointcheval, Jacques Stern: **Security Arguments for Digital Signatures and Blind Signatures.** J. Cryptology 13(3): 361-396 (2000) - [PDF](https://www.di.ens.fr/david.pointcheval/Documents/Papers/2000_joc.pdf), [dblp](https://dblp.org/rec/journals/joc/PointchevalS00)
-
-[11] David Bernhard, Bogdan Warinschi: **Cryptographic Voting - A Gentle Introduction.** IACR Cryptology ePrint Archive 2016: 765 (2016) - [PDF](https://eprint.iacr.org/2016/765.pdf), [dblp](https://dblp.org/rec/journals/iacr/BernhardW16)
+[8] David Bernhard, Bogdan Warinschi: **Cryptographic Voting - A Gentle Introduction.** IACR Cryptology ePrint Archive 2016: 765 (2016) - [PDF](https://eprint.iacr.org/2016/765.pdf), [dblp](https://dblp.org/rec/journals/iacr/BernhardW16)
 
 ## Authors
 
