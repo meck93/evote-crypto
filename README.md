@@ -181,3 +181,13 @@ By default, GitHub Packages publishes a package in the GitHub repository you spe
 [10] David Pointcheval, Jacques Stern: **Security Arguments for Digital Signatures and Blind Signatures.** J. Cryptology 13(3): 361-396 (2000) - [PDF](https://www.di.ens.fr/david.pointcheval/Documents/Papers/2000_joc.pdf), [dblp](https://dblp.org/rec/journals/joc/PointchevalS00)
 
 [11] David Bernhard, Bogdan Warinschi: **Cryptographic Voting - A Gentle Introduction.** IACR Cryptology ePrint Archive 2016: 765 (2016) - [PDF](https://eprint.iacr.org/2016/765.pdf), [dblp](https://dblp.org/rec/journals/iacr/BernhardW16)
+
+## Authors
+
+- **Moritz Eck** - [meck93](https://github.com/meck93)
+- **Alex Scheitlin** - [alexscheitlin](https://github.com/alexscheitlin)
+- **Nik Zaugg** - [nikzaugg](https://github.com/nikzaugg)
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
