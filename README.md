@@ -31,7 +31,7 @@ The library is divided into two parts: [Finite Fields](src/ff-elgamal) and [Elli
   - `Membership`: Proof of membership of a vote (0 or 1)
   - `Decryption`: Proof of correct decryption of the sum
 
-TODO: link to final report for detailed introduction
+If you'd like to have a more detailed explanation of the cryptography (encryption & proofs) used in this library (project), please have a look at our [report](report.pdf).
 
 ## Cryptographic Building Blocks [1]
 
