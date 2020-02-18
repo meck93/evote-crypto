@@ -1,6 +1,6 @@
 {
   "name": "@meck93/evote-crypto",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "",
   "repository": {
     "type": "git",
@@ -26,7 +26,7 @@
     "ts-mocha": "./node_modules/.bin/ts-mocha",
     "ts-node": "./node_modules/.bin/ts-node",
     "tsc": "./node_modules/.bin/tsc",
-    "preversion": "build"
+    "preversion": "npm run build"
   },
   "license": "MIT",
   "bundledDependencies": [
@@ -36,30 +36,30 @@
     "bn.js": "^5.1.1",
     "elliptic": "6.5.2",
     "hash.js": "^1.1.7",
-    "random": "^2.1.1",
+    "random": "^2.2.0",
     "web3": "^1.2.6"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.9",
+    "@types/chai": "^4.2.11",
     "@types/elliptic": "^6.4.12",
-    "@types/mocha": "^7.0.1",
-    "@typescript-eslint/eslint-plugin": "^2.19.2",
-    "@typescript-eslint/parser": "^2.19.2",
+    "@types/mocha": "^7.0.2",
+    "@typescript-eslint/eslint-plugin": "^2.27.0",
+    "@typescript-eslint/parser": "^2.27.0",
     "chai": "^4.2.0",
     "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.10.0",
+    "eslint-config-prettier": "^6.10.1",
     "eslint-import-resolver-typescript": "^2.0.0",
-    "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-json": "^2.0.1",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-json": "^2.1.1",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.2",
-    "lint-staged": "^10.0.7",
-    "mocha": "^6.2.2",
-    "nyc": "^15.0.0",
-    "prettier": "^1.19.1",
-    "ts-mocha": "^6.0.0",
-    "ts-node": "^8.6.2",
-    "typescript": "^3.7.5"
+    "lint-staged": "^10.1.2",
+    "mocha": "^6.2.3",
+    "nyc": "^15.0.1",
+    "prettier": "^2.0.4",
+    "ts-mocha": "^7.0.0",
+    "ts-node": "^8.8.2",
+    "typescript": "^3.8.3"
   },
   "nyc": {
     "extension": [
