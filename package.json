@@ -26,7 +26,7 @@
     "ts-mocha": "./node_modules/.bin/ts-mocha",
     "ts-node": "./node_modules/.bin/ts-node",
     "tsc": "./node_modules/.bin/tsc",
-    "preversion": "build"
+    "preversion": "npm run build"
   },
   "license": "MIT",
   "bundledDependencies": [
