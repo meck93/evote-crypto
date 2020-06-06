@@ -33,33 +33,33 @@
     "elliptic"
   ],
   "dependencies": {
-    "bn.js": "^5.1.1",
+    "bn.js": "^5.1.2",
     "elliptic": "6.5.2",
     "hash.js": "^1.1.7",
     "random": "^2.2.0",
-    "web3": "^1.2.6"
+    "web3": "^1.2.8"
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
     "@types/elliptic": "^6.4.12",
     "@types/mocha": "^7.0.2",
-    "@typescript-eslint/eslint-plugin": "^2.27.0",
-    "@typescript-eslint/parser": "^2.27.0",
+    "@typescript-eslint/eslint-plugin": "^3.1.0",
+    "@typescript-eslint/parser": "^3.1.0",
     "chai": "^4.2.0",
-    "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.10.1",
+    "eslint": "^7.2.0",
+    "eslint-config-prettier": "^6.11.0",
     "eslint-import-resolver-typescript": "^2.0.0",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-json": "^2.1.1",
     "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-prettier": "^3.1.2",
-    "lint-staged": "^10.1.2",
-    "mocha": "^6.2.3",
-    "nyc": "^15.0.1",
-    "prettier": "^2.0.4",
+    "eslint-plugin-prettier": "^3.1.3",
+    "lint-staged": "^10.2.9",
+    "mocha": "^7.2.0",
+    "nyc": "^15.1.0",
+    "prettier": "^2.0.5",
     "ts-mocha": "^7.0.0",
-    "ts-node": "^8.8.2",
-    "typescript": "^3.8.3"
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.5"
   },
   "nyc": {
     "extension": [
