@@ -34,7 +34,7 @@
   ],
   "dependencies": {
     "bn.js": "^5.1.2",
-    "elliptic": "6.5.2",
+    "elliptic": "6.5.3",
     "hash.js": "^1.1.7",
     "random": "^2.2.0",
     "web3": "^1.2.8"
