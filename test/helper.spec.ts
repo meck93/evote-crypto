@@ -12,20 +12,24 @@ describe('Global Helper Test', () => {
 
   it('should invert BNs', () => {
     const base = 10
-    const modulus = 4
+
+    // with moving to reduction context, only odd modulus >3 are valid
+    // see here: https://github.com/indutny/bn.js/issues/193#issuecomment-471473625
+    // should be no problem -> all primes are odd anyway
+    const modulus = 7
 
     // inverse a mod modulus = c
     const tests = [
-      { a: 0, c: 0 }, // none
+      { a: 0, c: 0 },
       { a: 1, c: 1 },
-      { a: 2, c: 1 }, // none
-      { a: 3, c: 3 },
-      { a: 4, c: 0 }, // none
-      { a: 5, c: 1 },
-      { a: 6, c: 1 }, // none
-      { a: 7, c: 3 },
-      { a: 8, c: 0 }, // none
-      { a: 9, c: 1 },
+      { a: 2, c: 4 },
+      { a: 3, c: 5 },
+      { a: 4, c: 2 },
+      { a: 5, c: 3 },
+      { a: 6, c: 6 },
+      { a: 7, c: 0 },
+      { a: 8, c: 1 },
+      { a: 9, c: 4 },
     ]
 
     for (const test of tests) {
@@ -34,7 +38,8 @@ describe('Global Helper Test', () => {
       const result = GlobalHelper.invmBN(a, new BN(modulus, base))
 
       const log = false
-      log && console.log('a:', a.toNumber(), ', c:', c.toNumber(), 'res:', result.toNumber())
+      log &&
+        console.log(`a invMod modulus: ${a} mod 4`, ', c:', c.toNumber(), 'res:', result.toNumber())
       expect(result.eq(c)).to.be.true
     }
   })
@@ -188,29 +193,26 @@ describe('Global Helper Test', () => {
 
   it('should divide BNs', () => {
     const base = 10
-    const modulus = 4
+    const modulus = 7
 
     // a / b = c
     const tests = [
       { a: 0, b: 0, c: 0 }, // none
-
       { a: 1, b: 0, c: 0 }, // none
       { a: 1, b: 1, c: 1 },
-
       { a: 2, b: 0, c: 0 }, // none
       { a: 2, b: 1, c: 2 },
-      { a: 2, b: 2, c: 2 },
-
+      { a: 2, b: 2, c: 1 },
       { a: 3, b: 0, c: 0 }, // none
       { a: 3, b: 1, c: 3 },
-      { a: 3, b: 2, c: 3 },
+      { a: 3, b: 2, c: 5 },
       { a: 3, b: 3, c: 1 },
-
-      { a: 4, b: 0, c: 0 }, // none
-      { a: 4, b: 1, c: 0 }, // none
-      { a: 4, b: 2, c: 0 }, // none
-      { a: 4, b: 3, c: 0 }, // none
-      { a: 4, b: 4, c: 0 }, // none
+      { a: 4, b: 0, c: 0 },
+      { a: 4, b: 1, c: 4 },
+      { a: 4, b: 2, c: 2 },
+      { a: 4, b: 3, c: 6 },
+      { a: 4, b: 4, c: 1 },
+      { a: 8, b: 7, c: 0 },
     ]
 
     for (const test of tests) {
@@ -332,7 +334,7 @@ describe('Global Helper Test', () => {
   // a very long time to execute.
   const filterOutliers = (array: number[]): number[] => {
     const arrMean = mean(array)
-    return array.filter(value => value / arrMean < 50)
+    return array.filter((value) => value / arrMean < 50)
   }
 
   const safeEqualityCheck = (a: Buffer, b: Buffer, equalInputs: boolean): number => {
