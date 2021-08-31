@@ -11,8 +11,7 @@ describe('ElGamal Finite Field NIZKP for Key Generation', () => {
 
       // generate the public and private key share: H_, SK_
       const share: FFelGamal.KeyPair = FFelGamal.SystemSetup.generateKeyPair(sp)
-
-      expect(share.h).to.eql(sp.g.pow(share.sk).mod(sp.p))
+      expect(share.h.eq(sp.g.pow(share.sk).mod(sp.p))).to.be.true
 
       log && console.log('Key Parts')
       log && console.log('h:\t', share.h.toString())

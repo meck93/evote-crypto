@@ -72,8 +72,8 @@ describe('ElGamal Finite Field E2E Test', () => {
         )
 
       expect(decryptedSum.toNumber()).to.equal(_result)
-      expect(summary.yes).to.equal(_votes.filter(v => v === 1).length)
-      expect(summary.no).to.equal(_votes.filter(v => v === 0).length)
+      expect(summary.yes).to.equal(_votes.filter((v) => v === 1).length)
+      expect(summary.no).to.equal(_votes.filter((v) => v === 0).length)
     }
 
     // voters: 3

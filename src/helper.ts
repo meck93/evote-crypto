@@ -1,13 +1,41 @@
 import BN = require('bn.js')
 import crypto = require('crypto')
+import { GlobalHelper } from '.'
 
 export const newBN = (n: number, base = 10): BN => new BN(n, base)
-export const invmBN = (a: BN, modulus: BN): BN => a.invm(modulus)
-export const addBN = (a: BN, b: BN, modulus: BN): BN => a.add(b).mod(modulus)
-export const subBN = (a: BN, b: BN, modulus: BN): BN => a.sub(b).mod(modulus)
-export const mulBN = (a: BN, b: BN, modulus: BN): BN => a.mul(b).mod(modulus)
-export const divBN = (a: BN, b: BN, modulus: BN): BN => mulBN(a, invmBN(b, modulus), modulus)
-export const powBN = (a: BN, b: BN, modulus: BN): BN => a.pow(b).mod(modulus)
+export const invmBN = (a: BN, modulus: BN): BN => {
+  const reductionCtx = BN.red(modulus)
+  return a.toRed(reductionCtx).redInvm().fromRed()
+}
+export const addBN = (a: BN, b: BN, modulus: BN): BN => {
+  const reductionCtx = BN.red(modulus)
+  const aRed = a.toRed(reductionCtx)
+  const bRed = b.toRed(reductionCtx)
+  return aRed.redAdd(bRed).fromRed()
+}
+export const subBN = (a: BN, b: BN, modulus: BN): BN => {
+  const reductionCtx = BN.red(modulus)
+  const aRed = a.toRed(reductionCtx)
+  const bRed = b.toRed(reductionCtx)
+  return aRed.redSub(bRed).fromRed()
+}
+export const mulBN = (a: BN, b: BN, modulus: BN): BN => {
+  const reductionCtx = BN.red(modulus)
+  const aRed = a.toRed(reductionCtx)
+  const bRed = b.toRed(reductionCtx)
+  return aRed.redMul(bRed).fromRed()
+}
+export const divBN = (a: BN, b: BN, modulus: BN): BN => {
+  const reductionCtx = BN.red(modulus)
+  const aRed = a.toRed(reductionCtx)
+  const bRed = b.toRed(reductionCtx)
+  return bRed.redInvm().redMul(aRed).fromRed()
+}
+export const powBN = (a: BN, b: BN, modulus: BN): BN => {
+  const reductionCtx = BN.red(modulus)
+  const baseRed = a.toRed(reductionCtx)
+  return baseRed.redPow(b).fromRed()
+}
 
 // compute the required number of bytes to store a decimal
 export const getByteSizeForDecimalNumber = (n: BN): BN => {
@@ -19,17 +47,21 @@ export const getByteSizeForDecimalNumber = (n: BN): BN => {
 
 // get a secure random value x: 0 < x < n
 export const getSecureRandomValue = (n: BN): BN => {
-  const ONE: BN = new BN(1, 10)
-  const UPPER_BOUND_RANDOM: BN = n.sub(ONE)
-  const BYTE_SIZE: BN = getByteSizeForDecimalNumber(n)
+  const ONE: BN = GlobalHelper.newBN(1, 10)
+  const NODE_RAND_UPPER_LIMIT: BN = GlobalHelper.newBN(4294967295 * 8, 10)
+  const UPPER_BOUND_RANDOM: BN = n.sub(ONE).gt(NODE_RAND_UPPER_LIMIT)
+    ? NODE_RAND_UPPER_LIMIT
+    : n.sub(ONE)
+  const BYTE_SIZE: BN = getByteSizeForDecimalNumber(UPPER_BOUND_RANDOM)
 
   let byteSize: number
   try {
     byteSize = BYTE_SIZE.toNumber()
+    byteSize = byteSize > 32 ? 4 : byteSize
   } catch {
     // https://www.ecma-international.org/ecma-262/5.1/#sec-8.5
     // used for large numbers from EC
-    byteSize = 32
+    byteSize = 4
   }
 
   let randomBytes: Buffer = crypto.randomBytes(byteSize)
@@ -73,7 +105,7 @@ export const timingSafeEqualBN = (a: BN, b: BN): boolean => {
   if (!BN.isBN(b)) {
     throw new TypeError('Second argument must be of type: BN')
   }
-  const a_ = new Buffer(a.toArray())
-  const b_ = new Buffer(b.toArray())
+  const a_ = Buffer.from(a.toArray())
+  const b_ = Buffer.from(b.toArray())
   return timingSafeEqual(a_, b_)
 }
